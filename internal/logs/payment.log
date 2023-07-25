@@ -1,0 +1,2 @@
+{"level":"info","fileLogging":true,"jsonLogOutput":true,"logDirectory":"/home/ibanrama/Documents/Developments/golang/dev/src/DueIt-Spending-Sevice/internal/logs","fileName":"spending.log","maxSizeMB":200000000,"maxBackups":2000,"maxAgeInDays":2000,"time":"2023-07-08T13:47:07+07:00","message":"logging configured"}
+{"level":"info","time":"2023-07-08T13:47:07+07:00","message":"postgres started on dbname : jasanya"}
