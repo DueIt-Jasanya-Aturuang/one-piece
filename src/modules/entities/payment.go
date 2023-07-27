@@ -5,7 +5,7 @@ import "database/sql"
 type Payment struct {
 	Id          string         `json:"id"`
 	Name        string         `json:"name"`
-	Description string         `json:"description"`
+	Description sql.NullString `json:"description"`
 	Image       string         `json:"image"`
 	CreatedAt   int64          `json:"created_at"`
 	CreatedBy   string         `json:"created_by"`
