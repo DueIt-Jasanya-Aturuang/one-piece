@@ -3,6 +3,7 @@ package converterentity
 import (
 	"time"
 
+	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/config"
 	sqlHelper "github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/utils/sql-helper"
 	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/dto"
 	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/entities"
@@ -13,7 +14,7 @@ func (convert *ConvertImpl) CreatePaymentToEntity(Id string) entities.Payment {
 		Id:          Id,
 		Name:        convert.PaymentEntity.Id,
 		Description: sqlHelper.NewNullString(convert.PaymentCreateRequest.Description),
-		Image:       convert.PaymentEntity.Image,
+		Image:       config.Get().Default.DefaultImage,
 		CreatedAt:   time.Now().Unix(),
 		CreatedBy:   Id,
 		UpdatedAt:   time.Now().Unix(),
