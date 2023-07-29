@@ -13,9 +13,10 @@ import (
 )
 
 type PaymentService interface {
-	CreatePayment(ctx context.Context, userId string) (*entities.Payment, error)
+	CreatePayment(ctx context.Context) (*entities.Payment, error)
 	UpdatePayment(ctx context.Context, req *dto.PaymentUpdateRequest) (*dto.PaymentResponse, error)
-	GetPaymentById(ctx context.Context, Id string) (*dto.PaymentResponse, error)
+	GetPaymentById(ctx context.Context, id string) (*dto.PaymentResponse, error)
+	GetPaymentByName(ctx context.Context, name string) (*dto.PaymentResponse, error)
 }
 
 type PaymentServiceImpl struct {

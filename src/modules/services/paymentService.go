@@ -7,7 +7,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/entities"
 )
 
-func (service *PaymentServiceImpl) CreatePayment(ctx context.Context, Id string) (*entities.Payment, error) {
+func (service *PaymentServiceImpl) CreatePayment(ctx context.Context) (*entities.Payment, error) {
 	return nil, nil
 }
 
@@ -15,6 +15,10 @@ func (service *PaymentServiceImpl) UpdatePayment(ctx context.Context, req *dto.P
 	return nil, nil
 }
 
-func (service *PaymentServiceImpl) GetPaymentById(ctx context.Context, Id string) (*dto.PaymentResponse, error) {
+func (service *PaymentServiceImpl) GetPaymentById(ctx context.Context, id string) (*dto.PaymentResponse, error) {
+	return nil, nil
+}
+
+func (service *PaymentServiceImpl) GetPaymentByName(ctx context.Context, name string) (*dto.PaymentResponse, error) {
 	return nil, nil
 }

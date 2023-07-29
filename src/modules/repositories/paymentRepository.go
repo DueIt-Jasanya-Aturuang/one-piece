@@ -11,6 +11,7 @@ type PaymentRepository interface {
 	CreatePayment(ctx context.Context, tx *sql.Tx, entity entities.Payment) (*entities.Payment, error)
 	UpdatePayment(ctx context.Context, tx *sql.Tx, entity entities.Payment) (*entities.Payment, error)
 	GetPaymentById(ctx context.Context, db *sql.DB, id string) (*entities.Payment, error)
+	GetPaymentByName(ctx context.Context, db *sql.DB, name string) (*entities.Payment, error)
 }
 
 type PaymentRepositoryImpl struct{}
@@ -55,6 +56,38 @@ func (repo *PaymentRepositoryImpl) GetPaymentById(ctx context.Context, db *sql.D
 	}
 
 	SQL := "SELECT id, name, description, image, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM m_payment_methods WHERE id = $1 LIMIT 1"
+	row, err := db.QueryContext(ctx, SQL, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if !row.Next() {
+		return nil, nil
+	}
+
+	var payment entities.Payment
+
+	row.Scan(
+		&payment.Id,
+		&payment.Name,
+		&payment.Description,
+		&payment.CreatedAt,
+		&payment.CreatedBy,
+		&payment.UpdatedAt,
+		&payment.UpdatedBy,
+		&payment.DeletedAt,
+		&payment.DeletedBy,
+	)
+	return &payment, nil
+}
+
+func (repo *PaymentRepositoryImpl) GetPaymentByName(ctx context.Context, db *sql.DB, id string) (*entities.Payment, error) {
+	_, err := db.Exec(`set search_path='dueit'`)
+	if err != nil {
+		return nil, err
+	}
+
+	SQL := "SELECT id, name, description, image, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM m_payment_methods WHERE name = $1 LIMIT 1"
 	row, err := db.QueryContext(ctx, SQL, id)
 	if err != nil {
 		return nil, err
