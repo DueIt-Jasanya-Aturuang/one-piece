@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/services"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -23,18 +22,31 @@ func MsgForTag(tag, param string) string {
 	return ""
 }
 
-func MustUnique(field validator.FieldLevel, ctx context.Context, db *sql.DB, service *services.PaymentServiceImpl) bool {
+func MustUnique(field validator.FieldLevel) bool {
 	value, ok := field.Field().Interface().(string)
 	if ok {
-		payment, err := service.PaymentRepository.GetPaymentByName(ctx, db, value)
-		if err != nil {
+		ctx := context.Background()
+		db := &sql.DB{}
+		payment := GetPaymentByName(ctx, db, value)
+
+		if payment {
 			return false
 		}
-
-		if payment != nil {
-			return false
-		}
-
 	}
+	return true
+}
+
+func GetPaymentByName(ctx context.Context, db *sql.DB, name string) bool {
+	_, err := db.Exec(`set search_path='dueit'`)
+	if err != nil {
+		return false
+	}
+
+	SQL := "SELECT id, name, description, image, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM m_payment_methods WHERE name = $1 LIMIT 1"
+	_, err = db.QueryContext(ctx, SQL, name)
+	if err != nil {
+		return false
+	}
+
 	return true
 }
