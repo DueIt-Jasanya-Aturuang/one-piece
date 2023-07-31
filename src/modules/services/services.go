@@ -14,8 +14,7 @@ import (
 
 type PaymentService interface {
 	CreatePayment(ctx context.Context, req *dto.PaymentCreateRequest) (*entities.Payment, error)
-	UpdatePayment(ctx context.Context, req *dto.PaymentUpdateRequest) (*dto.PaymentResponse, error)
-	GetPaymentById(ctx context.Context, id string) (*dto.PaymentResponse, error)
+	UpdatePayment(ctx context.Context, req *dto.PaymentUpdateRequest, id string) (*dto.PaymentResponse, error)
 	GetPaymentByName(ctx context.Context, name string) (*dto.PaymentResponse, error)
 }
 

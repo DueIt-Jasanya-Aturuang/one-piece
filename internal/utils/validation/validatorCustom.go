@@ -43,10 +43,14 @@ func GetPaymentByName(ctx context.Context, db *sql.DB, name string) bool {
 	}
 
 	SQL := "SELECT id, name, description, image, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM m_payment_methods WHERE name = $1 LIMIT 1"
-	_, err = db.QueryContext(ctx, SQL, name)
+	row, err := db.QueryContext(ctx, SQL, name)
 	if err != nil {
 		return false
 	}
 
-	return true
+	if !row.Next() {
+		return true
+	}
+
+	return false
 }
