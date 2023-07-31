@@ -12,6 +12,7 @@ type PaymentRepository interface {
 	UpdatePayment(ctx context.Context, tx *sql.Tx, entity entities.Payment) (*entities.Payment, error)
 	GetPaymentById(ctx context.Context, db *sql.DB, id string) (*entities.Payment, error)
 	GetPaymentByName(ctx context.Context, db *sql.DB, name string) (*entities.Payment, error)
+	DeletePayment(ctx context.Context, tx *sql.Tx, id string) (bool, error)
 }
 
 type PaymentRepositoryImpl struct{}
@@ -111,4 +112,19 @@ func (repo *PaymentRepositoryImpl) GetPaymentByName(ctx context.Context, db *sql
 		&payment.DeletedBy,
 	)
 	return &payment, nil
+}
+func (repo *PaymentRepositoryImpl) DeletePayment(ctx context.Context, tx *sql.Tx, id string) (bool, error) {
+	_, err := tx.Exec(`set search_path='dueit'`)
+	if err != nil {
+		return false, err
+	}
+
+	SQL := "delete from category where id = ?"
+	_, err = tx.ExecContext(ctx, SQL, id)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

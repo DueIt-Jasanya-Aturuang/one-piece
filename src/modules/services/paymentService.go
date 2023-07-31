@@ -132,3 +132,7 @@ func (service *PaymentServiceImpl) UpdatePayment(ctx context.Context, req *dto.P
 func (service *PaymentServiceImpl) GetPaymentByName(ctx context.Context, name string) (*dto.PaymentResponse, error) {
 	return nil, nil
 }
+
+func (service *PaymentServiceImpl) DeletePayment(ctx context.Context, name string) (bool, error) {
+	return false, nil
+}
