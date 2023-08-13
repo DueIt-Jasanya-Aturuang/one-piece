@@ -30,4 +30,15 @@ type Config struct {
 			Name string `mapstructure:"NAME"`
 		} `mapstructure:"POSTGRESQL"`
 	} `mapstructure:"DB"`
+
+	ThirdParty struct {
+		Minio struct {
+			AccessKey string `mapstructure:"ACCESSKEY"`
+			SecretKey string `mapstructure:"SECRETKEY"`
+			Endpoint  string `mapstructure:"ENDPOINT"`
+			Port      int    `mapstructure:"PORT"`
+			Bucket    string `mapstructure:"BUCKET"`
+			SSL       bool   `mapstructure:"SSL"`
+		} `mapstructure:"MINIO"`
+	} `mapstructure:"THIRD_PARTY"`
 }
