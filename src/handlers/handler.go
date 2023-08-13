@@ -17,5 +17,9 @@ func NewHttpHandler(
 	}
 }
 
-func (hand *HttpHandlerImpl) HandlerRouter(app *fiber.App) {
+func (handler *HttpHandlerImpl) HandlerRouter(app *fiber.App) {
+	app.Route("/payment", func(router fiber.Router) {
+		router.Post("/", handler.CreatePayment)
+		router.Put("/:id", handler.UpdatePayment)
+	})
 }
