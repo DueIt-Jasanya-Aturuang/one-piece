@@ -1,4 +1,4 @@
-module github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service
+module github.com/DueIt-Jasanya-Aturuang/one-piece
 
 go 1.20
 

@@ -3,9 +3,9 @@ package converterentity
 import (
 	"time"
 
-	sqlHelper "github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/utils/sql-helper"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/dto"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/entities"
+	sqlHelper "github.com/DueIt-Jasanya-Aturuang/one-piece/internal/utils/sql-helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/dto"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/entities"
 )
 
 func (convert *ConvertImpl) CreatePaymentToEntity(id string) entities.Payment {

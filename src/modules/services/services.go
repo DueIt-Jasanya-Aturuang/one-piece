@@ -3,12 +3,12 @@ package services
 import (
 	"context"
 
-	dbimpl "github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/infrastructures/db/dbImpl"
-	converterEntity "github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/helpers/converter-entity"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/helpers/minio"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/dto"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/entities"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/repositories"
+	dbimpl "github.com/DueIt-Jasanya-Aturuang/one-piece/infrastructures/db/dbImpl"
+	converterEntity "github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helpers/converter-entity"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helpers/minio"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/dto"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/entities"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/repositories"
 	"github.com/go-playground/validator/v10"
 )
 

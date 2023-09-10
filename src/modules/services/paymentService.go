@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/config"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/http-protocol/exception"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/utils/validation"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/dto"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/entities"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/config"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/http-protocol/exception"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/utils/validation"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/dto"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/entities"
 	satoriuuid "github.com/satori/go.uuid"
 )
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/config"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/config"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

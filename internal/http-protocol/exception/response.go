@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/utils/validation"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/utils/validation"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"

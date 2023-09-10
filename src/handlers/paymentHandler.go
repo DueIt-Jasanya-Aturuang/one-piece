@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/http-protocol/exception"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/dto"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/http-protocol/exception"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/dto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 )

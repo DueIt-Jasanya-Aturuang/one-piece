@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/config"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/config"
 	"github.com/minio/minio-go/v7"
 	"github.com/rs/zerolog/log"
 )

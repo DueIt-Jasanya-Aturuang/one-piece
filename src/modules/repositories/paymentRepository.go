@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/entities"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/entities"
 )
 
 type PaymentRepository interface {

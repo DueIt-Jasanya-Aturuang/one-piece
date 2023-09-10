@@ -3,8 +3,8 @@ package httpprotocol
 import (
 	"fmt"
 
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/config"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/handlers"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/config"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/handlers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/rs/zerolog/log"

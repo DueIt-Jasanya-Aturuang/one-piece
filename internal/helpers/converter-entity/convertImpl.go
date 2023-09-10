@@ -1,8 +1,8 @@
 package converterentity
 
 import (
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/dto"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/entities"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/dto"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/entities"
 )
 
 type ConvertImpl struct {

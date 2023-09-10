@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/services"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/src/modules/services"
 	"github.com/gofiber/fiber/v2"
 )
 
