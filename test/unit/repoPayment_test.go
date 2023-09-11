@@ -217,7 +217,7 @@ func TestRepoGetPaymentById(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentRes, err := paymentRepo.GetPaymentById(context.TODO(), payment.ID)
+		paymentRes, err := paymentRepo.GetPaymentByID(context.TODO(), payment.ID)
 		assert.NoError(t, err)
 		assert.NotNil(t, paymentRes)
 
@@ -235,7 +235,7 @@ func TestRepoGetPaymentById(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentResp, err := paymentRepo.GetPaymentById(context.TODO(), "nil")
+		paymentResp, err := paymentRepo.GetPaymentByID(context.TODO(), "nil")
 		assert.Error(t, err)
 		assert.Nil(t, paymentResp)
 		assert.Equal(t, sql.ErrNoRows, err)

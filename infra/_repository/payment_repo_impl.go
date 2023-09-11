@@ -96,7 +96,7 @@ func (p *PaymentRepositoryImpl) UpdatePayment(ctx context.Context, payment *doma
 	return nil
 }
 
-func (p *PaymentRepositoryImpl) GetPaymentById(ctx context.Context, id string) (*domain.Payment, error) {
+func (p *PaymentRepositoryImpl) GetPaymentByID(ctx context.Context, id string) (*domain.Payment, error) {
 	query := `SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
 			 FROM m_payment_methods WHERE id = $1`
