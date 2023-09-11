@@ -183,3 +183,57 @@ func (p *PaymentRepositoryImpl) GetPaymentByName(ctx context.Context, name strin
 
 	return &payment, nil
 }
+
+func (p *PaymentRepositoryImpl) GetAllPayment(ctx context.Context) (*[]domain.Payment, error) {
+	query := `SELECT id, name, description, image, created_at, created_by, 
+       				updated_at, updated_by, deleted_at, deleted_by 
+			 FROM m_payment_methods`
+
+	conn, err := p.GetConn()
+	if err != nil {
+		return nil, err
+	}
+
+	stmt, err := conn.PrepareContext(ctx, query)
+	if err != nil {
+		log.Warn().Msgf(util.LogErrPrepareContext, err)
+		return nil, err
+	}
+	defer func() {
+		if errClose := stmt.Close(); errClose != nil {
+			log.Warn().Msgf(util.LogErrPrepareContextClose, errClose)
+		}
+	}()
+
+	rows, err := stmt.QueryContext(ctx)
+	if err != nil {
+		log.Warn().Msgf(util.LogErrQueryRows, err)
+		return nil, err
+	}
+
+	var payments []domain.Payment
+	
+	for rows.Next() {
+		var payment domain.Payment
+
+		if err = rows.Scan(
+			&payment.ID,
+			&payment.Name,
+			&payment.Description,
+			&payment.Image,
+			&payment.CreatedAt,
+			&payment.CreatedBy,
+			&payment.UpdatedAt,
+			&payment.UpdatedBy,
+			&payment.DeletedAt,
+			&payment.DeletedBy,
+		); err != nil {
+			log.Warn().Msgf(util.LogErrQueryRowsScan, err)
+			return nil, err
+		}
+
+		payments = append(payments, payment)
+	}
+
+	return &payments, nil
+}

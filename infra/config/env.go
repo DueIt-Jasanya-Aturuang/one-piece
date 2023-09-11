@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -20,6 +21,17 @@ func EnvInit() {
 	PgDB = os.Getenv("POSTGRESQL_NAME")
 	PgSchema = os.Getenv("POSTGRESQL_SCHEMA")
 	PgSsl = os.Getenv("POSTGRESQL_SSL")
+
+	minioSslBool, err := strconv.ParseBool(os.Getenv("MINIO_SSL"))
+	if err != nil {
+		panic(err)
+	}
+	MinIoID = os.Getenv("MINIO_ID")
+	MinIoSecretKey = os.Getenv("MINIO_SECRETKEY")
+	MinIoEndpoint = os.Getenv("MINIO_ENDPOINT")
+	// MinIoPort = os.Getenv("MINIO_PORT")
+	MinIoBucket = os.Getenv("MINIO_BUCKET")
+	MinIoSSL = minioSslBool
 }
 
 var (
@@ -30,4 +42,12 @@ var (
 	PgDB     string
 	PgSchema string
 	PgSsl    string
+)
+
+var (
+	MinIoID        string
+	MinIoSecretKey string
+	MinIoEndpoint  string
+	MinIoBucket    string
+	MinIoSSL       bool
 )
