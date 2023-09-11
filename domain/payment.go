@@ -19,6 +19,7 @@ type Payment struct {
 	DeletedBy   sql.NullString
 }
 
+//counterfeiter:generate -o ./mocks . PaymentRepository
 type PaymentRepository interface {
 	CreatePayment(ctx context.Context, payment *Payment) error
 	UpdatePayment(ctx context.Context, payment *Payment) error

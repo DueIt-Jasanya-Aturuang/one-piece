@@ -59,7 +59,7 @@ func (p *PaymentUsecaseImpl) CreatePayment(
 
 		err = p.minioRepo.UploadFile(ctx, req.Image, fileName)
 
-		return err
+		return errors.New("asd")
 	})
 
 	if err != nil {
@@ -86,13 +86,13 @@ func (p *PaymentUsecaseImpl) UpdatePayment(
 		return nil, util.ErrHTTPString("payment tidak tersedia", 404)
 	}
 	if payment.Name != req.Name {
-		payment, err = p.paymentRepo.GetPaymentByName(ctx, req.ID)
+		paymentName, err := p.paymentRepo.GetPaymentByName(ctx, req.Name)
 		if err != nil {
 			if !errors.Is(err, sql.ErrNoRows) {
 				return nil, util.ErrHTTPString("", 500)
 			}
 		}
-		if payment != nil {
+		if paymentName != nil {
 			return nil, util.ErrHTTPString("nama payment sudah tersedia", 409)
 		}
 	}
@@ -102,7 +102,7 @@ func (p *PaymentUsecaseImpl) UpdatePayment(
 
 	if reqImageCondition {
 		fileExt := filepath.Ext(req.Image.Filename)
-		fileName = p.minioRepo.GenerateFileName(fileExt, "")
+		fileName = p.minioRepo.GenerateFileName(fileExt, "payment-images/public/")
 	}
 
 	paymentConv := converter.UpdatePaymentReqToModel(req, fileName)
@@ -146,7 +146,7 @@ func (p *PaymentUsecaseImpl) GetAllPayment(ctx context.Context) (*[]domain.Respo
 
 	payments, err := p.paymentRepo.GetAllPayment(ctx)
 	if err != nil {
-		return nil, err
+		return nil, util.ErrHTTPString("", 500)
 	}
 
 	var responses []domain.ResponsePayment
