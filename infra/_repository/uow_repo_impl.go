@@ -49,6 +49,8 @@ func (u *UnitOfWorkRepositoryImpl) CloseConn() {
 	err := u.conn.Close()
 	if err != nil {
 		log.Warn().Msgf(util.LogErrDBConnClose, err)
+	} else {
+		log.Info().Msgf("close connetion")
 	}
 }
 
@@ -74,6 +76,7 @@ func (u *UnitOfWorkRepositoryImpl) StartTx(ctx context.Context, opts *sql.TxOpti
 			return errRollback
 		}
 
+		log.Ctx(ctx).Info().Msgf(util.LogInfoRollback, err)
 		return err
 	}
 

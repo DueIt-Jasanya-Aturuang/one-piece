@@ -29,7 +29,7 @@ type PaymentUsecase interface {
 type PaymentRepository interface {
 	CreatePayment(ctx context.Context, payment *Payment) error
 	UpdatePayment(ctx context.Context, payment *Payment) error
-	GetPaymentById(ctx context.Context, id string) (*Payment, error)
+	GetPaymentByID(ctx context.Context, id string) (*Payment, error)
 	GetPaymentByName(ctx context.Context, name string) (*Payment, error)
 	UnitOfWorkRepository
 }

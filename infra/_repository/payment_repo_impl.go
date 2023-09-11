@@ -2,6 +2,8 @@ package _repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/rs/zerolog/log"
 
@@ -31,6 +33,7 @@ func (p *PaymentRepositoryImpl) CreatePayment(ctx context.Context, payment *doma
 
 	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
+		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return err
 	}
 	defer func() {
@@ -67,6 +70,7 @@ func (p *PaymentRepositoryImpl) UpdatePayment(ctx context.Context, payment *doma
 
 	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
+		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return err
 	}
 	defer func() {
@@ -92,12 +96,90 @@ func (p *PaymentRepositoryImpl) UpdatePayment(ctx context.Context, payment *doma
 	return nil
 }
 
-func (p *PaymentRepositoryImpl) GetPaymentById(ctx context.Context, id string) (*domain.Payment, error) {
-	// TODO implement me
-	panic("implement me")
+func (p *PaymentRepositoryImpl) GetPaymentByID(ctx context.Context, id string) (*domain.Payment, error) {
+	query := `SELECT id, name, description, image, created_at, created_by, 
+       				updated_at, updated_by, deleted_at, deleted_by 
+			 FROM m_payment_methods WHERE id = $1`
+
+	conn, err := p.GetConn()
+	if err != nil {
+		return nil, err
+	}
+
+	stmt, err := conn.PrepareContext(ctx, query)
+	if err != nil {
+		log.Warn().Msgf(util.LogErrPrepareContext, err)
+		return nil, err
+	}
+	defer func() {
+		if errClose := stmt.Close(); errClose != nil {
+			log.Warn().Msgf(util.LogErrPrepareContextClose, errClose)
+		}
+	}()
+
+	var payment domain.Payment
+
+	if err = stmt.QueryRowContext(ctx, id).Scan(
+		&payment.ID,
+		&payment.Name,
+		&payment.Description,
+		&payment.Image,
+		&payment.CreatedAt,
+		&payment.CreatedBy,
+		&payment.UpdatedAt,
+		&payment.UpdatedBy,
+		&payment.DeletedAt,
+		&payment.DeletedBy,
+	); err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
+		}
+		return nil, err
+	}
+
+	return &payment, nil
 }
 
 func (p *PaymentRepositoryImpl) GetPaymentByName(ctx context.Context, name string) (*domain.Payment, error) {
-	// TODO implement me
-	panic("implement me")
+	query := `SELECT id, name, description, image, created_at, created_by, 
+       				updated_at, updated_by, deleted_at, deleted_by 
+			 FROM m_payment_methods WHERE name = $1`
+
+	conn, err := p.GetConn()
+	if err != nil {
+		return nil, err
+	}
+
+	stmt, err := conn.PrepareContext(ctx, query)
+	if err != nil {
+		log.Warn().Msgf(util.LogErrPrepareContext, err)
+		return nil, err
+	}
+	defer func() {
+		if errClose := stmt.Close(); errClose != nil {
+			log.Warn().Msgf(util.LogErrPrepareContextClose, errClose)
+		}
+	}()
+
+	var payment domain.Payment
+
+	if err = stmt.QueryRowContext(ctx, name).Scan(
+		&payment.ID,
+		&payment.Name,
+		&payment.Description,
+		&payment.Image,
+		&payment.CreatedAt,
+		&payment.CreatedBy,
+		&payment.UpdatedAt,
+		&payment.UpdatedBy,
+		&payment.DeletedAt,
+		&payment.DeletedBy,
+	); err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
+		}
+		return nil, err
+	}
+
+	return &payment, nil
 }
