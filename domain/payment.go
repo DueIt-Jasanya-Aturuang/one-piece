@@ -19,37 +19,38 @@ type Payment struct {
 	DeletedBy   sql.NullString
 }
 
-type PaymentUsecase interface {
-	CreatePayment(ctx context.Context, req *RequestCreatePayment) (*ResponsePayment, error)
-	UpdatePayment(ctx context.Context, req *RequestUpdatePayment, id string) (*ResponsePayment, error)
-	GetPaymentByName(ctx context.Context, name string) (*ResponsePayment, error)
-	DeletePayment(ctx context.Context, id string) (bool, error)
-}
-
+//counterfeiter:generate -o ./mocks . PaymentRepository
 type PaymentRepository interface {
 	CreatePayment(ctx context.Context, payment *Payment) error
 	UpdatePayment(ctx context.Context, payment *Payment) error
+	GetAllPayment(ctx context.Context) (*[]Payment, error)
 	GetPaymentByID(ctx context.Context, id string) (*Payment, error)
 	GetPaymentByName(ctx context.Context, name string) (*Payment, error)
 	UnitOfWorkRepository
 }
 
+type PaymentUsecase interface {
+	CreatePayment(ctx context.Context, req *RequestCreatePayment) (*ResponsePayment, error)
+	UpdatePayment(ctx context.Context, req *RequestUpdatePayment) (*ResponsePayment, error)
+	GetAllPayment(ctx context.Context) (*[]ResponsePayment, error)
+}
+
 type RequestCreatePayment struct {
-	Id          string
-	Name        string                `json:"name" form:"name" validation:"required,min=3,max=32"`
-	Description string                `json:"description" form:"description"`
-	Image       *multipart.FileHeader `json:"image" form:"image" validation:"required"`
+	Name        string                `form:"name" validation:"required,min=3,max=32"`
+	Description string                `form:"description"`
+	Image       *multipart.FileHeader `form:"image" validation:"required"`
 }
 
 type RequestUpdatePayment struct {
-	Name        string                `json:"name" form:"name" validation:"required,min=3,max=32"`
-	Description string                `json:"description" form:"description"`
-	Image       *multipart.FileHeader `json:"image" form:"image" validation:"required"`
+	Name        string                `form:"name" validation:"required,min=3,max=32"`
+	Description string                `form:"description"`
+	Image       *multipart.FileHeader `form:"image" validation:"required"`
+	ID          string
 }
 
 type ResponsePayment struct {
-	Id          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description *string `json:"description"`
-	Image       string  `json:"image"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
 }

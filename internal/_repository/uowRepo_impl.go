@@ -85,6 +85,7 @@ func (u *UnitOfWorkRepositoryImpl) StartTx(ctx context.Context, opts *sql.TxOpti
 		return errCommit
 	}
 
+	log.Info().Msgf(util.LogInfoCommit)
 	return nil
 }
 

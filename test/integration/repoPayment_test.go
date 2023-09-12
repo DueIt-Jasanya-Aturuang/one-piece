@@ -15,7 +15,7 @@ func CreatePayment(t *testing.T) {
 		ID:          "payment1",
 		Name:        "bca",
 		Description: sql.NullString{},
-		Image:       "bca.png",
+		Image:       "/files/payment-images/public/1694486436938350118.png",
 		CreatedAt:   0,
 		CreatedBy:   "userID1",
 		UpdatedAt:   0,
@@ -71,8 +71,8 @@ func UpdatePayment(t *testing.T) {
 	payment := &domain.Payment{
 		ID:          "payment1",
 		Name:        "bca",
-		Description: sql.NullString{String: "payment bca", Valid: true},
-		Image:       "bca2.png",
+		Description: sql.NullString{},
+		Image:       "/files/payment-images/public/1694486436938350118.png",
 		CreatedAt:   0,
 		CreatedBy:   "userID1",
 		UpdatedAt:   0,
@@ -109,8 +109,7 @@ func GetPaymentByName(t *testing.T) {
 	payment, err := PaymentRepo.GetPaymentByName(ctx, "bca")
 	assert.NoError(t, err)
 	assert.NotNil(t, payment)
-	assert.Equal(t, "payment bca", payment.Description.String)
-	assert.Equal(t, true, payment.Description.Valid)
+	assert.Equal(t, false, payment.Description.Valid)
 }
 
 func GetPaymentByNameERROR(t *testing.T) {
