@@ -69,6 +69,14 @@ func TestInit(t *testing.T) {
 		t.Run("createBucket", createBucket)
 		t.Run("MinioRepo", minioRepo)
 	})
+
+	t.Run("PAYMENT_USECASE", func(t *testing.T) {
+		t.Run("CreatePayment", UsecaseCreatePayment)
+		t.Run("CreatePayment409ERROR", UsecaseCreatePayment409ERROR)
+		t.Run("UpdatePayment", UsecaseUpdatePayment)
+		t.Run("UpdatePaymentERROR", UsecaseUpdatePaymentERROR)
+		t.Run("GetAllPayment", UsecaseGetAllPayment)
+	})
 }
 
 func newFileHeader() *multipart.FileHeader {

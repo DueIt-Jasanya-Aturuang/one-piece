@@ -7,6 +7,7 @@ const (
 	LogErrRollback            = "failed rollback data | err : %v"
 	LogInfoRollback           = "rollback data | err : %v"
 	LogErrCommit              = "failed commit data | err %v"
+	LogInfoCommit             = "commit data"
 	LogErrPrepareContextClose = "failed close prepared context | err : %v"
 	LogErrPrepareContext      = "failed open prepared context | err : %v"
 	LogErrExecContext         = "failed exec context | err : %v"

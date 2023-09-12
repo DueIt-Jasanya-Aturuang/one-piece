@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
@@ -36,11 +38,14 @@ func (p *PaymentUsecaseImpl) CreatePayment(
 	}
 	defer p.paymentRepo.CloseConn()
 
-	_, err = p.paymentRepo.GetPaymentByName(ctx, req.Name)
+	paymentCheck, err := p.paymentRepo.GetPaymentByName(ctx, req.Name)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return nil, util.ErrHTTPString("", 500)
 		}
+	}
+	log.Debug().Msgf("%v", paymentCheck)
+	if paymentCheck != nil {
 		return nil, util.ErrHTTPString("nama payment sudah tersedia", 409)
 	}
 
@@ -59,7 +64,7 @@ func (p *PaymentUsecaseImpl) CreatePayment(
 
 		err = p.minioRepo.UploadFile(ctx, req.Image, fileName)
 
-		return errors.New("asd")
+		return nil
 	})
 
 	if err != nil {
