@@ -23,7 +23,7 @@ func NewPaymentHandlerImpl(
 	}
 }
 
-func (h *PaymentHandlerImpl) CreatePayment(w http.ResponseWriter, r *http.Request) {
+func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 	req := new(domain.RequestCreatePayment)
 
 	err := helper.ParseForm(r, req)
@@ -41,7 +41,7 @@ func (h *PaymentHandlerImpl) CreatePayment(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	payment, err := h.paymentUsecase.CreatePayment(r.Context(), req)
+	payment, err := h.paymentUsecase.Create(r.Context(), req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
@@ -55,7 +55,7 @@ func (h *PaymentHandlerImpl) CreatePayment(w http.ResponseWriter, r *http.Reques
 	helper.SuccessResponseEncode(w, resp)
 }
 
-func (h *PaymentHandlerImpl) UpdatePayment(w http.ResponseWriter, r *http.Request) {
+func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 	req := new(domain.RequestUpdatePayment)
 
 	err := helper.ParseForm(r, req)
@@ -73,14 +73,14 @@ func (h *PaymentHandlerImpl) UpdatePayment(w http.ResponseWriter, r *http.Reques
 
 	_, fileHeader, _ := r.FormFile("image")
 	req.Image = fileHeader
-	
+
 	err = validation.UpdatePaymentValidation(req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	payment, err := h.paymentUsecase.UpdatePayment(r.Context(), req)
+	payment, err := h.paymentUsecase.Update(r.Context(), req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
@@ -94,8 +94,8 @@ func (h *PaymentHandlerImpl) UpdatePayment(w http.ResponseWriter, r *http.Reques
 	helper.SuccessResponseEncode(w, resp)
 }
 
-func (h *PaymentHandlerImpl) GetAllPayment(w http.ResponseWriter, r *http.Request) {
-	payments, err := h.paymentUsecase.GetAllPayment(r.Context())
+func (h *PaymentHandlerImpl) GetAll(w http.ResponseWriter, r *http.Request) {
+	payments, err := h.paymentUsecase.GetAll(r.Context())
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return

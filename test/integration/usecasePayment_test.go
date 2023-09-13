@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"testing"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
 )
 
 func UsecaseCreatePayment(t *testing.T) {
@@ -26,10 +28,10 @@ func UsecaseCreatePayment(t *testing.T) {
 			Image:       newFileHeader(),
 		}
 
-		payment, err := usecasePayment.CreatePayment(ctx, req)
+		payment, err := usecasePayment.Create(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, payment)
-		assert.Equal(t, payment.Description, req.Description)
+		assert.Equal(t, *payment.Description, req.Description)
 	})
 
 	t.Run("SUCCESS_description-nil", func(t *testing.T) {
@@ -39,10 +41,10 @@ func UsecaseCreatePayment(t *testing.T) {
 			Image:       newFileHeader(),
 		}
 
-		payment, err := usecasePayment.CreatePayment(ctx, req)
+		payment, err := usecasePayment.Create(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, payment)
-		assert.Equal(t, "null", payment.Description)
+		assert.Equal(t, helper.GetNullString(sql.NullString{}), payment.Description)
 	})
 
 }
@@ -61,7 +63,7 @@ func UsecaseCreatePayment409ERROR(t *testing.T) {
 			Image:       newFileHeader(),
 		}
 
-		payment, err := usecasePayment.CreatePayment(ctx, req)
+		payment, err := usecasePayment.Create(ctx, req)
 		assert.Error(t, err)
 		assert.Nil(t, payment)
 		var errHTTP *domain.ErrHTTP
@@ -85,10 +87,10 @@ func UsecaseUpdatePayment(t *testing.T) {
 			Image:       newFileHeader(),
 		}
 
-		payment, err := usecasePayment.UpdatePayment(ctx, req)
+		payment, err := usecasePayment.Update(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, payment)
-		assert.Equal(t, payment.Description, req.Description)
+		assert.Equal(t, *payment.Description, req.Description)
 	})
 
 	t.Run("SUCCESS_image-nil", func(t *testing.T) {
@@ -99,10 +101,10 @@ func UsecaseUpdatePayment(t *testing.T) {
 			Image:       nil,
 		}
 
-		payment, err := usecasePayment.UpdatePayment(ctx, req)
+		payment, err := usecasePayment.Update(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, payment)
-		assert.Equal(t, payment.Description, req.Description)
+		assert.Equal(t, *payment.Description, req.Description)
 	})
 
 	t.Run("SUCCESS_beda-nama", func(t *testing.T) {
@@ -113,10 +115,10 @@ func UsecaseUpdatePayment(t *testing.T) {
 			Image:       nil,
 		}
 
-		payment, err := usecasePayment.UpdatePayment(ctx, req)
+		payment, err := usecasePayment.Update(ctx, req)
 		assert.NoError(t, err)
 		assert.NotNil(t, payment)
-		assert.Equal(t, payment.Description, req.Description)
+		assert.Equal(t, *payment.Description, req.Description)
 	})
 
 }
@@ -136,7 +138,7 @@ func UsecaseUpdatePaymentERROR(t *testing.T) {
 			Image:       newFileHeader(),
 		}
 
-		payment, err := usecasePayment.UpdatePayment(ctx, req)
+		payment, err := usecasePayment.Update(ctx, req)
 		assert.Error(t, err)
 		assert.Nil(t, payment)
 		var errHTTP *domain.ErrHTTP
@@ -152,7 +154,7 @@ func UsecaseUpdatePaymentERROR(t *testing.T) {
 			Image:       newFileHeader(),
 		}
 
-		payment, err := usecasePayment.UpdatePayment(ctx, req)
+		payment, err := usecasePayment.Update(ctx, req)
 		assert.Error(t, err)
 		assert.Nil(t, payment)
 		var errHTTP *domain.ErrHTTP
@@ -168,7 +170,7 @@ func UsecaseGetAllPayment(t *testing.T) {
 	ctx := context.TODO()
 	usecasePayment := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 
-	payments, err := usecasePayment.GetAllPayment(ctx)
+	payments, err := usecasePayment.GetAll(ctx)
 	assert.NoError(t, err)
 	assert.NotNil(t, payments)
 	t.Log(payments)

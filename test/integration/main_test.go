@@ -54,11 +54,11 @@ func TestMain(m *testing.M) {
 
 func TestInit(t *testing.T) {
 	t.Run("PAYMENT_REPO", func(t *testing.T) {
-		t.Run("CreatePayment", CreatePayment)
-		t.Run("GetPaymentByID", GetPaymentById)
+		t.Run("Create", CreatePayment)
+		t.Run("GetByID", GetPaymentById)
 		t.Run("GetPaymentById_ERROR", GetPaymentByIdERROR)
-		t.Run("UpdatePayment", UpdatePayment)
-		t.Run("GetPaymentByName", GetPaymentByName)
+		t.Run("Update", UpdatePayment)
+		t.Run("GetByName", GetPaymentByName)
 		t.Run("GetPaymentByName_ERROR", GetPaymentByNameERROR)
 	})
 
@@ -68,11 +68,11 @@ func TestInit(t *testing.T) {
 	})
 
 	t.Run("PAYMENT_USECASE", func(t *testing.T) {
-		t.Run("CreatePayment", UsecaseCreatePayment)
+		t.Run("Create", UsecaseCreatePayment)
 		t.Run("CreatePayment409ERROR", UsecaseCreatePayment409ERROR)
-		t.Run("UpdatePayment", UsecaseUpdatePayment)
+		t.Run("Update", UsecaseUpdatePayment)
 		t.Run("UpdatePaymentERROR", UsecaseUpdatePaymentERROR)
-		t.Run("GetAllPayment", UsecaseGetAllPayment)
+		t.Run("GetAll", UsecaseGetAllPayment)
 	})
 }
 

@@ -33,7 +33,7 @@ func CreatePayment(t *testing.T) {
 		Isolation: sql.LevelReadCommitted,
 		ReadOnly:  false,
 	}, func() error {
-		err = PaymentRepo.CreatePayment(context.TODO(), payment)
+		err = PaymentRepo.Create(context.TODO(), payment)
 		if err != nil {
 			return err
 		}
@@ -49,7 +49,7 @@ func GetPaymentById(t *testing.T) {
 	assert.NoError(t, err)
 	defer PaymentRepo.CloseConn()
 
-	payment, err := PaymentRepo.GetPaymentByID(ctx, "payment1")
+	payment, err := PaymentRepo.GetByID(ctx, "payment1")
 	assert.NoError(t, err)
 	assert.NotNil(t, payment)
 	assert.Equal(t, "bca", payment.Name)
@@ -61,7 +61,7 @@ func GetPaymentByIdERROR(t *testing.T) {
 	assert.NoError(t, err)
 	defer PaymentRepo.CloseConn()
 
-	payment, err := PaymentRepo.GetPaymentByID(ctx, "payment1nill")
+	payment, err := PaymentRepo.GetByID(ctx, "payment1nill")
 	assert.Error(t, err)
 	assert.Nil(t, payment)
 	assert.Equal(t, sql.ErrNoRows, err)
@@ -90,7 +90,7 @@ func UpdatePayment(t *testing.T) {
 		Isolation: sql.LevelReadCommitted,
 		ReadOnly:  false,
 	}, func() error {
-		err = PaymentRepo.UpdatePayment(context.TODO(), payment)
+		err = PaymentRepo.Update(context.TODO(), payment)
 		if err != nil {
 			return err
 		}
@@ -106,7 +106,7 @@ func GetPaymentByName(t *testing.T) {
 	assert.NoError(t, err)
 	defer PaymentRepo.CloseConn()
 
-	payment, err := PaymentRepo.GetPaymentByName(ctx, "bca")
+	payment, err := PaymentRepo.GetByName(ctx, "bca")
 	assert.NoError(t, err)
 	assert.NotNil(t, payment)
 	assert.Equal(t, false, payment.Description.Valid)
@@ -118,7 +118,7 @@ func GetPaymentByNameERROR(t *testing.T) {
 	assert.NoError(t, err)
 	defer PaymentRepo.CloseConn()
 
-	payment, err := PaymentRepo.GetPaymentByName(ctx, "namepaymentnil")
+	payment, err := PaymentRepo.GetByName(ctx, "namepaymentnil")
 	assert.Error(t, err)
 	assert.Nil(t, payment)
 	assert.Equal(t, sql.ErrNoRows, err)

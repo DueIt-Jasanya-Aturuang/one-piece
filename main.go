@@ -25,12 +25,18 @@ func main() {
 	uow := _repository.NewUnitOfWorkRepositoryImpl(pgConn)
 	paymentRepo := _repository.NewPaymentRepositoryImpl(uow)
 	minioRepo := _repository.NewMinioImpl(minioConn)
+	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
+	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
 
 	// usecase
 	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	spendingTypeUsecase := _usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
+	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo)
 
 	// handler
 	paymentHandler := rest.NewPaymentHandlerImpl(paymentUsecase)
+	spendingTypeHandler := rest.NewSpendingTypeHandlerImpl(spendingTypeUsecase)
+	spendingHistoryHandler := rest.NewSpendingHistoryHandlerImpl(spendingHistoryUsecase)
 
 	// route
 	r := chi.NewRouter()
@@ -38,9 +44,22 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.MethodNotAllowed(helper.MethodNotAllowed)
 
-	r.Get("/finance/payment", paymentHandler.GetAllPayment)
-	r.Post("/finance/payment", paymentHandler.CreatePayment)
-	r.Put("/finance/payment/{id}", paymentHandler.UpdatePayment)
+	r.Route("/finance", func(r chi.Router) {
+		r.Get("/payment", paymentHandler.GetAll)
+		r.Post("/payment", paymentHandler.Create)
+		r.Put("/payment/{id}", paymentHandler.Update)
+
+		r.Get("/spending-type/{profile-id}", spendingTypeHandler.GetAllByProfileID)
+		r.Post("/spending-type", spendingTypeHandler.Create)
+		r.Put("/spending-type/{profile-id}/{id}", spendingTypeHandler.Update)
+		r.Delete("/spending-type/{profile-id}/{id}", spendingTypeHandler.Delete)
+
+		r.Get("/spending-history/{profile-id}", spendingHistoryHandler.GetAllByProfileID)
+		r.Get("/spending-history/{profile-id}/{id}", spendingHistoryHandler.GetByIDAndProfileID)
+		r.Post("/spending-history", spendingHistoryHandler.Create)
+		r.Put("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Update)
+		r.Delete("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Delete)
+	})
 
 	log.Info().Msgf("Server is running on port %s", config.AppAddr)
 	err := http.ListenAndServe(config.AppAddr, r)

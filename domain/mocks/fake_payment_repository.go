@@ -14,29 +14,57 @@ type FakePaymentRepository struct {
 	closeConnMutex       sync.RWMutex
 	closeConnArgsForCall []struct {
 	}
-	CreatePaymentStub        func(context.Context, *domain.Payment) error
-	createPaymentMutex       sync.RWMutex
-	createPaymentArgsForCall []struct {
+	CreateStub        func(context.Context, *domain.Payment) error
+	createMutex       sync.RWMutex
+	createArgsForCall []struct {
 		arg1 context.Context
 		arg2 *domain.Payment
 	}
-	createPaymentReturns struct {
+	createReturns struct {
 		result1 error
 	}
-	createPaymentReturnsOnCall map[int]struct {
+	createReturnsOnCall map[int]struct {
 		result1 error
 	}
-	GetAllPaymentStub        func(context.Context) (*[]domain.Payment, error)
-	getAllPaymentMutex       sync.RWMutex
-	getAllPaymentArgsForCall []struct {
+	GetAllStub        func(context.Context) (*[]domain.Payment, error)
+	getAllMutex       sync.RWMutex
+	getAllArgsForCall []struct {
 		arg1 context.Context
 	}
-	getAllPaymentReturns struct {
+	getAllReturns struct {
 		result1 *[]domain.Payment
 		result2 error
 	}
-	getAllPaymentReturnsOnCall map[int]struct {
+	getAllReturnsOnCall map[int]struct {
 		result1 *[]domain.Payment
+		result2 error
+	}
+	GetByIDStub        func(context.Context, string) (*domain.Payment, error)
+	getByIDMutex       sync.RWMutex
+	getByIDArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	getByIDReturns struct {
+		result1 *domain.Payment
+		result2 error
+	}
+	getByIDReturnsOnCall map[int]struct {
+		result1 *domain.Payment
+		result2 error
+	}
+	GetByNameStub        func(context.Context, string) (*domain.Payment, error)
+	getByNameMutex       sync.RWMutex
+	getByNameArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	getByNameReturns struct {
+		result1 *domain.Payment
+		result2 error
+	}
+	getByNameReturnsOnCall map[int]struct {
+		result1 *domain.Payment
 		result2 error
 	}
 	GetConnStub        func() (*sql.Conn, error)
@@ -49,34 +77,6 @@ type FakePaymentRepository struct {
 	}
 	getConnReturnsOnCall map[int]struct {
 		result1 *sql.Conn
-		result2 error
-	}
-	GetPaymentByIDStub        func(context.Context, string) (*domain.Payment, error)
-	getPaymentByIDMutex       sync.RWMutex
-	getPaymentByIDArgsForCall []struct {
-		arg1 context.Context
-		arg2 string
-	}
-	getPaymentByIDReturns struct {
-		result1 *domain.Payment
-		result2 error
-	}
-	getPaymentByIDReturnsOnCall map[int]struct {
-		result1 *domain.Payment
-		result2 error
-	}
-	GetPaymentByNameStub        func(context.Context, string) (*domain.Payment, error)
-	getPaymentByNameMutex       sync.RWMutex
-	getPaymentByNameArgsForCall []struct {
-		arg1 context.Context
-		arg2 string
-	}
-	getPaymentByNameReturns struct {
-		result1 *domain.Payment
-		result2 error
-	}
-	getPaymentByNameReturnsOnCall map[int]struct {
-		result1 *domain.Payment
 		result2 error
 	}
 	GetTxStub        func() (*sql.Tx, error)
@@ -115,16 +115,16 @@ type FakePaymentRepository struct {
 	startTxReturnsOnCall map[int]struct {
 		result1 error
 	}
-	UpdatePaymentStub        func(context.Context, *domain.Payment) error
-	updatePaymentMutex       sync.RWMutex
-	updatePaymentArgsForCall []struct {
+	UpdateStub        func(context.Context, *domain.Payment) error
+	updateMutex       sync.RWMutex
+	updateArgsForCall []struct {
 		arg1 context.Context
 		arg2 *domain.Payment
 	}
-	updatePaymentReturns struct {
+	updateReturns struct {
 		result1 error
 	}
-	updatePaymentReturnsOnCall map[int]struct {
+	updateReturnsOnCall map[int]struct {
 		result1 error
 	}
 	invocations      map[string][][]interface{}
@@ -155,17 +155,17 @@ func (fake *FakePaymentRepository) CloseConnCalls(stub func()) {
 	fake.CloseConnStub = stub
 }
 
-func (fake *FakePaymentRepository) CreatePayment(arg1 context.Context, arg2 *domain.Payment) error {
-	fake.createPaymentMutex.Lock()
-	ret, specificReturn := fake.createPaymentReturnsOnCall[len(fake.createPaymentArgsForCall)]
-	fake.createPaymentArgsForCall = append(fake.createPaymentArgsForCall, struct {
+func (fake *FakePaymentRepository) Create(arg1 context.Context, arg2 *domain.Payment) error {
+	fake.createMutex.Lock()
+	ret, specificReturn := fake.createReturnsOnCall[len(fake.createArgsForCall)]
+	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		arg1 context.Context
 		arg2 *domain.Payment
 	}{arg1, arg2})
-	stub := fake.CreatePaymentStub
-	fakeReturns := fake.createPaymentReturns
-	fake.recordInvocation("CreatePayment", []interface{}{arg1, arg2})
-	fake.createPaymentMutex.Unlock()
+	stub := fake.CreateStub
+	fakeReturns := fake.createReturns
+	fake.recordInvocation("Create", []interface{}{arg1, arg2})
+	fake.createMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -175,58 +175,58 @@ func (fake *FakePaymentRepository) CreatePayment(arg1 context.Context, arg2 *dom
 	return fakeReturns.result1
 }
 
-func (fake *FakePaymentRepository) CreatePaymentCallCount() int {
-	fake.createPaymentMutex.RLock()
-	defer fake.createPaymentMutex.RUnlock()
-	return len(fake.createPaymentArgsForCall)
+func (fake *FakePaymentRepository) CreateCallCount() int {
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	return len(fake.createArgsForCall)
 }
 
-func (fake *FakePaymentRepository) CreatePaymentCalls(stub func(context.Context, *domain.Payment) error) {
-	fake.createPaymentMutex.Lock()
-	defer fake.createPaymentMutex.Unlock()
-	fake.CreatePaymentStub = stub
+func (fake *FakePaymentRepository) CreateCalls(stub func(context.Context, *domain.Payment) error) {
+	fake.createMutex.Lock()
+	defer fake.createMutex.Unlock()
+	fake.CreateStub = stub
 }
 
-func (fake *FakePaymentRepository) CreatePaymentArgsForCall(i int) (context.Context, *domain.Payment) {
-	fake.createPaymentMutex.RLock()
-	defer fake.createPaymentMutex.RUnlock()
-	argsForCall := fake.createPaymentArgsForCall[i]
+func (fake *FakePaymentRepository) CreateArgsForCall(i int) (context.Context, *domain.Payment) {
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	argsForCall := fake.createArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakePaymentRepository) CreatePaymentReturns(result1 error) {
-	fake.createPaymentMutex.Lock()
-	defer fake.createPaymentMutex.Unlock()
-	fake.CreatePaymentStub = nil
-	fake.createPaymentReturns = struct {
+func (fake *FakePaymentRepository) CreateReturns(result1 error) {
+	fake.createMutex.Lock()
+	defer fake.createMutex.Unlock()
+	fake.CreateStub = nil
+	fake.createReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakePaymentRepository) CreatePaymentReturnsOnCall(i int, result1 error) {
-	fake.createPaymentMutex.Lock()
-	defer fake.createPaymentMutex.Unlock()
-	fake.CreatePaymentStub = nil
-	if fake.createPaymentReturnsOnCall == nil {
-		fake.createPaymentReturnsOnCall = make(map[int]struct {
+func (fake *FakePaymentRepository) CreateReturnsOnCall(i int, result1 error) {
+	fake.createMutex.Lock()
+	defer fake.createMutex.Unlock()
+	fake.CreateStub = nil
+	if fake.createReturnsOnCall == nil {
+		fake.createReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.createPaymentReturnsOnCall[i] = struct {
+	fake.createReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakePaymentRepository) GetAllPayment(arg1 context.Context) (*[]domain.Payment, error) {
-	fake.getAllPaymentMutex.Lock()
-	ret, specificReturn := fake.getAllPaymentReturnsOnCall[len(fake.getAllPaymentArgsForCall)]
-	fake.getAllPaymentArgsForCall = append(fake.getAllPaymentArgsForCall, struct {
+func (fake *FakePaymentRepository) GetAll(arg1 context.Context) (*[]domain.Payment, error) {
+	fake.getAllMutex.Lock()
+	ret, specificReturn := fake.getAllReturnsOnCall[len(fake.getAllArgsForCall)]
+	fake.getAllArgsForCall = append(fake.getAllArgsForCall, struct {
 		arg1 context.Context
 	}{arg1})
-	stub := fake.GetAllPaymentStub
-	fakeReturns := fake.getAllPaymentReturns
-	fake.recordInvocation("GetAllPayment", []interface{}{arg1})
-	fake.getAllPaymentMutex.Unlock()
+	stub := fake.GetAllStub
+	fakeReturns := fake.getAllReturns
+	fake.recordInvocation("GetAll", []interface{}{arg1})
+	fake.getAllMutex.Unlock()
 	if stub != nil {
 		return stub(arg1)
 	}
@@ -236,47 +236,177 @@ func (fake *FakePaymentRepository) GetAllPayment(arg1 context.Context) (*[]domai
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakePaymentRepository) GetAllPaymentCallCount() int {
-	fake.getAllPaymentMutex.RLock()
-	defer fake.getAllPaymentMutex.RUnlock()
-	return len(fake.getAllPaymentArgsForCall)
+func (fake *FakePaymentRepository) GetAllCallCount() int {
+	fake.getAllMutex.RLock()
+	defer fake.getAllMutex.RUnlock()
+	return len(fake.getAllArgsForCall)
 }
 
-func (fake *FakePaymentRepository) GetAllPaymentCalls(stub func(context.Context) (*[]domain.Payment, error)) {
-	fake.getAllPaymentMutex.Lock()
-	defer fake.getAllPaymentMutex.Unlock()
-	fake.GetAllPaymentStub = stub
+func (fake *FakePaymentRepository) GetAllCalls(stub func(context.Context) (*[]domain.Payment, error)) {
+	fake.getAllMutex.Lock()
+	defer fake.getAllMutex.Unlock()
+	fake.GetAllStub = stub
 }
 
-func (fake *FakePaymentRepository) GetAllPaymentArgsForCall(i int) context.Context {
-	fake.getAllPaymentMutex.RLock()
-	defer fake.getAllPaymentMutex.RUnlock()
-	argsForCall := fake.getAllPaymentArgsForCall[i]
+func (fake *FakePaymentRepository) GetAllArgsForCall(i int) context.Context {
+	fake.getAllMutex.RLock()
+	defer fake.getAllMutex.RUnlock()
+	argsForCall := fake.getAllArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakePaymentRepository) GetAllPaymentReturns(result1 *[]domain.Payment, result2 error) {
-	fake.getAllPaymentMutex.Lock()
-	defer fake.getAllPaymentMutex.Unlock()
-	fake.GetAllPaymentStub = nil
-	fake.getAllPaymentReturns = struct {
+func (fake *FakePaymentRepository) GetAllReturns(result1 *[]domain.Payment, result2 error) {
+	fake.getAllMutex.Lock()
+	defer fake.getAllMutex.Unlock()
+	fake.GetAllStub = nil
+	fake.getAllReturns = struct {
 		result1 *[]domain.Payment
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakePaymentRepository) GetAllPaymentReturnsOnCall(i int, result1 *[]domain.Payment, result2 error) {
-	fake.getAllPaymentMutex.Lock()
-	defer fake.getAllPaymentMutex.Unlock()
-	fake.GetAllPaymentStub = nil
-	if fake.getAllPaymentReturnsOnCall == nil {
-		fake.getAllPaymentReturnsOnCall = make(map[int]struct {
+func (fake *FakePaymentRepository) GetAllReturnsOnCall(i int, result1 *[]domain.Payment, result2 error) {
+	fake.getAllMutex.Lock()
+	defer fake.getAllMutex.Unlock()
+	fake.GetAllStub = nil
+	if fake.getAllReturnsOnCall == nil {
+		fake.getAllReturnsOnCall = make(map[int]struct {
 			result1 *[]domain.Payment
 			result2 error
 		})
 	}
-	fake.getAllPaymentReturnsOnCall[i] = struct {
+	fake.getAllReturnsOnCall[i] = struct {
 		result1 *[]domain.Payment
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakePaymentRepository) GetByID(arg1 context.Context, arg2 string) (*domain.Payment, error) {
+	fake.getByIDMutex.Lock()
+	ret, specificReturn := fake.getByIDReturnsOnCall[len(fake.getByIDArgsForCall)]
+	fake.getByIDArgsForCall = append(fake.getByIDArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.GetByIDStub
+	fakeReturns := fake.getByIDReturns
+	fake.recordInvocation("GetByID", []interface{}{arg1, arg2})
+	fake.getByIDMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakePaymentRepository) GetByIDCallCount() int {
+	fake.getByIDMutex.RLock()
+	defer fake.getByIDMutex.RUnlock()
+	return len(fake.getByIDArgsForCall)
+}
+
+func (fake *FakePaymentRepository) GetByIDCalls(stub func(context.Context, string) (*domain.Payment, error)) {
+	fake.getByIDMutex.Lock()
+	defer fake.getByIDMutex.Unlock()
+	fake.GetByIDStub = stub
+}
+
+func (fake *FakePaymentRepository) GetByIDArgsForCall(i int) (context.Context, string) {
+	fake.getByIDMutex.RLock()
+	defer fake.getByIDMutex.RUnlock()
+	argsForCall := fake.getByIDArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakePaymentRepository) GetByIDReturns(result1 *domain.Payment, result2 error) {
+	fake.getByIDMutex.Lock()
+	defer fake.getByIDMutex.Unlock()
+	fake.GetByIDStub = nil
+	fake.getByIDReturns = struct {
+		result1 *domain.Payment
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakePaymentRepository) GetByIDReturnsOnCall(i int, result1 *domain.Payment, result2 error) {
+	fake.getByIDMutex.Lock()
+	defer fake.getByIDMutex.Unlock()
+	fake.GetByIDStub = nil
+	if fake.getByIDReturnsOnCall == nil {
+		fake.getByIDReturnsOnCall = make(map[int]struct {
+			result1 *domain.Payment
+			result2 error
+		})
+	}
+	fake.getByIDReturnsOnCall[i] = struct {
+		result1 *domain.Payment
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakePaymentRepository) GetByName(arg1 context.Context, arg2 string) (*domain.Payment, error) {
+	fake.getByNameMutex.Lock()
+	ret, specificReturn := fake.getByNameReturnsOnCall[len(fake.getByNameArgsForCall)]
+	fake.getByNameArgsForCall = append(fake.getByNameArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	stub := fake.GetByNameStub
+	fakeReturns := fake.getByNameReturns
+	fake.recordInvocation("GetByName", []interface{}{arg1, arg2})
+	fake.getByNameMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakePaymentRepository) GetByNameCallCount() int {
+	fake.getByNameMutex.RLock()
+	defer fake.getByNameMutex.RUnlock()
+	return len(fake.getByNameArgsForCall)
+}
+
+func (fake *FakePaymentRepository) GetByNameCalls(stub func(context.Context, string) (*domain.Payment, error)) {
+	fake.getByNameMutex.Lock()
+	defer fake.getByNameMutex.Unlock()
+	fake.GetByNameStub = stub
+}
+
+func (fake *FakePaymentRepository) GetByNameArgsForCall(i int) (context.Context, string) {
+	fake.getByNameMutex.RLock()
+	defer fake.getByNameMutex.RUnlock()
+	argsForCall := fake.getByNameArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakePaymentRepository) GetByNameReturns(result1 *domain.Payment, result2 error) {
+	fake.getByNameMutex.Lock()
+	defer fake.getByNameMutex.Unlock()
+	fake.GetByNameStub = nil
+	fake.getByNameReturns = struct {
+		result1 *domain.Payment
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakePaymentRepository) GetByNameReturnsOnCall(i int, result1 *domain.Payment, result2 error) {
+	fake.getByNameMutex.Lock()
+	defer fake.getByNameMutex.Unlock()
+	fake.GetByNameStub = nil
+	if fake.getByNameReturnsOnCall == nil {
+		fake.getByNameReturnsOnCall = make(map[int]struct {
+			result1 *domain.Payment
+			result2 error
+		})
+	}
+	fake.getByNameReturnsOnCall[i] = struct {
+		result1 *domain.Payment
 		result2 error
 	}{result1, result2}
 }
@@ -333,136 +463,6 @@ func (fake *FakePaymentRepository) GetConnReturnsOnCall(i int, result1 *sql.Conn
 	}
 	fake.getConnReturnsOnCall[i] = struct {
 		result1 *sql.Conn
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakePaymentRepository) GetPaymentByID(arg1 context.Context, arg2 string) (*domain.Payment, error) {
-	fake.getPaymentByIDMutex.Lock()
-	ret, specificReturn := fake.getPaymentByIDReturnsOnCall[len(fake.getPaymentByIDArgsForCall)]
-	fake.getPaymentByIDArgsForCall = append(fake.getPaymentByIDArgsForCall, struct {
-		arg1 context.Context
-		arg2 string
-	}{arg1, arg2})
-	stub := fake.GetPaymentByIDStub
-	fakeReturns := fake.getPaymentByIDReturns
-	fake.recordInvocation("GetPaymentByID", []interface{}{arg1, arg2})
-	fake.getPaymentByIDMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *FakePaymentRepository) GetPaymentByIDCallCount() int {
-	fake.getPaymentByIDMutex.RLock()
-	defer fake.getPaymentByIDMutex.RUnlock()
-	return len(fake.getPaymentByIDArgsForCall)
-}
-
-func (fake *FakePaymentRepository) GetPaymentByIDCalls(stub func(context.Context, string) (*domain.Payment, error)) {
-	fake.getPaymentByIDMutex.Lock()
-	defer fake.getPaymentByIDMutex.Unlock()
-	fake.GetPaymentByIDStub = stub
-}
-
-func (fake *FakePaymentRepository) GetPaymentByIDArgsForCall(i int) (context.Context, string) {
-	fake.getPaymentByIDMutex.RLock()
-	defer fake.getPaymentByIDMutex.RUnlock()
-	argsForCall := fake.getPaymentByIDArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakePaymentRepository) GetPaymentByIDReturns(result1 *domain.Payment, result2 error) {
-	fake.getPaymentByIDMutex.Lock()
-	defer fake.getPaymentByIDMutex.Unlock()
-	fake.GetPaymentByIDStub = nil
-	fake.getPaymentByIDReturns = struct {
-		result1 *domain.Payment
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakePaymentRepository) GetPaymentByIDReturnsOnCall(i int, result1 *domain.Payment, result2 error) {
-	fake.getPaymentByIDMutex.Lock()
-	defer fake.getPaymentByIDMutex.Unlock()
-	fake.GetPaymentByIDStub = nil
-	if fake.getPaymentByIDReturnsOnCall == nil {
-		fake.getPaymentByIDReturnsOnCall = make(map[int]struct {
-			result1 *domain.Payment
-			result2 error
-		})
-	}
-	fake.getPaymentByIDReturnsOnCall[i] = struct {
-		result1 *domain.Payment
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakePaymentRepository) GetPaymentByName(arg1 context.Context, arg2 string) (*domain.Payment, error) {
-	fake.getPaymentByNameMutex.Lock()
-	ret, specificReturn := fake.getPaymentByNameReturnsOnCall[len(fake.getPaymentByNameArgsForCall)]
-	fake.getPaymentByNameArgsForCall = append(fake.getPaymentByNameArgsForCall, struct {
-		arg1 context.Context
-		arg2 string
-	}{arg1, arg2})
-	stub := fake.GetPaymentByNameStub
-	fakeReturns := fake.getPaymentByNameReturns
-	fake.recordInvocation("GetPaymentByName", []interface{}{arg1, arg2})
-	fake.getPaymentByNameMutex.Unlock()
-	if stub != nil {
-		return stub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *FakePaymentRepository) GetPaymentByNameCallCount() int {
-	fake.getPaymentByNameMutex.RLock()
-	defer fake.getPaymentByNameMutex.RUnlock()
-	return len(fake.getPaymentByNameArgsForCall)
-}
-
-func (fake *FakePaymentRepository) GetPaymentByNameCalls(stub func(context.Context, string) (*domain.Payment, error)) {
-	fake.getPaymentByNameMutex.Lock()
-	defer fake.getPaymentByNameMutex.Unlock()
-	fake.GetPaymentByNameStub = stub
-}
-
-func (fake *FakePaymentRepository) GetPaymentByNameArgsForCall(i int) (context.Context, string) {
-	fake.getPaymentByNameMutex.RLock()
-	defer fake.getPaymentByNameMutex.RUnlock()
-	argsForCall := fake.getPaymentByNameArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakePaymentRepository) GetPaymentByNameReturns(result1 *domain.Payment, result2 error) {
-	fake.getPaymentByNameMutex.Lock()
-	defer fake.getPaymentByNameMutex.Unlock()
-	fake.GetPaymentByNameStub = nil
-	fake.getPaymentByNameReturns = struct {
-		result1 *domain.Payment
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakePaymentRepository) GetPaymentByNameReturnsOnCall(i int, result1 *domain.Payment, result2 error) {
-	fake.getPaymentByNameMutex.Lock()
-	defer fake.getPaymentByNameMutex.Unlock()
-	fake.GetPaymentByNameStub = nil
-	if fake.getPaymentByNameReturnsOnCall == nil {
-		fake.getPaymentByNameReturnsOnCall = make(map[int]struct {
-			result1 *domain.Payment
-			result2 error
-		})
-	}
-	fake.getPaymentByNameReturnsOnCall[i] = struct {
-		result1 *domain.Payment
 		result2 error
 	}{result1, result2}
 }
@@ -647,17 +647,17 @@ func (fake *FakePaymentRepository) StartTxReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakePaymentRepository) UpdatePayment(arg1 context.Context, arg2 *domain.Payment) error {
-	fake.updatePaymentMutex.Lock()
-	ret, specificReturn := fake.updatePaymentReturnsOnCall[len(fake.updatePaymentArgsForCall)]
-	fake.updatePaymentArgsForCall = append(fake.updatePaymentArgsForCall, struct {
+func (fake *FakePaymentRepository) Update(arg1 context.Context, arg2 *domain.Payment) error {
+	fake.updateMutex.Lock()
+	ret, specificReturn := fake.updateReturnsOnCall[len(fake.updateArgsForCall)]
+	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		arg1 context.Context
 		arg2 *domain.Payment
 	}{arg1, arg2})
-	stub := fake.UpdatePaymentStub
-	fakeReturns := fake.updatePaymentReturns
-	fake.recordInvocation("UpdatePayment", []interface{}{arg1, arg2})
-	fake.updatePaymentMutex.Unlock()
+	stub := fake.UpdateStub
+	fakeReturns := fake.updateReturns
+	fake.recordInvocation("Update", []interface{}{arg1, arg2})
+	fake.updateMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -667,44 +667,44 @@ func (fake *FakePaymentRepository) UpdatePayment(arg1 context.Context, arg2 *dom
 	return fakeReturns.result1
 }
 
-func (fake *FakePaymentRepository) UpdatePaymentCallCount() int {
-	fake.updatePaymentMutex.RLock()
-	defer fake.updatePaymentMutex.RUnlock()
-	return len(fake.updatePaymentArgsForCall)
+func (fake *FakePaymentRepository) UpdateCallCount() int {
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	return len(fake.updateArgsForCall)
 }
 
-func (fake *FakePaymentRepository) UpdatePaymentCalls(stub func(context.Context, *domain.Payment) error) {
-	fake.updatePaymentMutex.Lock()
-	defer fake.updatePaymentMutex.Unlock()
-	fake.UpdatePaymentStub = stub
+func (fake *FakePaymentRepository) UpdateCalls(stub func(context.Context, *domain.Payment) error) {
+	fake.updateMutex.Lock()
+	defer fake.updateMutex.Unlock()
+	fake.UpdateStub = stub
 }
 
-func (fake *FakePaymentRepository) UpdatePaymentArgsForCall(i int) (context.Context, *domain.Payment) {
-	fake.updatePaymentMutex.RLock()
-	defer fake.updatePaymentMutex.RUnlock()
-	argsForCall := fake.updatePaymentArgsForCall[i]
+func (fake *FakePaymentRepository) UpdateArgsForCall(i int) (context.Context, *domain.Payment) {
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	argsForCall := fake.updateArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakePaymentRepository) UpdatePaymentReturns(result1 error) {
-	fake.updatePaymentMutex.Lock()
-	defer fake.updatePaymentMutex.Unlock()
-	fake.UpdatePaymentStub = nil
-	fake.updatePaymentReturns = struct {
+func (fake *FakePaymentRepository) UpdateReturns(result1 error) {
+	fake.updateMutex.Lock()
+	defer fake.updateMutex.Unlock()
+	fake.UpdateStub = nil
+	fake.updateReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakePaymentRepository) UpdatePaymentReturnsOnCall(i int, result1 error) {
-	fake.updatePaymentMutex.Lock()
-	defer fake.updatePaymentMutex.Unlock()
-	fake.UpdatePaymentStub = nil
-	if fake.updatePaymentReturnsOnCall == nil {
-		fake.updatePaymentReturnsOnCall = make(map[int]struct {
+func (fake *FakePaymentRepository) UpdateReturnsOnCall(i int, result1 error) {
+	fake.updateMutex.Lock()
+	defer fake.updateMutex.Unlock()
+	fake.UpdateStub = nil
+	if fake.updateReturnsOnCall == nil {
+		fake.updateReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.updatePaymentReturnsOnCall[i] = struct {
+	fake.updateReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -714,24 +714,24 @@ func (fake *FakePaymentRepository) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.closeConnMutex.RLock()
 	defer fake.closeConnMutex.RUnlock()
-	fake.createPaymentMutex.RLock()
-	defer fake.createPaymentMutex.RUnlock()
-	fake.getAllPaymentMutex.RLock()
-	defer fake.getAllPaymentMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.getAllMutex.RLock()
+	defer fake.getAllMutex.RUnlock()
+	fake.getByIDMutex.RLock()
+	defer fake.getByIDMutex.RUnlock()
+	fake.getByNameMutex.RLock()
+	defer fake.getByNameMutex.RUnlock()
 	fake.getConnMutex.RLock()
 	defer fake.getConnMutex.RUnlock()
-	fake.getPaymentByIDMutex.RLock()
-	defer fake.getPaymentByIDMutex.RUnlock()
-	fake.getPaymentByNameMutex.RLock()
-	defer fake.getPaymentByNameMutex.RUnlock()
 	fake.getTxMutex.RLock()
 	defer fake.getTxMutex.RUnlock()
 	fake.openConnMutex.RLock()
 	defer fake.openConnMutex.RUnlock()
 	fake.startTxMutex.RLock()
 	defer fake.startTxMutex.RUnlock()
-	fake.updatePaymentMutex.RLock()
-	defer fake.updatePaymentMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
