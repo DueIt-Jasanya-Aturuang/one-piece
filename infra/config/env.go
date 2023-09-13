@@ -14,6 +14,9 @@ func EnvInit() {
 		log.Fatalf("failed to load file .env | err : %v", err)
 	}
 
+	// app
+	AppAddr = os.Getenv("APPLICATION_ADDR")
+	
 	// pg db
 	PgHost = os.Getenv("POSTGRESQL_HOST")
 	PgPort = os.Getenv("POSTGRESQL_PORT")
@@ -35,6 +38,9 @@ func EnvInit() {
 	MinIoSSL = minioSslBool
 }
 
+var (
+	AppAddr string
+)
 var (
 	PgHost   string
 	PgPort   string

@@ -6,7 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func NewMinioConn() (*minio.Client, error) {
+func NewMinioConn() *minio.Client {
 	minioConn, err := minio.New(MinIoEndpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(MinIoID, MinIoSecretKey, ""),
 		Secure: MinIoSSL,
@@ -15,5 +15,5 @@ func NewMinioConn() (*minio.Client, error) {
 		log.Fatal().Err(err).Msg("failed open connection minio")
 	}
 
-	return minioConn, err
+	return minioConn
 }

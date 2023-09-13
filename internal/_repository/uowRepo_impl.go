@@ -7,7 +7,6 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
@@ -17,7 +16,7 @@ type UnitOfWorkRepositoryImpl struct {
 	conn *sql.Conn
 }
 
-func NewUnitOfWorkRepositoryImpl(db *sql.DB) domain.UnitOfWorkRepository {
+func NewUnitOfWorkRepositoryImpl(db *sql.DB) *UnitOfWorkRepositoryImpl {
 	return &UnitOfWorkRepositoryImpl{
 		db: db,
 	}
@@ -72,11 +71,11 @@ func (u *UnitOfWorkRepositoryImpl) StartTx(ctx context.Context, opts *sql.TxOpti
 	err = fn()
 	if err != nil {
 		if errRollback := tx.Rollback(); errRollback != nil {
-			log.Warn().Msgf(util.LogErrRollback, err)
+			log.Warn().Msgf(util.LogErrRollback, errRollback)
 			return errRollback
 		}
 
-		log.Ctx(ctx).Info().Msgf(util.LogInfoRollback, err)
+		log.Info().Msgf(util.LogInfoRollback, err)
 		return err
 	}
 

@@ -31,6 +31,8 @@ func ErrHTTPString(msg string, code int) error {
 			msg = "UNAUTHORIZATION"
 		case 409:
 			msg = "DATA CONFLICT"
+		case 408:
+			msg = "REQUEST TIME OUT"
 		case 500:
 			msg = "INTERNAL SERVER ERROR"
 		}

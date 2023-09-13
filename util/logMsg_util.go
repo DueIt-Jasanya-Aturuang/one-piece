@@ -26,3 +26,8 @@ const (
 	LogErrDelObjectMinio   = "failed delete object minio | err : %v"
 	LogInfoFileUploadMinio = "file upload info | msg : %v"
 )
+
+const (
+	LogErrDecode = "failed decode data | err : %v"
+	LogErrEncode = "failed encode | data : %v | err : %v"
+)

@@ -11,6 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
@@ -23,7 +24,7 @@ type PaymentUsecaseImpl struct {
 func NewPaymentUsecaseImpl(
 	paymentRepo domain.PaymentRepository,
 	minioRepo domain.MinioRepo,
-) domain.PaymentUsecase {
+) *PaymentUsecaseImpl {
 	return &PaymentUsecaseImpl{
 		paymentRepo: paymentRepo,
 		minioRepo:   minioRepo,
@@ -51,7 +52,7 @@ func (p *PaymentUsecaseImpl) CreatePayment(
 
 	fileExt := filepath.Ext(req.Image.Filename)
 	fileName := p.minioRepo.GenerateFileName(fileExt, "payment-images/public/")
-	paymentConv := converter.CreatePaymentReqToModel(req, fileName)
+	paymentConv := converter.CreatePaymentReqToModel(req, fmt.Sprintf("/%s/%s", config.MinIoBucket, fileName))
 
 	err = p.paymentRepo.StartTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
@@ -63,6 +64,9 @@ func (p *PaymentUsecaseImpl) CreatePayment(
 		}
 
 		err = p.minioRepo.UploadFile(ctx, req.Image, fileName)
+		if err != nil {
+			return err
+		}
 
 		return nil
 	})
@@ -110,7 +114,7 @@ func (p *PaymentUsecaseImpl) UpdatePayment(
 		fileName = p.minioRepo.GenerateFileName(fileExt, "payment-images/public/")
 	}
 
-	paymentConv := converter.UpdatePaymentReqToModel(req, fileName)
+	paymentConv := converter.UpdatePaymentReqToModel(req, fmt.Sprintf("/%s/%s", config.MinIoBucket, fileName))
 
 	err = p.paymentRepo.StartTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
