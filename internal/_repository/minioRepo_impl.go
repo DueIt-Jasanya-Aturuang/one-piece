@@ -9,7 +9,6 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
@@ -18,7 +17,7 @@ type MinioImpl struct {
 	c *minio.Client
 }
 
-func NewMinioImpl(c *minio.Client) domain.MinioRepo {
+func NewMinioImpl(c *minio.Client) *MinioImpl {
 	return &MinioImpl{
 		c: c,
 	}
@@ -40,6 +39,7 @@ func (m *MinioImpl) UploadFile(ctx context.Context, file *multipart.FileHeader, 
 	contentType := file.Header["Content-Type"][0]
 	fileSize := file.Size
 
+	log.Info().Msgf(objectName)
 	info, err := m.c.PutObject(ctx, config.MinIoBucket, objectName, fileReader, fileSize, minio.PutObjectOptions{
 		ContentType: contentType,
 	})
@@ -62,6 +62,6 @@ func (m *MinioImpl) DeleteFile(ctx context.Context, objectName string) error {
 }
 
 func (m *MinioImpl) GenerateFileName(fileExt string, path string) string {
-	nameFile := fmt.Sprintf("/%s/%s%d%s", config.MinIoBucket, path, time.Now().UnixNano(), fileExt)
+	nameFile := fmt.Sprintf("%s%d%s", path, time.Now().UnixNano(), fileExt)
 	return nameFile
 }

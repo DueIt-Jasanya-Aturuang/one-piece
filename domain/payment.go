@@ -29,6 +29,7 @@ type PaymentRepository interface {
 	UnitOfWorkRepository
 }
 
+//counterfeiter:generate -o ./mocks . PaymentUsecase
 type PaymentUsecase interface {
 	CreatePayment(ctx context.Context, req *RequestCreatePayment) (*ResponsePayment, error)
 	UpdatePayment(ctx context.Context, req *RequestUpdatePayment) (*ResponsePayment, error)
@@ -36,15 +37,15 @@ type PaymentUsecase interface {
 }
 
 type RequestCreatePayment struct {
-	Name        string                `form:"name" validation:"required,min=3,max=32"`
+	Name        string                `form:"name"`
 	Description string                `form:"description"`
-	Image       *multipart.FileHeader `form:"image" validation:"required"`
+	Image       *multipart.FileHeader `form:"image"`
 }
 
 type RequestUpdatePayment struct {
-	Name        string                `form:"name" validation:"required,min=3,max=32"`
+	Name        string                `form:"name"`
 	Description string                `form:"description"`
-	Image       *multipart.FileHeader `form:"image" validation:"required"`
+	Image       *multipart.FileHeader `form:"image"`
 	ID          string
 }
 

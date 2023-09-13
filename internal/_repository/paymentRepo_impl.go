@@ -17,7 +17,7 @@ type PaymentRepositoryImpl struct {
 
 func NewPaymentRepositoryImpl(
 	uow domain.UnitOfWorkRepository,
-) domain.PaymentRepository {
+) *PaymentRepositoryImpl {
 	return &PaymentRepositoryImpl{
 		UnitOfWorkRepository: uow,
 	}
@@ -212,7 +212,7 @@ func (p *PaymentRepositoryImpl) GetAllPayment(ctx context.Context) (*[]domain.Pa
 	}
 
 	var payments []domain.Payment
-	
+
 	for rows.Next() {
 		var payment domain.Payment
 

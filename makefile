@@ -2,10 +2,10 @@
 .DEFAULT_GOAL := help
 
 # Variabel untuk parameter koneksi database
-DB_URL := "postgres://jasanya:majubersama2023@103.82.92.34:5432/jasanya?search_path=dueit&sslmode=disable"
+DB_URL := "postgres://dueit_user:dueit_password@27.112.78.47:5432/dueit_db?search_path=dueit&sslmode=disable"
 
 # Variabel untuk direktori migrations
-MIGRATIONS_DIR := migrations
+MIGRATIONS_DIR := infra/migrations
 
 # Perintah untuk menjalankan migrasi
 migrate-up:

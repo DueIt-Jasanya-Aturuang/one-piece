@@ -39,10 +39,7 @@ func TestMain(m *testing.M) {
 	minioResourece, endpoint := minioStart(dockerpool)
 	resources = append(resources, minioResourece)
 	config.MinIoEndpoint, config.MinIoID, config.MinIoSecretKey, config.MinIoSSL = endpoint, "MYACCESSKEY", "MYSECRETKEY", false
-	minioConn, err := config.NewMinioConn()
-	if err != nil {
-		panic(err)
-	}
+	minioConn := config.NewMinioConn()
 	minioClient = minioConn
 
 	code := m.Run()
