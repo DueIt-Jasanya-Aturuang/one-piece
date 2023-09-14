@@ -57,9 +57,42 @@ func TestRepoSpendingTypeCreate(t *testing.T) {
 func TestRepoSpendingTypeUpdate(t *testing.T) {
 	db, mocksql, err := sqlmock.New()
 	assert.NoError(t, err)
-
-	mocksql.ExpectPrepare("")
 	defer db.Close()
+
+	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
+	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
+
+	query := regexp.QuoteMeta(`UPDATE m_spending_type SET title = $1, maximum_limit = $2, updated_at = $3, updated_by = $4 
+                    WHERE id = $5 AND profile_id = $6 AND deleted_at IS NULL`)
+	spendingType := &domain.SpendingType{
+		ID:           "test",
+		ProfileID:    "test",
+		Title:        "test",
+		MaximumLimit: 123,
+		UpdatedAt:    0,
+		UpdatedBy:    sql.NullString{String: "test", Valid: true},
+	}
+	t.Run("SUCCESS", func(t *testing.T) {
+		mocksql.ExpectBegin()
+		mocksql.ExpectPrepare(query)
+		mocksql.ExpectExec(query).WithArgs(
+			"test", 123, 0, "test", "test", "test",
+		).WillReturnResult(sqlmock.NewResult(1, 1))
+		mocksql.ExpectCommit()
+
+		err := spendingTypeRepo.OpenConn(context.TODO())
+		assert.NoError(t, err)
+		err = spendingTypeRepo.StartTx(context.TODO(), &sql.TxOptions{}, func() error {
+			err = spendingTypeRepo.Update(context.TODO(), spendingType)
+			assert.NoError(t, err)
+			return nil
+		})
+		assert.NoError(t, err)
+
+		err = mocksql.ExpectationsWereMet()
+		assert.NoError(t, err)
+	})
+
 }
 
 func TestRepoSpendingTypeDelete(t *testing.T) {
