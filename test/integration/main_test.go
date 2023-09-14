@@ -14,6 +14,7 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
 	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/test/integration/setup"
 )
 
 var DB *sql.DB
@@ -23,10 +24,10 @@ var PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
 var SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
 
 func TestMain(m *testing.M) {
-	dockerpool := SetupDocker()
+	dockerpool := setup.SetupDocker()
 	var resources []*dockertest.Resource
 
-	pgResource, dbPg, _ := Postgres(dockerpool)
+	pgResource, dbPg, _ := setup.Postgres(dockerpool)
 	resources = append(resources, pgResource)
 	DB = dbPg
 	Uow = _repository2.NewUnitOfWorkRepositoryImpl(DB)
@@ -36,9 +37,9 @@ func TestMain(m *testing.M) {
 		panic("db nil")
 	}
 
-	Migrate(DB)
+	setup.Migrate(DB)
 
-	minioResourece, endpoint := minioStart(dockerpool)
+	minioResourece, endpoint := setup.MinioStart(dockerpool)
 	resources = append(resources, minioResourece)
 	config.MinIoEndpoint, config.MinIoID, config.MinIoSecretKey, config.MinIoSSL = endpoint, "MYACCESSKEY", "MYSECRETKEY", false
 	minioConn := config.NewMinioConn()

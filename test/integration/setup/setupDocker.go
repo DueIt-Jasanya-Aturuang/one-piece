@@ -1,4 +1,4 @@
-package integration
+package setup
 
 import (
 	"github.com/ory/dockertest/v3"

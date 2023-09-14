@@ -1,4 +1,4 @@
-package integration
+package setup
 
 import (
 	"database/sql"
