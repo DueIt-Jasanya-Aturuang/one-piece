@@ -216,7 +216,7 @@ func (s *SpendingTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id
 
 func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.SpendingType, error) {
 	query := `SELECT id, profile_id, title, maximum_limit, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
-				FROM m_spending_type WHERE profile_id = $1 AND deleted_at IS NULL `
+				FROM m_spending_type WHERE profile_id = $1 AND deleted_at IS NULL`
 
 	conn, err := s.GetConn()
 	if err != nil {
