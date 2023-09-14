@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
@@ -98,9 +99,33 @@ func TestRepoSpendingTypeUpdate(t *testing.T) {
 func TestRepoSpendingTypeDelete(t *testing.T) {
 	db, mocksql, err := sqlmock.New()
 	assert.NoError(t, err)
-
-	mocksql.ExpectPrepare("")
 	defer db.Close()
+
+	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
+	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
+
+	query := regexp.QuoteMeta(`UPDATE m_spending_type SET deleted_by = $1, deleted_at = $2 WHERE id = $3 AND profile_id = $4`)
+
+	t.Run("SUCCESS", func(t *testing.T) {
+		mocksql.ExpectBegin()
+		mocksql.ExpectPrepare(query)
+		mocksql.ExpectExec(query).WithArgs(
+			"test", time.Now().Unix(), "test", "test",
+		).WillReturnResult(sqlmock.NewResult(1, 1))
+		mocksql.ExpectCommit()
+
+		err := spendingTypeRepo.OpenConn(context.TODO())
+		assert.NoError(t, err)
+		err = spendingTypeRepo.StartTx(context.TODO(), &sql.TxOptions{}, func() error {
+			err = spendingTypeRepo.Delete(context.TODO(), "test", "test")
+			assert.NoError(t, err)
+			return nil
+		})
+		assert.NoError(t, err)
+
+		err = mocksql.ExpectationsWereMet()
+		assert.NoError(t, err)
+	})
 }
 
 func TestRepoSpendingTypeGetByID(t *testing.T) {

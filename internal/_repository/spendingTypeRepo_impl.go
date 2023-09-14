@@ -118,16 +118,16 @@ func (s *SpendingTypeRepositoryImpl) Delete(ctx context.Context, id string, prof
 
 	if _, err = stmt.ExecContext(
 		ctx,
-		time.Now().Unix(),
 		profileID,
+		time.Now().Unix(),
 		id,
 		profileID,
 	); err != nil {
 		log.Warn().Msgf(util.LogErrExecContext, err)
 		return err
 	}
-	// TODO implement me
-	panic("implement me")
+
+	return nil
 }
 
 func (s *SpendingTypeRepositoryImpl) GetByID(ctx context.Context, id string) (*domain.SpendingType, error) {
