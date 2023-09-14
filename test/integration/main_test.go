@@ -20,6 +20,7 @@ var DB *sql.DB
 var minioClient *minio.Client
 var Uow = _repository2.NewUnitOfWorkRepositoryImpl(DB)
 var PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
+var SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
 
 func TestMain(m *testing.M) {
 	dockerpool := SetupDocker()
@@ -30,6 +31,7 @@ func TestMain(m *testing.M) {
 	DB = dbPg
 	Uow = _repository2.NewUnitOfWorkRepositoryImpl(DB)
 	PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
+	SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
 	if DB == nil {
 		panic("db nil")
 	}
@@ -60,6 +62,10 @@ func TestInit(t *testing.T) {
 		t.Run("Update", UpdatePayment)
 		t.Run("GetByName", GetPaymentByName)
 		t.Run("GetPaymentByName_ERROR", GetPaymentByNameERROR)
+	})
+
+	t.Run("SPENDINGTYPE_REPO", func(t *testing.T) {
+		t.Run("Create", CreateSpendingTYpe)
 	})
 
 	t.Run("MINIO_REPO", func(t *testing.T) {
