@@ -65,3 +65,21 @@ func UpdateSpendingType(t *testing.T) {
 	})
 	assert.NoError(t, err)
 }
+
+func DeleteSpendingType(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	err = SpendingTypeRepo.StartTx(context.TODO(), &sql.TxOptions{
+		Isolation: sql.LevelReadCommitted,
+		ReadOnly:  false,
+	}, func() error {
+		err = SpendingTypeRepo.Delete(context.TODO(), "spendingType1", "profileID1")
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	assert.NoError(t, err)
+}

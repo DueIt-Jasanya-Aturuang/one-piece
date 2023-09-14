@@ -67,6 +67,7 @@ func TestInit(t *testing.T) {
 	t.Run("SPENDINGTYPE_REPO", func(t *testing.T) {
 		t.Run("Create", CreateSpendingType)
 		t.Run("Update", UpdateSpendingType)
+		t.Run("Delete", DeleteSpendingType)
 	})
 
 	t.Run("MINIO_REPO", func(t *testing.T) {
