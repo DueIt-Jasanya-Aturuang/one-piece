@@ -16,7 +16,21 @@ func Migrate(db *sql.DB) {
 	}
 
 	// create table m_payment_methods
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS m_payment_methods (
+	createMPaymentMethodTable(db)
+
+	// create table m_profiles
+	createMProfilesTable(db)
+
+	// create data m_profiles
+	createMProfilesData(db)
+
+	// create table m_spending_type
+	createMSpendingTypeTable(db)
+
+}
+
+func createMPaymentMethodTable(db *sql.DB) {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS m_payment_methods (
     id 			VARCHAR(64) NOT NULL UNIQUE PRIMARY KEY,
     name        VARCHAR(128),
     description TEXT,
@@ -32,9 +46,10 @@ func Migrate(db *sql.DB) {
 		log.Err(err).Msgf("Failed to create table m_payment_methods: %s", err)
 		os.Exit(1)
 	}
+}
 
-	// create table m_profiles
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS m_profiles (
+func createMProfilesTable(db *sql.DB) {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS m_profiles (
    	   id VARCHAR(64) NOT NULL UNIQUE PRIMARY KEY,
 	   user_id VARCHAR(64),
 	   quotes VARCHAR(128),
@@ -50,16 +65,21 @@ func Migrate(db *sql.DB) {
 		log.Err(err).Msgf("Failed to create table m_profiles: %s", err)
 		os.Exit(1)
 	}
+
+}
+
+func createMProfilesData(db *sql.DB) {
 	// create data profiles
-	_, err = db.Exec(`INSERT INTO m_profiles (id, user_id, quotes, profesi, created_at, created_by, updated_at) 
+	_, err := db.Exec(`INSERT INTO m_profiles (id, user_id, quotes, profesi, created_at, created_by, updated_at) 
 			 VALUES ('profileID1', 'userID1', null, null, 0, 'profileID1', 0)`)
 	if err != nil {
 		log.Err(err).Msgf("Failed to create data m_profiles: %s", err)
 		os.Exit(1)
 	}
+}
 
-	// create table m_spending_type
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS m_spending_type (
+func createMSpendingTypeTable(db *sql.DB) {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS m_spending_type (
    	id            VARCHAR(64) NOT NULL UNIQUE PRIMARY KEY,
     profile_id    VARCHAR(64),
     title         VARCHAR(64),
