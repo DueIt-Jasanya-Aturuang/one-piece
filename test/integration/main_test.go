@@ -75,6 +75,7 @@ func TestInit(t *testing.T) {
 		t.Run("GetByIDAndProfileID_ERROR-deleted_at-null", GetByIDAndProfileIDSpendingTypeERRORDeletedAtNull)
 		t.Run("GetByIDAndProfileID_ERROR-invalid-id", GetByIDAndProfileIDSpendingTypeERRORInvalidID)
 		t.Run("GetByIDAndProfileID_ERROR-invalid-profile_id", GetByIDAndProfileIDSpendingTypeERRORInvalidProfileID)
+		t.Run("GetAllByProfileID", GetAllByProfileIDSpendingType)
 	})
 
 	t.Run("MINIO_REPO", func(t *testing.T) {

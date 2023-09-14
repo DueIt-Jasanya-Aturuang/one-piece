@@ -165,3 +165,15 @@ func GetByIDAndProfileIDSpendingTypeERRORInvalidProfileID(t *testing.T) {
 	assert.Nil(t, spendingType)
 	assert.Equal(t, sql.ErrNoRows, err)
 }
+
+func GetAllByProfileIDSpendingType(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	spendingTypes, err := SpendingTypeRepo.GetAllByProfileID(context.TODO(), "profileID1")
+	assert.NoError(t, err)
+	assert.NotNil(t, spendingTypes)
+	t.Log(spendingTypes)
+	assert.Equal(t, 4, len(*spendingTypes))
+}
