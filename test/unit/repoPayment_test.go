@@ -106,7 +106,7 @@ func TestRepoUpdatePayment(t *testing.T) {
 	paymentRepo := _repository2.NewPaymentRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`UPDATE m_payment_methods SET name = $1, description = $2, image = $3, updated_at = $4, updated_by = $5 
-            	WHERE id = $6`)
+            	WHERE id = $6 AND deleted_at IS NULL`)
 
 	payment := domain.Payment{
 		ID:          "paymentID",
@@ -188,7 +188,7 @@ func TestRepoGetPaymentById(t *testing.T) {
 
 	query := regexp.QuoteMeta(`SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods WHERE id = $1`)
+			 FROM m_payment_methods WHERE id = $1 AND deleted_at IS NULL`)
 
 	payment := domain.Payment{
 		ID:          "paymentID",
@@ -254,7 +254,7 @@ func TestRepoGetPaymentByName(t *testing.T) {
 
 	query := regexp.QuoteMeta(`SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods WHERE name = $1`)
+			 FROM m_payment_methods WHERE name = $1 AND deleted_at IS NULL`)
 
 	payment := domain.Payment{
 		ID:          "paymentID",
@@ -320,7 +320,7 @@ func TestRepoGetAllPayment(t *testing.T) {
 
 	query := regexp.QuoteMeta(`SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods`)
+			 FROM m_payment_methods WHERE deleted_at IS NULL`)
 
 	payment := []domain.Payment{
 		{

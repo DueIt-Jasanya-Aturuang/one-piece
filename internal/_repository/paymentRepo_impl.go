@@ -62,7 +62,7 @@ func (p *PaymentRepositoryImpl) Create(ctx context.Context, payment *domain.Paym
 
 func (p *PaymentRepositoryImpl) Update(ctx context.Context, payment *domain.Payment) error {
 	query := `UPDATE m_payment_methods SET name = $1, description = $2, image = $3, updated_at = $4, updated_by = $5 
-            	WHERE id = $6`
+            	WHERE id = $6 AND deleted_at IS NULL`
 	tx, err := p.GetTx()
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func (p *PaymentRepositoryImpl) Update(ctx context.Context, payment *domain.Paym
 func (p *PaymentRepositoryImpl) GetByID(ctx context.Context, id string) (*domain.Payment, error) {
 	query := `SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods WHERE id = $1`
+			 FROM m_payment_methods WHERE id = $1 AND deleted_at IS NULL`
 
 	conn, err := p.GetConn()
 	if err != nil {
@@ -143,7 +143,7 @@ func (p *PaymentRepositoryImpl) GetByID(ctx context.Context, id string) (*domain
 func (p *PaymentRepositoryImpl) GetByName(ctx context.Context, name string) (*domain.Payment, error) {
 	query := `SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods WHERE name = $1`
+			 FROM m_payment_methods WHERE name = $1 AND deleted_at IS NULL`
 
 	conn, err := p.GetConn()
 	if err != nil {
@@ -187,7 +187,7 @@ func (p *PaymentRepositoryImpl) GetByName(ctx context.Context, name string) (*do
 func (p *PaymentRepositoryImpl) GetAll(ctx context.Context) (*[]domain.Payment, error) {
 	query := `SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods`
+			 FROM m_payment_methods WHERE deleted_at IS NULL`
 
 	conn, err := p.GetConn()
 	if err != nil {

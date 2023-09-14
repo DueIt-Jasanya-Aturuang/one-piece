@@ -49,7 +49,7 @@ type SpendingTypeRepository interface {
 	Delete(ctx context.Context, id string, profileID string) error
 	GetByID(ctx context.Context, id string) (*SpendingType, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)
-	GetAllByProfileID(ctx context.Context, profileID string) (*SpendingType, error)
+	GetAllByProfileID(ctx context.Context, profileID string) (*[]SpendingType, error)
 	UnitOfWorkRepository
 }
 
