@@ -100,12 +100,67 @@ func GetByIDSpendingType(t *testing.T) {
 	t.Log(spendingType)
 }
 
-func GetByIDSpendingTypeERROR(t *testing.T) {
+func GetByIDSpendingTypeERRORDeletedAtNull(t *testing.T) {
 	err := SpendingTypeRepo.OpenConn(context.TODO())
 	assert.NoError(t, err)
 	defer SpendingTypeRepo.CloseConn()
 
 	spendingType, err := SpendingTypeRepo.GetByID(context.TODO(), "spendingType1")
+	assert.Error(t, err)
+	assert.Nil(t, spendingType)
+	assert.Equal(t, sql.ErrNoRows, err)
+}
+
+func GetByIDSpendingTypeERRORInvalidID(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	spendingType, err := SpendingTypeRepo.GetByID(context.TODO(), "spendingType1123")
+	assert.Error(t, err)
+	assert.Nil(t, spendingType)
+	assert.Equal(t, sql.ErrNoRows, err)
+}
+
+func GetByIDAndProfileIDSpendingType(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	spendingType, err := SpendingTypeRepo.GetByIDAndProfileID(context.TODO(), "spendingType2", "profileID1")
+	assert.NoError(t, err)
+	assert.NotNil(t, spendingType)
+	t.Log(spendingType)
+}
+
+func GetByIDAndProfileIDSpendingTypeERRORDeletedAtNull(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	spendingType, err := SpendingTypeRepo.GetByIDAndProfileID(context.TODO(), "spendingType1", "profileID1")
+	assert.Error(t, err)
+	assert.Nil(t, spendingType)
+	assert.Equal(t, sql.ErrNoRows, err)
+}
+
+func GetByIDAndProfileIDSpendingTypeERRORInvalidID(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	spendingType, err := SpendingTypeRepo.GetByIDAndProfileID(context.TODO(), "spendingType1123", "profileID1")
+	assert.Error(t, err)
+	assert.Nil(t, spendingType)
+	assert.Equal(t, sql.ErrNoRows, err)
+}
+
+func GetByIDAndProfileIDSpendingTypeERRORInvalidProfileID(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	spendingType, err := SpendingTypeRepo.GetByIDAndProfileID(context.TODO(), "spendingType2", "profileID1123")
 	assert.Error(t, err)
 	assert.Nil(t, spendingType)
 	assert.Equal(t, sql.ErrNoRows, err)

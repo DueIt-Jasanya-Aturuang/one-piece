@@ -69,7 +69,12 @@ func TestInit(t *testing.T) {
 		t.Run("Update", UpdateSpendingType)
 		t.Run("Delete", DeleteSpendingType)
 		t.Run("GetByID", GetByIDSpendingType)
-		t.Run("GetByID_ERROR-NO-ROW", GetByIDSpendingTypeERROR)
+		t.Run("GetByID_ERROR-deleted_at-null", GetByIDSpendingTypeERRORDeletedAtNull)
+		t.Run("GetByID_ERROR-invalid-id", GetByIDSpendingTypeERRORInvalidID)
+		t.Run("GetByIDAndProfileID", GetByIDAndProfileIDSpendingType)
+		t.Run("GetByIDAndProfileID_ERROR-deleted_at-null", GetByIDAndProfileIDSpendingTypeERRORDeletedAtNull)
+		t.Run("GetByIDAndProfileID_ERROR-invalid-id", GetByIDAndProfileIDSpendingTypeERRORInvalidID)
+		t.Run("GetByIDAndProfileID_ERROR-invalid-profile_id", GetByIDAndProfileIDSpendingTypeERRORInvalidProfileID)
 	})
 
 	t.Run("MINIO_REPO", func(t *testing.T) {
