@@ -68,6 +68,8 @@ func TestInit(t *testing.T) {
 		t.Run("Create", CreateSpendingType)
 		t.Run("Update", UpdateSpendingType)
 		t.Run("Delete", DeleteSpendingType)
+		t.Run("GetByID", GetByIDSpendingType)
+		t.Run("GetByID_ERROR-NO-ROW", GetByIDSpendingTypeERROR)
 	})
 
 	t.Run("MINIO_REPO", func(t *testing.T) {
