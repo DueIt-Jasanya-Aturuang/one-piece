@@ -212,3 +212,13 @@ func CheckDataSpendingType(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, true, exist)
 }
+
+func CheckByTitleAndProfileIDSpendingType(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	exist, err := SpendingTypeRepo.CheckByTitleAndProfileID(context.TODO(), "profileID1", "title")
+	assert.NoError(t, err)
+	assert.Equal(t, true, exist)
+}

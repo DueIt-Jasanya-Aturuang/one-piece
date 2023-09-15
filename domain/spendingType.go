@@ -67,6 +67,7 @@ type SpendingTypeRepository interface {
 	Update(ctx context.Context, spendingType *SpendingType) error
 	Delete(ctx context.Context, id string, profileID string) error
 	CheckData(ctx context.Context, profileID string) (bool, error)
+	CheckByTitleAndProfileID(ctx context.Context, profileID string, title string) (bool, error)
 	GetDefault(ctx context.Context) (*[]SpendingType, error)
 	GetByID(ctx context.Context, id string) (*SpendingType, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)

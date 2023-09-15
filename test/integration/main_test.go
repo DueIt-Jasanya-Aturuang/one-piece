@@ -14,6 +14,7 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
 	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/test/integration/setup"
 )
 
@@ -23,6 +24,7 @@ var Uow = _repository2.NewUnitOfWorkRepositoryImpl(DB)
 var PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
 var SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
 var SpendingHistoryRepo = _repository2.NewSpendingHistoryRepositoryImpl(Uow)
+var SpendingTypeUsecase = _usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
 
 func TestMain(m *testing.M) {
 	dockerpool := setup.SetupDocker()
@@ -35,6 +37,8 @@ func TestMain(m *testing.M) {
 	PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
 	SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
 	SpendingHistoryRepo = _repository2.NewSpendingHistoryRepositoryImpl(Uow)
+	SpendingTypeUsecase = _usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
+
 	if DB == nil {
 		panic("db nil")
 	}
@@ -72,6 +76,7 @@ func TestInit(t *testing.T) {
 		t.Run("Update", UpdateSpendingType)
 		t.Run("Delete", DeleteSpendingType)
 		t.Run("CheckData", CheckDataSpendingType)
+		t.Run("CheckByTitleAndProfileID", CheckByTitleAndProfileIDSpendingType)
 		t.Run("GetByID", GetByIDSpendingType)
 		t.Run("GetByID_ERROR-deleted_at-null", GetByIDSpendingTypeERRORDeletedAtNull)
 		t.Run("GetByID_ERROR-invalid-id", GetByIDSpendingTypeERRORInvalidID)
@@ -102,6 +107,18 @@ func TestInit(t *testing.T) {
 		t.Run("Update", UsecaseUpdatePayment)
 		t.Run("UpdatePaymentERROR", UsecaseUpdatePaymentERROR)
 		t.Run("GetAll", UsecaseGetAllPayment)
+	})
+
+	t.Run("SPENDINGTYPE_USECASE", func(t *testing.T) {
+		t.Run("Create", CreateSpendingTypeUsecase)
+		t.Run("Create_ERRORNameAlready", CreateSpendingTypeUsecaseERRORNameAlready)
+		t.Run("Update", UpdateSpendingTypeUsecase)
+		t.Run("Update_ERRORNameAlready", UpdateSpendingTypeUsecaseERRORNameAlready)
+		t.Run("Delete", DeleteSpendingTypeUsecase)
+		t.Run("GetByIDAndProfileID", GetByIDAndProfileIDSpendingTypeUsecase)
+		t.Run("GetByIDAndProfileID_ERRORNoRow", GetByIDAndProfileIDSpendingTypeUsecaseERRORNoRow)
+		t.Run("GetAllByProfileID", GetAllByProfileIDSpendingTypeUsecase)
+		t.Run("GetAllByProfileID_WithCreateDefaultType", GetAllByProfileIDSpendingTypeUsecaseWithCreateDefaultType)
 	})
 }
 

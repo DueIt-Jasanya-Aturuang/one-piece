@@ -81,6 +81,13 @@ func createMProfilesData(db *sql.DB) {
 		log.Err(err).Msgf("Failed to create data m_profiles: %s", err)
 		os.Exit(1)
 	}
+
+	_, err = db.Exec(`INSERT INTO m_profiles (id, user_id, quotes, profesi, created_at, created_by, updated_at) 
+			 VALUES ('profileID2', 'userID2', null, null, 0, 'profileID2', 0)`)
+	if err != nil {
+		log.Err(err).Msgf("Failed to create data m_profiles: %s", err)
+		os.Exit(1)
+	}
 }
 
 func createMSpendingTypeTable(db *sql.DB) {

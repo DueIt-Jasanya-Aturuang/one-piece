@@ -35,7 +35,7 @@ func CreateSpendingHistory(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		if i == 4 {
-			spendingHistory.TimeSpendingHistory = time.Now().Add(-24 * time.Hour)
+			spendingHistory.TimeSpendingHistory = time.Now().Add(-24 * time.Hour).UTC()
 		}
 		if i == 3 {
 			spendingHistory.PaymentMethodID = sql.NullString{String: "payment1", Valid: true}
@@ -122,8 +122,8 @@ func GetAllByTimeAndProfileIDSpendingHistory(t *testing.T) {
 		assert.NoError(t, err)
 		defer SpendingTypeRepo.CloseConn()
 
-		startTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
-		endTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 23, 59, 59, 0, time.UTC)
+		startTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().UTC().Day(), 0, 0, 0, 0, time.UTC)
+		endTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().UTC().Day(), 23, 59, 59, 0, time.UTC)
 		spendingHistories, err := SpendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.RequestGetFilteredDataSpendingHistory{
 			ProfileID: "profileID1",
 			StartTime: startTime,
@@ -140,8 +140,8 @@ func GetAllByTimeAndProfileIDSpendingHistory(t *testing.T) {
 		assert.NoError(t, err)
 		defer SpendingTypeRepo.CloseConn()
 
-		startTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
-		endTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 23, 59, 59, 0, time.UTC)
+		startTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().UTC().Day(), 0, 0, 0, 0, time.UTC)
+		endTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().UTC().Day(), 23, 59, 59, 0, time.UTC)
 		startTime = startTime.Add(-24 * time.Hour)
 		endTime = endTime.Add(-24 * time.Hour)
 		spendingHistories, err := SpendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.RequestGetFilteredDataSpendingHistory{
