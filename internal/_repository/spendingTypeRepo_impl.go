@@ -218,9 +218,14 @@ func (s *SpendingTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id
 	return &spendingType, nil
 }
 
-func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.SpendingType, error) {
-	query := `SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
-				FROM m_spending_type WHERE profile_id = $1 AND deleted_at IS NULL`
+func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, profileID string, startPeriod time.Time, endPeriod time.Time) (*[]domain.SpendingTypeJoin, error) {
+	query := `SELECT mst.id, mst.profile_id, mst.title, mst.maximum_limit, mst.icon, mst.created_at, mst.created_by, 
+       				mst.updated_at, mst.updated_by, mst.deleted_at, mst.deleted_by, 
+       				COALESCE(SUM(CASE WHEN tsh.time_spending_history BETWEEN $2 AND $3 AND tsh.deleted_at IS NULL THEN tsh.spending_amount ELSE 0 END), 0)
+				FROM m_spending_type mst
+				LEFT JOIN t_spending_history tsh ON mst.id = tsh.spending_type_id
+				WHERE mst.profile_id = $1 AND tsh.deleted_at IS NULL AND mst.deleted_at IS NULL
+				GROUP BY mst.id`
 
 	conn, err := s.GetConn()
 	if err != nil {
@@ -238,7 +243,7 @@ func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, prof
 		}
 	}()
 
-	rows, err := stmt.QueryContext(ctx, profileID)
+	rows, err := stmt.QueryContext(ctx, profileID, startPeriod, endPeriod)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrQueryRows, err)
 		return nil, err
@@ -249,9 +254,9 @@ func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, prof
 		}
 	}()
 
-	var spendingTypes []domain.SpendingType
+	var spendingTypes []domain.SpendingTypeJoin
 	for rows.Next() {
-		var spendingType domain.SpendingType
+		var spendingType domain.SpendingTypeJoin
 		if err = rows.Scan(
 			&spendingType.ID,
 			&spendingType.ProfileID,
@@ -264,6 +269,7 @@ func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, prof
 			&spendingType.UpdatedBy,
 			&spendingType.DeletedAt,
 			&spendingType.DeletedBy,
+			&spendingType.Used,
 		); err != nil {
 			log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
 			return nil, err

@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"time"
 )
 
 // SpendingType spending type entity
@@ -11,6 +12,17 @@ type SpendingType struct {
 	Title        string
 	MaximumLimit int
 	Icon         string
+	AuditInfo
+}
+
+// SpendingTypeJoin join table
+type SpendingTypeJoin struct {
+	ID           string
+	ProfileID    string
+	Title        string
+	MaximumLimit int
+	Icon         string
+	Used         int
 	AuditInfo
 }
 
@@ -33,11 +45,14 @@ type RequestUpdateSpendingType struct {
 
 // ResponseSpendingType response spending type
 type ResponseSpendingType struct {
-	ID           string `json:"id"`
-	ProfileID    string `json:"profile_id"`
-	Title        string `json:"title"`
-	MaximumLimit int    `json:"maximum_limit"`
-	Icon         string `json:"icon"`
+	ID                 string `json:"id"`
+	ProfileID          string `json:"profile_id"`
+	Title              string `json:"title"`
+	MaximumLimit       int    `json:"maximum_limit"`
+	FormatMaximumLimit int    `json:"format_maximum_limit"`
+	Icon               string `json:"icon"`
+	Used               int    `json:"used,omiempty"`
+	PersentaseUsed     string `json:"persentase_used,omitempty"`
 }
 
 // SpendingTypeRepository spending history repository interface
@@ -47,7 +62,7 @@ type SpendingTypeRepository interface {
 	Delete(ctx context.Context, id string, profileID string) error
 	GetByID(ctx context.Context, id string) (*SpendingType, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)
-	GetAllByProfileID(ctx context.Context, profileID string) (*[]SpendingType, error)
+	GetAllByProfileID(ctx context.Context, profileID string, startPeriod time.Time, endPeriod time.Time) (*[]SpendingTypeJoin, error)
 	UnitOfWorkRepository
 }
 

@@ -177,7 +177,9 @@ func GetAllByProfileIDSpendingType(t *testing.T) {
 	assert.NoError(t, err)
 	defer SpendingTypeRepo.CloseConn()
 
-	spendingTypes, err := SpendingTypeRepo.GetAllByProfileID(context.TODO(), "profileID1")
+	startPeriod := time.Date(time.Now().Year(), time.Now().Month(), 14, 0, 0, 0, 0, time.UTC)
+	endPeriod := startPeriod.AddDate(0, 1, 0)
+	spendingTypes, err := SpendingTypeRepo.GetAllByProfileID(context.TODO(), "profileID1", startPeriod, endPeriod)
 	assert.NoError(t, err)
 	assert.NotNil(t, spendingTypes)
 	t.Log(spendingTypes)

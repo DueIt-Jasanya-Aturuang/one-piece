@@ -230,21 +230,28 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
 	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
 	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
 
-	query := regexp.QuoteMeta(`SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
-				FROM m_spending_type WHERE profile_id = $1 AND deleted_at IS NULL`)
+	query := regexp.QuoteMeta(`SELECT mst.id, mst.profile_id, mst.title, mst.maximum_limit, mst.icon, mst.created_at, mst.created_by, 
+       				mst.updated_at, mst.updated_by, mst.deleted_at, mst.deleted_by, 
+       				COALESCE(SUM(CASE WHEN tsh.time_spending_history BETWEEN $2 AND $3 AND tsh.deleted_at IS NULL THEN tsh.spending_amount ELSE 0 END), 0)
+				FROM m_spending_type mst
+				LEFT JOIN t_spending_history tsh ON mst.id = tsh.spending_type_id
+				WHERE mst.profile_id = $1 AND tsh.deleted_at IS NULL AND mst.deleted_at IS NULL
+				GROUP BY mst.id`)
 	rows := sqlmock.NewRows([]string{"id", "profile_id", "title", "maximum_limit", "icon", "created_at", "created_by",
-		"updated_at", "updated_by", "deleted_at", "deleted_by"})
+		"updated_at", "updated_by", "deleted_at", "deleted_by", "used"})
 
 	t.Run("SUCCESS", func(t *testing.T) {
-		rows.AddRow("test", "test", "test", 123, "test", 0, "test", 0, nil, nil, nil)
-		rows.AddRow("test1", "test", "test1", 123, "test", 0, "test1", 0, nil, nil, nil)
-		rows.AddRow("test2", "test", "test2", 123, "test", 0, "test2", 0, nil, nil, nil)
+		startPeriod := time.Date(time.Now().Year(), time.Now().Month(), 14, 0, 0, 0, 0, time.UTC)
+		endPeriod := startPeriod.AddDate(0, 1, 0)
+		rows.AddRow("test", "test", "test", 123, "test", 0, "test", 0, nil, nil, nil, 0)
+		rows.AddRow("test1", "test", "test1", 123, "test", 0, "test1", 0, nil, nil, nil, 0)
+		rows.AddRow("test2", "test", "test2", 123, "test", 0, "test2", 0, nil, nil, nil, 0)
 		mocksql.ExpectPrepare(query)
-		mocksql.ExpectQuery(query).WithArgs("test").WillReturnRows(rows)
+		mocksql.ExpectQuery(query).WithArgs("test", startPeriod, endPeriod).WillReturnRows(rows)
 
 		err := spendingTypeRepo.OpenConn(context.TODO())
 		assert.NoError(t, err)
-		spendingType, err := spendingTypeRepo.GetAllByProfileID(context.TODO(), "test")
+		spendingType, err := spendingTypeRepo.GetAllByProfileID(context.TODO(), "test", startPeriod, endPeriod)
 		assert.NoError(t, err)
 		assert.NotNil(t, spendingType)
 		assert.Equal(t, 3, len(*spendingType))
@@ -253,12 +260,14 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
 	})
 
 	t.Run("SUCCESS_nil", func(t *testing.T) {
+		startPeriod := time.Date(time.Now().Year(), time.Now().Month(), 14, 0, 0, 0, 0, time.UTC)
+		endPeriod := startPeriod.AddDate(0, 1, 0)
 		mocksql.ExpectPrepare(query)
-		mocksql.ExpectQuery(query).WithArgs("test").WillReturnRows(rows)
+		mocksql.ExpectQuery(query).WithArgs("test", startPeriod, endPeriod).WillReturnRows(rows)
 
 		err := spendingTypeRepo.OpenConn(context.TODO())
 		assert.NoError(t, err)
-		spendingType, err := spendingTypeRepo.GetAllByProfileID(context.TODO(), "test")
+		spendingType, err := spendingTypeRepo.GetAllByProfileID(context.TODO(), "test", startPeriod, endPeriod)
 		assert.NoError(t, err)
 		assert.NotNil(t, spendingType)
 		assert.Equal(t, 0, len(*spendingType))
