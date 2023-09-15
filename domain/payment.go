@@ -12,12 +12,7 @@ type Payment struct {
 	Name        string
 	Description sql.NullString
 	Image       string
-	CreatedAt   int64
-	CreatedBy   string
-	UpdatedAt   int64
-	UpdatedBy   sql.NullString
-	DeletedAt   sql.NullInt64
-	DeletedBy   sql.NullString
+	AuditInfo
 }
 
 // RequestCreatePayment create payment request

@@ -29,9 +29,11 @@ func TestRepoSpendingTypeCreate(t *testing.T) {
 		ProfileID:    "test",
 		Title:        "test",
 		MaximumLimit: 123,
-		CreatedAt:    0,
-		CreatedBy:    "test",
-		UpdatedAt:    0,
+		AuditInfo: domain.AuditInfo{
+			CreatedAt: 0,
+			CreatedBy: "test",
+			UpdatedAt: 0,
+		},
 	}
 	t.Run("SUCCESS", func(t *testing.T) {
 		mocksql.ExpectBegin()
@@ -70,8 +72,10 @@ func TestRepoSpendingTypeUpdate(t *testing.T) {
 		ProfileID:    "test",
 		Title:        "test",
 		MaximumLimit: 123,
-		UpdatedAt:    0,
-		UpdatedBy:    sql.NullString{String: "test", Valid: true},
+		AuditInfo: domain.AuditInfo{
+			UpdatedAt: 0,
+			UpdatedBy: sql.NullString{String: "test", Valid: true},
+		},
 	}
 	t.Run("SUCCESS", func(t *testing.T) {
 		mocksql.ExpectBegin()

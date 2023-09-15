@@ -16,12 +16,14 @@ func CreatePayment(t *testing.T) {
 		Name:        "bca",
 		Description: sql.NullString{},
 		Image:       "/files/payment-images/public/1694486436938350118.png",
-		CreatedAt:   0,
-		CreatedBy:   "userID1",
-		UpdatedAt:   0,
-		UpdatedBy:   sql.NullString{},
-		DeletedAt:   sql.NullInt64{},
-		DeletedBy:   sql.NullString{},
+		AuditInfo: domain.AuditInfo{
+			CreatedAt: 0,
+			CreatedBy: "userID1",
+			UpdatedAt: 0,
+			UpdatedBy: sql.NullString{},
+			DeletedAt: sql.NullInt64{},
+			DeletedBy: sql.NullString{},
+		},
 	}
 
 	ctx := context.Background()
@@ -73,12 +75,14 @@ func UpdatePayment(t *testing.T) {
 		Name:        "bca",
 		Description: sql.NullString{},
 		Image:       "/files/payment-images/public/1694486436938350118.png",
-		CreatedAt:   0,
-		CreatedBy:   "userID1",
-		UpdatedAt:   0,
-		UpdatedBy:   sql.NullString{},
-		DeletedAt:   sql.NullInt64{},
-		DeletedBy:   sql.NullString{},
+		AuditInfo: domain.AuditInfo{
+			CreatedAt: 0,
+			CreatedBy: "userID1",
+			UpdatedAt: 0,
+			UpdatedBy: sql.NullString{},
+			DeletedAt: sql.NullInt64{},
+			DeletedBy: sql.NullString{},
+		},
 	}
 
 	ctx := context.Background()

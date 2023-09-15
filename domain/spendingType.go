@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"database/sql"
 )
 
 // SpendingType spending type entity
@@ -11,12 +10,7 @@ type SpendingType struct {
 	ProfileID    string
 	Title        string
 	MaximumLimit int
-	CreatedAt    int64
-	CreatedBy    string
-	UpdatedAt    int64
-	UpdatedBy    sql.NullString
-	DeletedAt    sql.NullInt64
-	DeletedBy    sql.NullString
+	AuditInfo
 }
 
 // RequestCreateSpendingType request create spending type

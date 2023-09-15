@@ -18,9 +18,11 @@ func CreateSpendingType(t *testing.T) {
 		ProfileID:    "profileID1",
 		Title:        "title",
 		MaximumLimit: 15000000,
-		CreatedAt:    time.Now().Unix(),
-		CreatedBy:    "profileID1",
-		UpdatedAt:    time.Now().Unix(),
+		AuditInfo: domain.AuditInfo{
+			CreatedAt: time.Now().Unix(),
+			CreatedBy: "profileID1",
+			UpdatedAt: time.Now().Unix(),
+		},
 	}
 
 	for i := 0; i < 5; i++ {
@@ -50,8 +52,10 @@ func UpdateSpendingType(t *testing.T) {
 		ProfileID:    "profileID1",
 		Title:        "title",
 		MaximumLimit: 15000000,
-		UpdatedAt:    time.Now().Unix(),
-		UpdatedBy:    sql.NullString{String: "profileID1", Valid: true},
+		AuditInfo: domain.AuditInfo{
+			UpdatedAt: time.Now().Unix(),
+			UpdatedBy: sql.NullString{String: "profileID1", Valid: true},
+		},
 	}
 
 	err := SpendingTypeRepo.OpenConn(context.TODO())

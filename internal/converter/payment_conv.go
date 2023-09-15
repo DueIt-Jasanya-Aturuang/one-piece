@@ -17,12 +17,14 @@ func CreatePaymentReqToModel(req *domain.RequestCreatePayment, fileName string) 
 		Name:        req.Name,
 		Description: helper.NewNullString(req.Description),
 		Image:       fileName,
-		CreatedAt:   time.Now().Unix(),
-		CreatedBy:   "",
-		UpdatedAt:   time.Now().Unix(),
-		UpdatedBy:   sql.NullString{},
-		DeletedAt:   sql.NullInt64{},
-		DeletedBy:   sql.NullString{},
+		AuditInfo: domain.AuditInfo{
+			CreatedAt: time.Now().Unix(),
+			CreatedBy: "",
+			UpdatedAt: time.Now().Unix(),
+			UpdatedBy: sql.NullString{},
+			DeletedAt: sql.NullInt64{},
+			DeletedBy: sql.NullString{},
+		},
 	}
 
 	return payment
@@ -56,10 +58,12 @@ func UpdatePaymentReqToModel(req *domain.RequestUpdatePayment, fileName string) 
 		Name:        req.Name,
 		Description: helper.NewNullString(req.Description),
 		Image:       fileName,
-		UpdatedAt:   time.Now().Unix(),
-		UpdatedBy:   helper.NewNullString(""),
-		DeletedAt:   sql.NullInt64{},
-		DeletedBy:   sql.NullString{},
+		AuditInfo: domain.AuditInfo{
+			UpdatedAt: time.Now().Unix(),
+			UpdatedBy: helper.NewNullString(""),
+			DeletedAt: sql.NullInt64{},
+			DeletedBy: sql.NullString{},
+		},
 	}
 
 	return payment
