@@ -14,29 +14,32 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
 	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/test/integration/setup"
 )
 
 var DB *sql.DB
 var minioClient *minio.Client
 var Uow = _repository2.NewUnitOfWorkRepositoryImpl(DB)
 var PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
+var SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
 
 func TestMain(m *testing.M) {
-	dockerpool := SetupDocker()
+	dockerpool := setup.SetupDocker()
 	var resources []*dockertest.Resource
 
-	pgResource, dbPg, _ := Postgres(dockerpool)
+	pgResource, dbPg, _ := setup.Postgres(dockerpool)
 	resources = append(resources, pgResource)
 	DB = dbPg
 	Uow = _repository2.NewUnitOfWorkRepositoryImpl(DB)
 	PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
+	SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
 	if DB == nil {
 		panic("db nil")
 	}
 
-	Migrate(DB)
+	setup.Migrate(DB)
 
-	minioResourece, endpoint := minioStart(dockerpool)
+	minioResourece, endpoint := setup.MinioStart(dockerpool)
 	resources = append(resources, minioResourece)
 	config.MinIoEndpoint, config.MinIoID, config.MinIoSecretKey, config.MinIoSSL = endpoint, "MYACCESSKEY", "MYSECRETKEY", false
 	minioConn := config.NewMinioConn()
@@ -54,12 +57,26 @@ func TestMain(m *testing.M) {
 
 func TestInit(t *testing.T) {
 	t.Run("PAYMENT_REPO", func(t *testing.T) {
-		t.Run("CreatePayment", CreatePayment)
-		t.Run("GetPaymentByID", GetPaymentById)
+		t.Run("Create", CreatePayment)
+		t.Run("GetByID", GetPaymentById)
 		t.Run("GetPaymentById_ERROR", GetPaymentByIdERROR)
-		t.Run("UpdatePayment", UpdatePayment)
-		t.Run("GetPaymentByName", GetPaymentByName)
+		t.Run("Update", UpdatePayment)
+		t.Run("GetByName", GetPaymentByName)
 		t.Run("GetPaymentByName_ERROR", GetPaymentByNameERROR)
+	})
+
+	t.Run("SPENDINGTYPE_REPO", func(t *testing.T) {
+		t.Run("Create", CreateSpendingType)
+		t.Run("Update", UpdateSpendingType)
+		t.Run("Delete", DeleteSpendingType)
+		t.Run("GetByID", GetByIDSpendingType)
+		t.Run("GetByID_ERROR-deleted_at-null", GetByIDSpendingTypeERRORDeletedAtNull)
+		t.Run("GetByID_ERROR-invalid-id", GetByIDSpendingTypeERRORInvalidID)
+		t.Run("GetByIDAndProfileID", GetByIDAndProfileIDSpendingType)
+		t.Run("GetByIDAndProfileID_ERROR-deleted_at-null", GetByIDAndProfileIDSpendingTypeERRORDeletedAtNull)
+		t.Run("GetByIDAndProfileID_ERROR-invalid-id", GetByIDAndProfileIDSpendingTypeERRORInvalidID)
+		t.Run("GetByIDAndProfileID_ERROR-invalid-profile_id", GetByIDAndProfileIDSpendingTypeERRORInvalidProfileID)
+		t.Run("GetAllByTimeNowAndProfileID", GetAllByProfileIDSpendingType)
 	})
 
 	t.Run("MINIO_REPO", func(t *testing.T) {
@@ -68,11 +85,11 @@ func TestInit(t *testing.T) {
 	})
 
 	t.Run("PAYMENT_USECASE", func(t *testing.T) {
-		t.Run("CreatePayment", UsecaseCreatePayment)
+		t.Run("Create", UsecaseCreatePayment)
 		t.Run("CreatePayment409ERROR", UsecaseCreatePayment409ERROR)
-		t.Run("UpdatePayment", UsecaseUpdatePayment)
+		t.Run("Update", UsecaseUpdatePayment)
 		t.Run("UpdatePaymentERROR", UsecaseUpdatePaymentERROR)
-		t.Run("GetAllPayment", UsecaseGetAllPayment)
+		t.Run("GetAll", UsecaseGetAllPayment)
 	})
 }
 

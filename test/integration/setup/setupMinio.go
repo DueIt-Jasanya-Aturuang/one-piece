@@ -1,4 +1,4 @@
-package integration
+package setup
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"github.com/ory/dockertest/v3/docker"
 )
 
-func minioStart(dockerpool *dockertest.Pool) (*dockertest.Resource, string) {
+func MinioStart(dockerpool *dockertest.Pool) (*dockertest.Resource, string) {
 	resource, err := dockerpool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "minio/minio",
 		Tag:        "latest",

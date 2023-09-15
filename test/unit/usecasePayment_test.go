@@ -62,8 +62,8 @@ func TestUsecaseCreatePayment(t *testing.T) {
 		paymentRepo.OpenConnReturns(nil)
 		defer paymentRepo.CloseConn()
 
-		paymentRepo.GetPaymentByName(ctx, "bca")
-		paymentRepo.GetPaymentByNameReturns(&domain.Payment{}, nil)
+		paymentRepo.GetByName(ctx, "bca")
+		paymentRepo.GetByNameReturns(nil, sql.ErrNoRows)
 
 		minioRepo.GenerateFileName(filepath.Ext(fileHeader.Filename), "payment-images/public/")
 		minioRepo.GenerateFileNameReturns("/files/payment-images/public/12345678.png")
@@ -76,7 +76,7 @@ func TestUsecaseCreatePayment(t *testing.T) {
 		})
 		paymentRepo.StartTxReturns(nil)
 
-		payment, err := paymentUsecase.CreatePayment(ctx, &domain.RequestCreatePayment{
+		payment, err := paymentUsecase.Create(ctx, &domain.RequestCreatePayment{
 			Name:        "bca",
 			Description: "bcatransfer",
 			Image:       newFileHeader(),
@@ -93,8 +93,8 @@ func TestUsecaseCreatePayment(t *testing.T) {
 		paymentRepo.OpenConnReturns(nil)
 		defer paymentRepo.CloseConn()
 
-		paymentRepo.GetPaymentByName(ctx, "bca")
-		paymentRepo.GetPaymentByNameReturns(&domain.Payment{}, nil)
+		paymentRepo.GetByName(ctx, "bca")
+		paymentRepo.GetByNameReturns(&domain.Payment{}, nil)
 
 		minioRepo.GenerateFileName(filepath.Ext(fileHeader.Filename), "payment-images/public/")
 		minioRepo.GenerateFileNameReturns("/files/payment-images/public/12345678.png")
@@ -107,7 +107,7 @@ func TestUsecaseCreatePayment(t *testing.T) {
 		})
 		paymentRepo.StartTxReturns(errors.New("errors new"))
 
-		payment, err := paymentUsecase.CreatePayment(ctx, &domain.RequestCreatePayment{
+		payment, err := paymentUsecase.Create(ctx, &domain.RequestCreatePayment{
 			Name:        "bca",
 			Description: "bcatransfer",
 			Image:       newFileHeader(),
@@ -125,10 +125,10 @@ func TestUsecaseCreatePayment(t *testing.T) {
 		paymentRepo.OpenConnReturns(nil)
 		defer paymentRepo.CloseConn()
 
-		paymentRepo.GetPaymentByName(ctx, "nil")
-		paymentRepo.GetPaymentByNameReturns(nil, sql.ErrNoRows)
+		paymentRepo.GetByName(ctx, "nil")
+		paymentRepo.GetByNameReturns(&domain.Payment{}, nil)
 
-		payment, err := paymentUsecase.CreatePayment(ctx, &domain.RequestCreatePayment{
+		payment, err := paymentUsecase.Create(ctx, &domain.RequestCreatePayment{
 			Name:        "bca",
 			Description: "bcatransfer",
 			Image:       newFileHeader(),
@@ -155,11 +155,11 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 		paymentRepo.OpenConnReturns(nil)
 		defer paymentRepo.CloseConn()
 
-		paymentRepo.GetPaymentByID(ctx, "123")
-		paymentRepo.GetPaymentByIDReturns(&domain.Payment{Name: "sama"}, nil)
+		paymentRepo.GetByID(ctx, "123")
+		paymentRepo.GetByIDReturns(&domain.Payment{Name: "sama"}, nil)
 
-		paymentRepo.GetPaymentByName(ctx, "bca")
-		paymentRepo.GetPaymentByNameReturns(&domain.Payment{Name: "beda"}, nil)
+		paymentRepo.GetByName(ctx, "bca")
+		paymentRepo.GetByNameReturns(&domain.Payment{Name: "beda"}, nil)
 
 		minioRepo.GenerateFileName(filepath.Ext(fileHeader.Filename), "payment-images/public/")
 		minioRepo.GenerateFileNameReturns("/files/payment-images/public/12345678.png")
@@ -172,7 +172,7 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 		})
 		paymentRepo.StartTxReturns(nil)
 
-		payment, err := paymentUsecase.UpdatePayment(ctx, &domain.RequestUpdatePayment{
+		payment, err := paymentUsecase.Update(ctx, &domain.RequestUpdatePayment{
 			ID:          "123",
 			Name:        "sama",
 			Description: "bcatransfer",
@@ -190,11 +190,11 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 		paymentRepo.OpenConnReturns(nil)
 		defer paymentRepo.CloseConn()
 
-		paymentRepo.GetPaymentByID(ctx, "123")
-		paymentRepo.GetPaymentByIDReturns(&domain.Payment{Name: "sama2", Image: "ada"}, nil)
+		paymentRepo.GetByID(ctx, "123")
+		paymentRepo.GetByIDReturns(&domain.Payment{Name: "sama2", Image: "ada"}, nil)
 
-		paymentRepo.GetPaymentByName(ctx, "bca")
-		paymentRepo.GetPaymentByNameReturns(nil, sql.ErrNoRows)
+		paymentRepo.GetByName(ctx, "bca")
+		paymentRepo.GetByNameReturns(nil, sql.ErrNoRows)
 
 		minioRepo.GenerateFileName(filepath.Ext(fileHeader.Filename), "payment-images/public/")
 		minioRepo.GenerateFileNameReturns("/files/payment-images/public/12345678.png")
@@ -207,7 +207,7 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 		})
 		paymentRepo.StartTxReturns(nil)
 
-		payment, err := paymentUsecase.UpdatePayment(ctx, &domain.RequestUpdatePayment{
+		payment, err := paymentUsecase.Update(ctx, &domain.RequestUpdatePayment{
 			ID:          "123",
 			Name:        "sama",
 			Description: "bcatransfer",
@@ -225,11 +225,11 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 		paymentRepo.OpenConnReturns(nil)
 		defer paymentRepo.CloseConn()
 
-		paymentRepo.GetPaymentByID(ctx, "123")
-		paymentRepo.GetPaymentByIDReturns(&domain.Payment{Name: "sama2", Image: "ada"}, nil)
+		paymentRepo.GetByID(ctx, "123")
+		paymentRepo.GetByIDReturns(&domain.Payment{Name: "sama2", Image: "ada"}, nil)
 
-		paymentRepo.GetPaymentByName(ctx, "bca")
-		paymentRepo.GetPaymentByNameReturns(nil, sql.ErrNoRows)
+		paymentRepo.GetByName(ctx, "bca")
+		paymentRepo.GetByNameReturns(nil, sql.ErrNoRows)
 
 		minioRepo.GenerateFileName(filepath.Ext(fileHeader.Filename), "payment-images/public/")
 		minioRepo.GenerateFileNameReturns("/files/payment-images/public/12345678.png")
@@ -242,7 +242,7 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 		})
 		paymentRepo.StartTxReturns(nil)
 
-		payment, err := paymentUsecase.UpdatePayment(ctx, &domain.RequestUpdatePayment{
+		payment, err := paymentUsecase.Update(ctx, &domain.RequestUpdatePayment{
 			ID:          "123",
 			Name:        "sama",
 			Description: "bcatransfer",
@@ -259,10 +259,10 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 		paymentRepo.OpenConnReturns(nil)
 		defer paymentRepo.CloseConn()
 
-		paymentRepo.GetPaymentByID(ctx, "nil")
-		paymentRepo.GetPaymentByIDReturns(nil, sql.ErrNoRows)
+		paymentRepo.GetByID(ctx, "nil")
+		paymentRepo.GetByIDReturns(nil, sql.ErrNoRows)
 
-		payment, err := paymentUsecase.UpdatePayment(ctx, &domain.RequestUpdatePayment{
+		payment, err := paymentUsecase.Update(ctx, &domain.RequestUpdatePayment{
 			ID:          "123",
 			Name:        "bca",
 			Description: "bcatransfer",
@@ -282,13 +282,13 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 		paymentRepo.OpenConnReturns(nil)
 		defer paymentRepo.CloseConn()
 
-		paymentRepo.GetPaymentByID(ctx, "123")
-		paymentRepo.GetPaymentByIDReturns(&domain.Payment{Name: "sama"}, nil)
+		paymentRepo.GetByID(ctx, "123")
+		paymentRepo.GetByIDReturns(&domain.Payment{Name: "sama"}, nil)
 
-		paymentRepo.GetPaymentByName(ctx, "bca")
-		paymentRepo.GetPaymentByNameReturns(&domain.Payment{Name: "sama"}, nil)
+		paymentRepo.GetByName(ctx, "bca")
+		paymentRepo.GetByNameReturns(&domain.Payment{Name: "sama"}, nil)
 
-		payment, err := paymentUsecase.UpdatePayment(ctx, &domain.RequestUpdatePayment{
+		payment, err := paymentUsecase.Update(ctx, &domain.RequestUpdatePayment{
 			ID:          "123",
 			Name:        "bca",
 			Description: "bcatransfer",
@@ -323,10 +323,10 @@ func TestUsecaseGetAllPayment(t *testing.T) {
 		paymentRepo.OpenConnReturns(nil)
 		defer paymentRepo.CloseConn()
 
-		paymentRepo.GetAllPayment(ctx)
-		paymentRepo.GetAllPaymentReturns(data, nil)
+		paymentRepo.GetAll(ctx)
+		paymentRepo.GetAllReturns(data, nil)
 
-		payments, err := paymentUsecase.GetAllPayment(ctx)
+		payments, err := paymentUsecase.GetAll(ctx)
 		assert.NoError(t, err)
 		assert.NotNil(t, payments)
 		assert.Equal(t, 2, len(*payments))
@@ -339,10 +339,10 @@ func TestUsecaseGetAllPayment(t *testing.T) {
 		paymentRepo.OpenConnReturns(nil)
 		defer paymentRepo.CloseConn()
 
-		paymentRepo.GetAllPayment(ctx)
-		paymentRepo.GetAllPaymentReturns(nil, errors.New("error db"))
+		paymentRepo.GetAll(ctx)
+		paymentRepo.GetAllReturns(nil, errors.New("error db"))
 
-		payments, err := paymentUsecase.GetAllPayment(ctx)
+		payments, err := paymentUsecase.GetAll(ctx)
 		assert.Error(t, err)
 		assert.Nil(t, payments)
 		var errHTTP *domain.ErrHTTP

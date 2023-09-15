@@ -15,10 +15,10 @@ func NewNullString(s string) sql.NullString {
 	}
 }
 
-func GetNullString(s sql.NullString) string {
+func GetNullString(s sql.NullString) *string {
 	if s.Valid {
-		return s.String
+		return &s.String
 	}
 
-	return "null"
+	return nil
 }

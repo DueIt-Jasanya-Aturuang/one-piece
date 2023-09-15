@@ -13,6 +13,7 @@ const (
 	LogErrExecContext         = "failed exec context | err : %v"
 	LogErrQueryRowContextScan = "failed scan data | err : %v"
 	LogErrQueryRows           = "failed Rows data | err : %v"
+	LogErrQueryRowsClose      = "failed Close Rows data | err : %v"
 	LogErrQueryRowsScan       = "failed scan data | err : %v"
 )
 

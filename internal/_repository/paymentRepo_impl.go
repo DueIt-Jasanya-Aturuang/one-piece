@@ -23,7 +23,7 @@ func NewPaymentRepositoryImpl(
 	}
 }
 
-func (p *PaymentRepositoryImpl) CreatePayment(ctx context.Context, payment *domain.Payment) error {
+func (p *PaymentRepositoryImpl) Create(ctx context.Context, payment *domain.Payment) error {
 	query := `INSERT INTO m_payment_methods (id, name, description, image, created_at, created_by, updated_at) 
 				VALUES ($1, $2, $3, $4, $5, $6, $7)`
 	tx, err := p.GetTx()
@@ -60,9 +60,9 @@ func (p *PaymentRepositoryImpl) CreatePayment(ctx context.Context, payment *doma
 	return nil
 }
 
-func (p *PaymentRepositoryImpl) UpdatePayment(ctx context.Context, payment *domain.Payment) error {
+func (p *PaymentRepositoryImpl) Update(ctx context.Context, payment *domain.Payment) error {
 	query := `UPDATE m_payment_methods SET name = $1, description = $2, image = $3, updated_at = $4, updated_by = $5 
-            	WHERE id = $6`
+            	WHERE id = $6 AND deleted_at IS NULL`
 	tx, err := p.GetTx()
 	if err != nil {
 		return err
@@ -96,10 +96,10 @@ func (p *PaymentRepositoryImpl) UpdatePayment(ctx context.Context, payment *doma
 	return nil
 }
 
-func (p *PaymentRepositoryImpl) GetPaymentByID(ctx context.Context, id string) (*domain.Payment, error) {
+func (p *PaymentRepositoryImpl) GetByID(ctx context.Context, id string) (*domain.Payment, error) {
 	query := `SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods WHERE id = $1`
+			 FROM m_payment_methods WHERE id = $1 AND deleted_at IS NULL`
 
 	conn, err := p.GetConn()
 	if err != nil {
@@ -140,10 +140,10 @@ func (p *PaymentRepositoryImpl) GetPaymentByID(ctx context.Context, id string) (
 	return &payment, nil
 }
 
-func (p *PaymentRepositoryImpl) GetPaymentByName(ctx context.Context, name string) (*domain.Payment, error) {
+func (p *PaymentRepositoryImpl) GetByName(ctx context.Context, name string) (*domain.Payment, error) {
 	query := `SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods WHERE name = $1`
+			 FROM m_payment_methods WHERE name = $1 AND deleted_at IS NULL`
 
 	conn, err := p.GetConn()
 	if err != nil {
@@ -184,10 +184,10 @@ func (p *PaymentRepositoryImpl) GetPaymentByName(ctx context.Context, name strin
 	return &payment, nil
 }
 
-func (p *PaymentRepositoryImpl) GetAllPayment(ctx context.Context) (*[]domain.Payment, error) {
+func (p *PaymentRepositoryImpl) GetAll(ctx context.Context) (*[]domain.Payment, error) {
 	query := `SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods`
+			 FROM m_payment_methods WHERE deleted_at IS NULL`
 
 	conn, err := p.GetConn()
 	if err != nil {

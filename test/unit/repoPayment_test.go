@@ -30,12 +30,14 @@ func TestRepoCreatePayment(t *testing.T) {
 		Name:        "bca",
 		Description: sql.NullString{},
 		Image:       "bca.png",
-		CreatedAt:   0,
-		CreatedBy:   "userID",
-		UpdatedAt:   0,
-		UpdatedBy:   sql.NullString{},
-		DeletedAt:   sql.NullInt64{},
-		DeletedBy:   sql.NullString{},
+		AuditInfo: domain.AuditInfo{
+			CreatedAt: 0,
+			CreatedBy: "userID",
+			UpdatedAt: 0,
+			UpdatedBy: sql.NullString{},
+			DeletedAt: sql.NullInt64{},
+			DeletedBy: sql.NullString{},
+		},
 	}
 
 	t.Run("SUCCESS_commit", func(t *testing.T) {
@@ -57,7 +59,7 @@ func TestRepoCreatePayment(t *testing.T) {
 		defer paymentRepo.CloseConn()
 
 		err = paymentRepo.StartTx(context.TODO(), &sql.TxOptions{}, func() error {
-			err = paymentRepo.CreatePayment(context.TODO(), &payment)
+			err = paymentRepo.Create(context.TODO(), &payment)
 			assert.NoError(t, err)
 			return err
 		})
@@ -86,7 +88,7 @@ func TestRepoCreatePayment(t *testing.T) {
 		defer paymentRepo.CloseConn()
 
 		err = paymentRepo.StartTx(context.TODO(), &sql.TxOptions{}, func() error {
-			err = paymentRepo.CreatePayment(context.TODO(), &payment)
+			err = paymentRepo.Create(context.TODO(), &payment)
 			assert.Error(t, err)
 			return err
 		})
@@ -106,19 +108,21 @@ func TestRepoUpdatePayment(t *testing.T) {
 	paymentRepo := _repository2.NewPaymentRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`UPDATE m_payment_methods SET name = $1, description = $2, image = $3, updated_at = $4, updated_by = $5 
-            	WHERE id = $6`)
+            	WHERE id = $6 AND deleted_at IS NULL`)
 
 	payment := domain.Payment{
 		ID:          "paymentID",
 		Name:        "bca",
 		Description: sql.NullString{},
 		Image:       "bca.png",
-		CreatedAt:   0,
-		CreatedBy:   "userID",
-		UpdatedAt:   0,
-		UpdatedBy:   sql.NullString{},
-		DeletedAt:   sql.NullInt64{},
-		DeletedBy:   sql.NullString{},
+		AuditInfo: domain.AuditInfo{
+			CreatedAt: 0,
+			CreatedBy: "userID",
+			UpdatedAt: 0,
+			UpdatedBy: sql.NullString{},
+			DeletedAt: sql.NullInt64{},
+			DeletedBy: sql.NullString{},
+		},
 	}
 
 	t.Run("SUCCESS_commit", func(t *testing.T) {
@@ -139,7 +143,7 @@ func TestRepoUpdatePayment(t *testing.T) {
 		defer paymentRepo.CloseConn()
 
 		err = paymentRepo.StartTx(context.TODO(), &sql.TxOptions{}, func() error {
-			err = paymentRepo.UpdatePayment(context.TODO(), &payment)
+			err = paymentRepo.Update(context.TODO(), &payment)
 			assert.NoError(t, err)
 			return err
 		})
@@ -167,7 +171,7 @@ func TestRepoUpdatePayment(t *testing.T) {
 		defer paymentRepo.CloseConn()
 
 		err = paymentRepo.StartTx(context.TODO(), &sql.TxOptions{}, func() error {
-			err = paymentRepo.UpdatePayment(context.TODO(), &payment)
+			err = paymentRepo.Update(context.TODO(), &payment)
 			assert.Error(t, err)
 			return err
 		})
@@ -188,19 +192,21 @@ func TestRepoGetPaymentById(t *testing.T) {
 
 	query := regexp.QuoteMeta(`SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods WHERE id = $1`)
+			 FROM m_payment_methods WHERE id = $1 AND deleted_at IS NULL`)
 
 	payment := domain.Payment{
 		ID:          "paymentID",
 		Name:        "bca",
 		Description: sql.NullString{},
 		Image:       "bca.png",
-		CreatedAt:   0,
-		CreatedBy:   "userID",
-		UpdatedAt:   0,
-		UpdatedBy:   sql.NullString{},
-		DeletedAt:   sql.NullInt64{},
-		DeletedBy:   sql.NullString{},
+		AuditInfo: domain.AuditInfo{
+			CreatedAt: 0,
+			CreatedBy: "userID",
+			UpdatedAt: 0,
+			UpdatedBy: sql.NullString{},
+			DeletedAt: sql.NullInt64{},
+			DeletedBy: sql.NullString{},
+		},
 	}
 
 	rows := sqlmock.NewRows([]string{"id", "name", "description", "image", "created_at", "created_by",
@@ -217,7 +223,7 @@ func TestRepoGetPaymentById(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentRes, err := paymentRepo.GetPaymentByID(context.TODO(), payment.ID)
+		paymentRes, err := paymentRepo.GetByID(context.TODO(), payment.ID)
 		assert.NoError(t, err)
 		assert.NotNil(t, paymentRes)
 
@@ -235,7 +241,7 @@ func TestRepoGetPaymentById(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentResp, err := paymentRepo.GetPaymentByID(context.TODO(), "nil")
+		paymentResp, err := paymentRepo.GetByID(context.TODO(), "nil")
 		assert.Error(t, err)
 		assert.Nil(t, paymentResp)
 		assert.Equal(t, sql.ErrNoRows, err)
@@ -254,19 +260,21 @@ func TestRepoGetPaymentByName(t *testing.T) {
 
 	query := regexp.QuoteMeta(`SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods WHERE name = $1`)
+			 FROM m_payment_methods WHERE name = $1 AND deleted_at IS NULL`)
 
 	payment := domain.Payment{
 		ID:          "paymentID",
 		Name:        "bca",
 		Description: sql.NullString{},
 		Image:       "bca.png",
-		CreatedAt:   0,
-		CreatedBy:   "userID",
-		UpdatedAt:   0,
-		UpdatedBy:   sql.NullString{},
-		DeletedAt:   sql.NullInt64{},
-		DeletedBy:   sql.NullString{},
+		AuditInfo: domain.AuditInfo{
+			CreatedAt: 0,
+			CreatedBy: "userID",
+			UpdatedAt: 0,
+			UpdatedBy: sql.NullString{},
+			DeletedAt: sql.NullInt64{},
+			DeletedBy: sql.NullString{},
+		},
 	}
 
 	rows := sqlmock.NewRows([]string{"id", "name", "description", "image", "created_at", "created_by",
@@ -283,7 +291,7 @@ func TestRepoGetPaymentByName(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentRes, err := paymentRepo.GetPaymentByName(context.TODO(), payment.Name)
+		paymentRes, err := paymentRepo.GetByName(context.TODO(), payment.Name)
 		assert.NoError(t, err)
 		assert.NotNil(t, paymentRes)
 
@@ -301,7 +309,7 @@ func TestRepoGetPaymentByName(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentResp, err := paymentRepo.GetPaymentByName(context.TODO(), "nil")
+		paymentResp, err := paymentRepo.GetByName(context.TODO(), "nil")
 		assert.Error(t, err)
 		assert.Nil(t, paymentResp)
 		assert.Equal(t, sql.ErrNoRows, err)
@@ -320,7 +328,7 @@ func TestRepoGetAllPayment(t *testing.T) {
 
 	query := regexp.QuoteMeta(`SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods`)
+			 FROM m_payment_methods WHERE deleted_at IS NULL`)
 
 	payment := []domain.Payment{
 		{
@@ -328,24 +336,28 @@ func TestRepoGetAllPayment(t *testing.T) {
 			Name:        "bca",
 			Description: sql.NullString{},
 			Image:       "bca.png",
-			CreatedAt:   0,
-			CreatedBy:   "userID",
-			UpdatedAt:   0,
-			UpdatedBy:   sql.NullString{},
-			DeletedAt:   sql.NullInt64{},
-			DeletedBy:   sql.NullString{},
+			AuditInfo: domain.AuditInfo{
+				CreatedAt: 0,
+				CreatedBy: "userID",
+				UpdatedAt: 0,
+				UpdatedBy: sql.NullString{},
+				DeletedAt: sql.NullInt64{},
+				DeletedBy: sql.NullString{},
+			},
 		},
 		{
 			ID:          "paymentID2",
 			Name:        "bni",
 			Description: sql.NullString{},
 			Image:       "bni.png",
-			CreatedAt:   0,
-			CreatedBy:   "userID",
-			UpdatedAt:   0,
-			UpdatedBy:   sql.NullString{},
-			DeletedAt:   sql.NullInt64{},
-			DeletedBy:   sql.NullString{},
+			AuditInfo: domain.AuditInfo{
+				CreatedAt: 0,
+				CreatedBy: "userID",
+				UpdatedAt: 0,
+				UpdatedBy: sql.NullString{},
+				DeletedAt: sql.NullInt64{},
+				DeletedBy: sql.NullString{},
+			},
 		},
 	}
 
@@ -362,7 +374,7 @@ func TestRepoGetAllPayment(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentRes, err := paymentRepo.GetAllPayment(context.TODO())
+		paymentRes, err := paymentRepo.GetAll(context.TODO())
 		assert.NoError(t, err)
 		assert.NotNil(t, paymentRes)
 		assert.Equal(t, 2, len(*paymentRes))

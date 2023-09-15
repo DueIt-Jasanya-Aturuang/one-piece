@@ -6,42 +6,23 @@ import (
 	"mime/multipart"
 )
 
+// Payment entity payment
 type Payment struct {
 	ID          string
 	Name        string
 	Description sql.NullString
 	Image       string
-	CreatedAt   int64
-	CreatedBy   string
-	UpdatedAt   int64
-	UpdatedBy   sql.NullString
-	DeletedAt   sql.NullInt64
-	DeletedBy   sql.NullString
+	AuditInfo
 }
 
-//counterfeiter:generate -o ./mocks . PaymentRepository
-type PaymentRepository interface {
-	CreatePayment(ctx context.Context, payment *Payment) error
-	UpdatePayment(ctx context.Context, payment *Payment) error
-	GetAllPayment(ctx context.Context) (*[]Payment, error)
-	GetPaymentByID(ctx context.Context, id string) (*Payment, error)
-	GetPaymentByName(ctx context.Context, name string) (*Payment, error)
-	UnitOfWorkRepository
-}
-
-//counterfeiter:generate -o ./mocks . PaymentUsecase
-type PaymentUsecase interface {
-	CreatePayment(ctx context.Context, req *RequestCreatePayment) (*ResponsePayment, error)
-	UpdatePayment(ctx context.Context, req *RequestUpdatePayment) (*ResponsePayment, error)
-	GetAllPayment(ctx context.Context) (*[]ResponsePayment, error)
-}
-
+// RequestCreatePayment create payment request
 type RequestCreatePayment struct {
 	Name        string                `form:"name"`
 	Description string                `form:"description"`
 	Image       *multipart.FileHeader `form:"image"`
 }
 
+// RequestUpdatePayment update payment request
 type RequestUpdatePayment struct {
 	Name        string                `form:"name"`
 	Description string                `form:"description"`
@@ -49,9 +30,31 @@ type RequestUpdatePayment struct {
 	ID          string
 }
 
+// ResponsePayment response payment
 type ResponsePayment struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Image       string `json:"image"`
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	Image       string  `json:"image"`
+}
+
+// PaymentRepository payment repository interface
+//
+//counterfeiter:generate -o ./mocks . PaymentRepository
+type PaymentRepository interface {
+	Create(ctx context.Context, payment *Payment) error
+	Update(ctx context.Context, payment *Payment) error
+	GetAll(ctx context.Context) (*[]Payment, error)
+	GetByID(ctx context.Context, id string) (*Payment, error)
+	GetByName(ctx context.Context, name string) (*Payment, error)
+	UnitOfWorkRepository
+}
+
+// PaymentUsecase payment usecase interface
+//
+//counterfeiter:generate -o ./mocks . PaymentUsecase
+type PaymentUsecase interface {
+	Create(ctx context.Context, req *RequestCreatePayment) (*ResponsePayment, error)
+	Update(ctx context.Context, req *RequestUpdatePayment) (*ResponsePayment, error)
+	GetAll(ctx context.Context) (*[]ResponsePayment, error)
 }

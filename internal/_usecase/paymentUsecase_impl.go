@@ -31,7 +31,7 @@ func NewPaymentUsecaseImpl(
 	}
 }
 
-func (p *PaymentUsecaseImpl) CreatePayment(
+func (p *PaymentUsecaseImpl) Create(
 	ctx context.Context, req *domain.RequestCreatePayment,
 ) (resp *domain.ResponsePayment, err error) {
 	if err = p.paymentRepo.OpenConn(ctx); err != nil {
@@ -39,13 +39,12 @@ func (p *PaymentUsecaseImpl) CreatePayment(
 	}
 	defer p.paymentRepo.CloseConn()
 
-	paymentCheck, err := p.paymentRepo.GetPaymentByName(ctx, req.Name)
+	paymentCheck, err := p.paymentRepo.GetByName(ctx, req.Name)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return nil, util.ErrHTTPString("", 500)
 		}
 	}
-	log.Debug().Msgf("%v", paymentCheck)
 	if paymentCheck != nil {
 		return nil, util.ErrHTTPString("nama payment sudah tersedia", 409)
 	}
@@ -58,7 +57,7 @@ func (p *PaymentUsecaseImpl) CreatePayment(
 		Isolation: sql.LevelReadCommitted,
 		ReadOnly:  false,
 	}, func() error {
-		err = p.paymentRepo.CreatePayment(ctx, paymentConv)
+		err = p.paymentRepo.Create(ctx, paymentConv)
 		if err != nil {
 			return err
 		}
@@ -79,7 +78,7 @@ func (p *PaymentUsecaseImpl) CreatePayment(
 	return resp, nil
 }
 
-func (p *PaymentUsecaseImpl) UpdatePayment(
+func (p *PaymentUsecaseImpl) Update(
 	ctx context.Context, req *domain.RequestUpdatePayment,
 ) (resp *domain.ResponsePayment, err error) {
 	if err = p.paymentRepo.OpenConn(ctx); err != nil {
@@ -87,7 +86,7 @@ func (p *PaymentUsecaseImpl) UpdatePayment(
 	}
 	defer p.paymentRepo.CloseConn()
 
-	payment, err := p.paymentRepo.GetPaymentByID(ctx, req.ID)
+	payment, err := p.paymentRepo.GetByID(ctx, req.ID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return nil, util.ErrHTTPString("", 500)
@@ -95,8 +94,9 @@ func (p *PaymentUsecaseImpl) UpdatePayment(
 		return nil, util.ErrHTTPString("payment tidak tersedia", 404)
 	}
 	if payment.Name != req.Name {
-		paymentName, err := p.paymentRepo.GetPaymentByName(ctx, req.Name)
+		paymentName, err := p.paymentRepo.GetByName(ctx, req.Name)
 		if err != nil {
+			log.Info().Err(err).Msgf("err")
 			if !errors.Is(err, sql.ErrNoRows) {
 				return nil, util.ErrHTTPString("", 500)
 			}
@@ -120,7 +120,7 @@ func (p *PaymentUsecaseImpl) UpdatePayment(
 		Isolation: sql.LevelReadCommitted,
 		ReadOnly:  false,
 	}, func() error {
-		if err = p.paymentRepo.UpdatePayment(ctx, paymentConv); err != nil {
+		if err = p.paymentRepo.Update(ctx, paymentConv); err != nil {
 			return err
 		}
 
@@ -147,13 +147,13 @@ func (p *PaymentUsecaseImpl) UpdatePayment(
 	return resp, nil
 }
 
-func (p *PaymentUsecaseImpl) GetAllPayment(ctx context.Context) (*[]domain.ResponsePayment, error) {
+func (p *PaymentUsecaseImpl) GetAll(ctx context.Context) (*[]domain.ResponsePayment, error) {
 	if err := p.paymentRepo.OpenConn(ctx); err != nil {
 		return nil, util.ErrHTTPString("", 500)
 	}
 	defer p.paymentRepo.CloseConn()
 
-	payments, err := p.paymentRepo.GetAllPayment(ctx)
+	payments, err := p.paymentRepo.GetAll(ctx)
 	if err != nil {
 		return nil, util.ErrHTTPString("", 500)
 	}
