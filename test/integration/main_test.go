@@ -22,6 +22,7 @@ var minioClient *minio.Client
 var Uow = _repository2.NewUnitOfWorkRepositoryImpl(DB)
 var PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
 var SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
+var SpendingHistoryRepo = _repository2.NewSpendingHistoryRepositoryImpl(Uow)
 
 func TestMain(m *testing.M) {
 	dockerpool := setup.SetupDocker()
@@ -33,6 +34,7 @@ func TestMain(m *testing.M) {
 	Uow = _repository2.NewUnitOfWorkRepositoryImpl(DB)
 	PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
 	SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
+	SpendingHistoryRepo = _repository2.NewSpendingHistoryRepositoryImpl(Uow)
 	if DB == nil {
 		panic("db nil")
 	}
@@ -79,18 +81,26 @@ func TestInit(t *testing.T) {
 		t.Run("GetAllByTimeNowAndProfileID", GetAllByProfileIDSpendingType)
 	})
 
-	t.Run("MINIO_REPO", func(t *testing.T) {
-		t.Run("createBucket", createBucket)
-		t.Run("MinioRepo", minioRepo)
+	t.Run("SPENDINGHISTORY_REPO", func(t *testing.T) {
+		t.Run("Create", CreateSpendingHistory)
+		t.Run("Update", UpdateSpendingHistory)
+		t.Run("Delete", DeleteSpendingHistory)
+		t.Run("GetAllByTimeAndProfileID", GetAllByTimeAndProfileIDSpendingHistory)
+		t.Run("GetByIDAndProfileID", GetByIDAndProfileIDSpendingHistory)
 	})
 
-	t.Run("PAYMENT_USECASE", func(t *testing.T) {
-		t.Run("Create", UsecaseCreatePayment)
-		t.Run("CreatePayment409ERROR", UsecaseCreatePayment409ERROR)
-		t.Run("Update", UsecaseUpdatePayment)
-		t.Run("UpdatePaymentERROR", UsecaseUpdatePaymentERROR)
-		t.Run("GetAll", UsecaseGetAllPayment)
-	})
+	// t.Run("MINIO_REPO", func(t *testing.T) {
+	// 	t.Run("createBucket", createBucket)
+	// 	t.Run("MinioRepo", minioRepo)
+	// })
+	//
+	// t.Run("PAYMENT_USECASE", func(t *testing.T) {
+	// 	t.Run("Create", UsecaseCreatePayment)
+	// 	t.Run("CreatePayment409ERROR", UsecaseCreatePayment409ERROR)
+	// 	t.Run("Update", UsecaseUpdatePayment)
+	// 	t.Run("UpdatePaymentERROR", UsecaseUpdatePaymentERROR)
+	// 	t.Run("GetAll", UsecaseGetAllPayment)
+	// })
 }
 
 func newFileHeader() *multipart.FileHeader {

@@ -27,6 +27,9 @@ func Migrate(db *sql.DB) {
 	// create table m_spending_type
 	createMSpendingTypeTable(db)
 
+	// create table t_spending_history
+	createMSpendingHistoryTable(db)
+
 }
 
 func createMPaymentMethodTable(db *sql.DB) {
@@ -93,6 +96,48 @@ func createMSpendingTypeTable(db *sql.DB) {
     constraint fk_m_profile
         foreign key (profile_id)
             references m_profiles (id)
+            on delete cascade
+            on update cascade
+    )`)
+	if err != nil {
+		log.Err(err).Msgf("Failed to create table m_spending_type: %s", err)
+		os.Exit(1)
+	}
+}
+
+func createMSpendingHistoryTable(db *sql.DB) {
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS t_spending_history (
+   	id                         VARCHAR(64) NOT NULL UNIQUE PRIMARY KEY,
+    profile_id                 VARCHAR(64),
+    spending_type_id           VARCHAR(64),
+    payment_method_id          VARCHAR(64) NULL,
+    payment_name               VARCHAR(64) NULL,
+    before_balance             DECIMAL,
+    spending_amount            DECIMAL,
+    after_balance              DECIMAL,
+    description                TEXT,
+    location                   VARCHAR(64),
+    time_spending_history      TIMESTAMP,
+    show_time_spending_history VARCHAR(64),
+    created_at                 DECIMAL     NOT NULL,
+    created_by                 VARCHAR(64),
+    updated_at                 DECIMAL     NOT NULL,
+    updated_by                 VARCHAR(64),
+    deleted_at                 DECIMAL,
+    deleted_by                 VARCHAR(64),
+    constraint fk_m_profile
+        foreign key (profile_id)
+            references m_profiles (id)
+            on delete cascade
+            on update cascade,
+    constraint fk_m_spending_type
+        foreign key (spending_type_id)
+            references m_spending_type (id)
+            on delete cascade
+            on update cascade,
+    constraint fk_m_payment_method
+        foreign key (payment_method_id)
+            references m_payment_methods (id)
             on delete cascade
             on update cascade
     )`)

@@ -212,10 +212,9 @@ func (p *PaymentRepositoryImpl) GetAll(ctx context.Context) (*[]domain.Payment, 
 	}
 
 	var payments []domain.Payment
+	var payment domain.Payment
 
 	for rows.Next() {
-		var payment domain.Payment
-
 		if err = rows.Scan(
 			&payment.ID,
 			&payment.Name,
