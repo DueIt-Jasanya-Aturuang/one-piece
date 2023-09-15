@@ -153,6 +153,7 @@ func (s *SpendingTypeRepositoryImpl) CheckData(ctx context.Context, profileID st
 
 	var exist bool
 	if err = stmt.QueryRowContext(ctx, profileID).Scan(&exist); err != nil {
+		log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
 		return false, err
 	}
 
@@ -297,7 +298,7 @@ func (s *SpendingTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id
 	return &spendingType, nil
 }
 
-func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, profileID string, startPeriod time.Time, endPeriod time.Time) (*[]domain.SpendingTypeJoin, error) {
+func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllSpendingType) (*[]domain.SpendingTypeJoin, error) {
 	query := `SELECT mst.id, mst.profile_id, mst.title, mst.maximum_limit, mst.icon, mst.created_at, mst.created_by, 
        				mst.updated_at, mst.updated_by, mst.deleted_at, mst.deleted_by, 
        				COALESCE(SUM(CASE WHEN tsh.time_spending_history BETWEEN $2 AND $3 AND tsh.deleted_at IS NULL THEN tsh.spending_amount ELSE 0 END), 0)
@@ -322,7 +323,7 @@ func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, prof
 		}
 	}()
 
-	rows, err := stmt.QueryContext(ctx, profileID, startPeriod, endPeriod)
+	rows, err := stmt.QueryContext(ctx, req.ProfileID, req.StartTime, req.EndTime)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrQueryRows, err)
 		return nil, err

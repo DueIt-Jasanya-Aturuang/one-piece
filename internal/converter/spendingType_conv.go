@@ -9,7 +9,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
 )
 
-func RequestCreateSpendingTypeToModel(req *domain.RequestCreateSpendingType) *domain.SpendingType {
+func SpendingTypeRequestCreateToModel(req *domain.RequestCreateSpendingType) *domain.SpendingType {
 	id := uuid.NewV4().String()
 	spendingType := &domain.SpendingType{
 		ID:           id,
@@ -27,7 +27,7 @@ func RequestCreateSpendingTypeToModel(req *domain.RequestCreateSpendingType) *do
 	return spendingType
 }
 
-func RequestUpdateSpendingTypeToModel(req *domain.RequestUpdateSpendingType) *domain.SpendingType {
+func SpendingTypeRequestUpdateToModel(req *domain.RequestUpdateSpendingType) *domain.SpendingType {
 	spendingType := &domain.SpendingType{
 		ID:           req.ID,
 		ProfileID:    req.ProfileID,
@@ -43,13 +43,29 @@ func RequestUpdateSpendingTypeToModel(req *domain.RequestUpdateSpendingType) *do
 	return spendingType
 }
 
-func ModelSpendingTypeToResponse(spendingType *domain.SpendingType) *domain.ResponseSpendingType {
+func SpendingTypeModelToResponse(spendingType *domain.SpendingType, formatMaximumLimit string) *domain.ResponseSpendingType {
 	resp := &domain.ResponseSpendingType{
-		ID:           spendingType.ID,
-		ProfileID:    spendingType.ProfileID,
-		Title:        spendingType.Title,
-		MaximumLimit: spendingType.MaximumLimit,
-		Icon:         spendingType.Icon,
+		ID:                 spendingType.ID,
+		ProfileID:          spendingType.ProfileID,
+		Title:              spendingType.Title,
+		MaximumLimit:       spendingType.MaximumLimit,
+		FormatMaximumLimit: formatMaximumLimit,
+		Icon:               spendingType.Icon,
+	}
+
+	return resp
+}
+
+func SpendingTypeModelJoinToResponse(spendingType domain.SpendingTypeJoin, usedPersentase string, formatMaximumLimit string) domain.ResponseSpendingType {
+	resp := domain.ResponseSpendingType{
+		ID:                 spendingType.ID,
+		ProfileID:          spendingType.ProfileID,
+		Title:              spendingType.Title,
+		MaximumLimit:       spendingType.MaximumLimit,
+		FormatMaximumLimit: formatMaximumLimit,
+		Icon:               spendingType.Icon,
+		Used:               spendingType.Used,
+		PersentaseUsed:     usedPersentase,
 	}
 
 	return resp

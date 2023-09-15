@@ -43,13 +43,19 @@ type RequestUpdateSpendingType struct {
 	Icon         string `json:"icon"`
 }
 
+type RequestGetAllSpendingType struct {
+	ProfileID string
+	StartTime time.Time
+	EndTime   time.Time
+}
+
 // ResponseSpendingType response spending type
 type ResponseSpendingType struct {
 	ID                 string `json:"id"`
 	ProfileID          string `json:"profile_id"`
 	Title              string `json:"title"`
 	MaximumLimit       int    `json:"maximum_limit"`
-	FormatMaximumLimit int    `json:"format_maximum_limit"`
+	FormatMaximumLimit string `json:"format_maximum_limit"`
 	Icon               string `json:"icon"`
 	Used               int    `json:"used,omiempty"`
 	PersentaseUsed     string `json:"persentase_used,omitempty"`
@@ -64,7 +70,7 @@ type SpendingTypeRepository interface {
 	GetDefault(ctx context.Context) (*[]SpendingType, error)
 	GetByID(ctx context.Context, id string) (*SpendingType, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)
-	GetAllByProfileID(ctx context.Context, profileID string, startPeriod time.Time, endPeriod time.Time) (*[]SpendingTypeJoin, error)
+	GetAllByProfileID(ctx context.Context, req *RequestGetAllSpendingType) (*[]SpendingTypeJoin, error)
 	UnitOfWorkRepository
 }
 
@@ -74,5 +80,5 @@ type SpendingTypeUsecase interface {
 	Update(ctx context.Context, req *RequestUpdateSpendingType) (*ResponseSpendingType, error)
 	Delete(ctx context.Context, id string, profileID string) error
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseSpendingType, error)
-	GetAllByProfileID(ctx context.Context, profileID string) (*[]ResponseSpendingType, error)
+	GetAllByProfileID(ctx context.Context, profileID string, periode int) (*[]ResponseSpendingType, error)
 }

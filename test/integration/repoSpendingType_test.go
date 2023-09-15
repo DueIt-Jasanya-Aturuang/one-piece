@@ -179,7 +179,13 @@ func GetAllByProfileIDSpendingType(t *testing.T) {
 
 	startPeriod := time.Date(time.Now().Year(), time.Now().Month(), 14, 0, 0, 0, 0, time.UTC)
 	endPeriod := startPeriod.AddDate(0, 1, 0)
-	spendingTypes, err := SpendingTypeRepo.GetAllByProfileID(context.TODO(), "profileID1", startPeriod, endPeriod)
+
+	req := &domain.RequestGetAllSpendingType{
+		ProfileID: "profileID1",
+		StartTime: startPeriod,
+		EndTime:   endPeriod,
+	}
+	spendingTypes, err := SpendingTypeRepo.GetAllByProfileID(context.TODO(), req)
 	assert.NoError(t, err)
 	assert.NotNil(t, spendingTypes)
 	t.Log(spendingTypes)

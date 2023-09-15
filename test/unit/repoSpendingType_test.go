@@ -249,9 +249,14 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs("test", startPeriod, endPeriod).WillReturnRows(rows)
 
+		req := &domain.RequestGetAllSpendingType{
+			ProfileID: "test",
+			StartTime: startPeriod,
+			EndTime:   endPeriod,
+		}
 		err := spendingTypeRepo.OpenConn(context.TODO())
 		assert.NoError(t, err)
-		spendingType, err := spendingTypeRepo.GetAllByProfileID(context.TODO(), "test", startPeriod, endPeriod)
+		spendingType, err := spendingTypeRepo.GetAllByProfileID(context.TODO(), req)
 		assert.NoError(t, err)
 		assert.NotNil(t, spendingType)
 		assert.Equal(t, 3, len(*spendingType))
@@ -265,9 +270,14 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs("test", startPeriod, endPeriod).WillReturnRows(rows)
 
+		req := &domain.RequestGetAllSpendingType{
+			ProfileID: "test",
+			StartTime: startPeriod,
+			EndTime:   endPeriod,
+		}
 		err := spendingTypeRepo.OpenConn(context.TODO())
 		assert.NoError(t, err)
-		spendingType, err := spendingTypeRepo.GetAllByProfileID(context.TODO(), "test", startPeriod, endPeriod)
+		spendingType, err := spendingTypeRepo.GetAllByProfileID(context.TODO(), req)
 		assert.NoError(t, err)
 		assert.NotNil(t, spendingType)
 		assert.Equal(t, 0, len(*spendingType))
