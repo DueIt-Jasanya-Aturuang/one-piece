@@ -71,6 +71,7 @@ func TestInit(t *testing.T) {
 		t.Run("Create", CreateSpendingType)
 		t.Run("Update", UpdateSpendingType)
 		t.Run("Delete", DeleteSpendingType)
+		t.Run("CheckData", CheckDataSpendingType)
 		t.Run("GetByID", GetByIDSpendingType)
 		t.Run("GetByID_ERROR-deleted_at-null", GetByIDSpendingTypeERRORDeletedAtNull)
 		t.Run("GetByID_ERROR-invalid-id", GetByIDSpendingTypeERRORInvalidID)
@@ -78,7 +79,8 @@ func TestInit(t *testing.T) {
 		t.Run("GetByIDAndProfileID_ERROR-deleted_at-null", GetByIDAndProfileIDSpendingTypeERRORDeletedAtNull)
 		t.Run("GetByIDAndProfileID_ERROR-invalid-id", GetByIDAndProfileIDSpendingTypeERRORInvalidID)
 		t.Run("GetByIDAndProfileID_ERROR-invalid-profile_id", GetByIDAndProfileIDSpendingTypeERRORInvalidProfileID)
-		t.Run("GetAllByTimeNowAndProfileID", GetAllByProfileIDSpendingType)
+		t.Run("GetAllByProfileID", GetAllByProfileIDSpendingType)
+		t.Run("GetDefault", GetDefaultSpendingType)
 	})
 
 	t.Run("SPENDINGHISTORY_REPO", func(t *testing.T) {

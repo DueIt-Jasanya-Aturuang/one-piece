@@ -26,6 +26,8 @@ func Migrate(db *sql.DB) {
 
 	// create table m_spending_type
 	createMSpendingTypeTable(db)
+	createMDefaultSpendingTypeTable(db)
+	createMDefaultSpendingTypeData(db)
 
 	// create table t_spending_history
 	createMSpendingHistoryTable(db)
@@ -112,6 +114,7 @@ func createMDefaultSpendingTypeTable(db *sql.DB) {
     title         VARCHAR(64),
     active        BOOLEAN,
     maximum_limit DECIMAL,
+    icon          VARCHAR(64),
     created_at    DECIMAL     NOT NULL,
     created_by    VARCHAR(64),
     updated_at    DECIMAL     NOT NULL,
@@ -127,24 +130,24 @@ func createMDefaultSpendingTypeTable(db *sql.DB) {
 
 func createMDefaultSpendingTypeData(db *sql.DB) {
 	_, err := db.Exec(`INSERT INTO m_default_spending_type
-(id, title, active, maximum_limit, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
-VALUES('215d0320-fda1-4008-b8d6-f6f6e96b853b', 'makan', true, 100000, 1684768516, NULL, 1684768516, NULL, NULL, NULL);`)
+(id, title, active, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES('215d0320-fda1-4008-b8d6-f6f6e96b853b', 'makan', true, 100000, 'icon.png', 1684768516, 'admin', 1684768516, NULL, NULL, NULL);`)
 	if err != nil {
 		log.Err(err).Msgf("Failed to create table m_spending_type: %s", err)
 		os.Exit(1)
 	}
 
 	_, err = db.Exec(`INSERT INTO m_default_spending_type
-(id, title, active, maximum_limit, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
-VALUES('7101e34a-2c12-4d26-97c4-22c2ee4f4cfa', 'transportasi', true, 200000, 1684768516, NULL, 1684768516, NULL, NULL, NULL);`)
+(id, title, active, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES('7101e34a-2c12-4d26-97c4-22c2ee4f4cfa', 'transportasi', true, 200000, 'icon.png', 1684768516, 'admin', 1684768516, NULL, NULL, NULL);`)
 	if err != nil {
 		log.Err(err).Msgf("Failed to create table m_spending_type: %s", err)
 		os.Exit(1)
 	}
 
 	_, err = db.Exec(`INSERT INTO m_default_spending_type
-(id, title, active, maximum_limit, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
-VALUES('c20d8e45-c246-4b55-ac1f-80e0a1c5d48c', 'loundry', true, 300000, 1684768516, NULL, 1684768516, NULL, NULL, NULL);`)
+(id, title, active, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES('c20d8e45-c246-4b55-ac1f-80e0a1c5d48c', 'loundry', true, 300000, 'icon.png', 1684768516, 'admin', 1684768516, NULL, NULL, NULL);`)
 	if err != nil {
 		log.Err(err).Msgf("Failed to create table m_spending_type: %s", err)
 		os.Exit(1)

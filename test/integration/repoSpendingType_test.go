@@ -185,3 +185,24 @@ func GetAllByProfileIDSpendingType(t *testing.T) {
 	t.Log(spendingTypes)
 	assert.Equal(t, 4, len(*spendingTypes))
 }
+
+func GetDefaultSpendingType(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	getDefault, err := SpendingTypeRepo.GetDefault(context.TODO())
+	assert.NoError(t, err)
+	assert.NotNil(t, getDefault)
+	assert.Equal(t, 3, len(*getDefault))
+}
+
+func CheckDataSpendingType(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	exist, err := SpendingTypeRepo.CheckData(context.TODO(), "profileID1")
+	assert.NoError(t, err)
+	assert.Equal(t, true, exist)
+}

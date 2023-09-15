@@ -132,6 +132,33 @@ func (s *SpendingTypeRepositoryImpl) Delete(ctx context.Context, id string, prof
 	return nil
 }
 
+func (s *SpendingTypeRepositoryImpl) CheckData(ctx context.Context, profileID string) (bool, error) {
+	query := `SELECT EXISTS(SELECT id FROM m_spending_type WHERE profile_id = $1);`
+
+	conn, err := s.GetConn()
+	if err != nil {
+		return false, err
+	}
+
+	stmt, err := conn.PrepareContext(ctx, query)
+	if err != nil {
+		log.Warn().Msgf(util.LogErrPrepareContext, err)
+		return false, err
+	}
+	defer func() {
+		if errClose := stmt.Close(); errClose != nil {
+			log.Warn().Msgf(util.LogErrPrepareContextClose, err)
+		}
+	}()
+
+	var exist bool
+	if err = stmt.QueryRowContext(ctx, profileID).Scan(&exist); err != nil {
+		return false, err
+	}
+
+	return exist, nil
+}
+
 func (s *SpendingTypeRepositoryImpl) GetByID(ctx context.Context, id string) (*domain.SpendingType, error) {
 	query := `SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_spending_type WHERE id = $1 AND deleted_at IS NULL`
@@ -173,6 +200,58 @@ func (s *SpendingTypeRepositoryImpl) GetByID(ctx context.Context, id string) (*d
 	}
 
 	return &spendingType, nil
+}
+
+func (s *SpendingTypeRepositoryImpl) GetDefault(ctx context.Context) (*[]domain.SpendingType, error) {
+	query := `SELECT id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
+				FROM m_default_spending_type WHERE active = true AND deleted_at IS NULL`
+
+	conn, err := s.GetConn()
+	if err != nil {
+		return nil, err
+	}
+
+	stmt, err := conn.PrepareContext(ctx, query)
+	if err != nil {
+		log.Warn().Msgf(util.LogErrPrepareContext, err)
+		return nil, err
+	}
+	defer func() {
+		if errClose := stmt.Close(); errClose != nil {
+			log.Warn().Msgf(util.LogErrPrepareContextClose, err)
+		}
+	}()
+
+	rows, err := stmt.QueryContext(ctx)
+	if err != nil {
+		log.Warn().Msgf(util.LogErrQueryRows, err)
+		return nil, err
+	}
+
+	var spendingTypes []domain.SpendingType
+	var spendingType domain.SpendingType
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&spendingType.ID,
+			&spendingType.Title,
+			&spendingType.MaximumLimit,
+			&spendingType.Icon,
+			&spendingType.CreatedAt,
+			&spendingType.CreatedBy,
+			&spendingType.UpdatedAt,
+			&spendingType.UpdatedBy,
+			&spendingType.DeletedAt,
+			&spendingType.DeletedBy,
+		); err != nil {
+			log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
+			return nil, err
+		}
+
+		spendingTypes = append(spendingTypes, spendingType)
+	}
+
+	return &spendingTypes, nil
 }
 
 func (s *SpendingTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.SpendingType, error) {
