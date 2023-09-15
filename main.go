@@ -1,56 +1,70 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"reflect"
-	"strings"
+	"net/http"
 
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/infrastructures/db"
-	dbImpl "github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/infrastructures/db/dbImpl"
-	convertErentity "github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/helpers/converter-entity"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/helpers/minio"
-	httpProtocol "github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/http-protocol"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/logs"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/internal/utils/validation"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/handlers"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/repositories"
-	"github.com/DueIt-Jasanya-Aturuang/DueIt-Payment-Service/src/modules/services"
-	"github.com/go-playground/validator/v10"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/rs/zerolog/log"
+
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
 )
 
 func main() {
-	dir, _ := os.Getwd()
-	dir = fmt.Sprintf("%s/internal/logs", dir)
-	logs.InitLogger(logs.Config{
-		ConsoleLoggingEnabled: true,
-		EncodeLogsAsJson:      true,
-		FileLoggingEnabled:    true,
-		Directory:             dir,
-		Filename:              "spending.log",
-		MaxSize:               200000000,
-		MaxBackups:            2000,
-		MaxAge:                2000,
+	config.LogInit()
+	config.EnvInit()
+
+	pgConn := config.NewPostgresConn()
+	minioConn := config.NewMinioConn()
+
+	// repository
+	uow := _repository.NewUnitOfWorkRepositoryImpl(pgConn)
+	paymentRepo := _repository.NewPaymentRepositoryImpl(uow)
+	minioRepo := _repository.NewMinioImpl(minioConn)
+	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
+	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
+
+	// usecase
+	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	spendingTypeUsecase := _usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
+	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo)
+
+	// handler
+	paymentHandler := rest.NewPaymentHandlerImpl(paymentUsecase)
+	spendingTypeHandler := rest.NewSpendingTypeHandlerImpl(spendingTypeUsecase)
+	spendingHistoryHandler := rest.NewSpendingHistoryHandlerImpl(spendingHistoryUsecase)
+
+	// route
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.MethodNotAllowed(helper.MethodNotAllowed)
+
+	r.Route("/finance", func(r chi.Router) {
+		r.Get("/payment", paymentHandler.GetAll)
+		r.Post("/payment", paymentHandler.Create)
+		r.Put("/payment/{id}", paymentHandler.Update)
+
+		r.Get("/spending-type/{profile-id}", spendingTypeHandler.GetAllByProfileID)
+		r.Post("/spending-type", spendingTypeHandler.Create)
+		r.Put("/spending-type/{profile-id}/{id}", spendingTypeHandler.Update)
+		r.Delete("/spending-type/{profile-id}/{id}", spendingTypeHandler.Delete)
+
+		r.Get("/spending-history/{profile-id}", spendingHistoryHandler.GetAllByProfileID)
+		r.Get("/spending-history/{profile-id}/{id}", spendingHistoryHandler.GetByIDAndProfileID)
+		r.Post("/spending-history", spendingHistoryHandler.Create)
+		r.Put("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Update)
+		r.Delete("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Delete)
 	})
 
-	postgresDb := db.NewPostgresConnection()
-	dbImpl := dbImpl.NewDbImpl(postgresDb)
-	converter := convertErentity.NewConvertImpl()
-	validator := validator.New()
-	validator.RegisterValidation("unique", validation.MustUnique)
-	validator.RegisterTagNameFunc(func(field reflect.StructField) string {
-		name := strings.SplitN(field.Tag.Get("json"), ",", 2)[0]
-		if name == "-" {
-			return ""
-		}
-		return name
-	})
+	log.Info().Msgf("Server is running on port %s", config.AppAddr)
+	err := http.ListenAndServe(config.AppAddr, r)
+	if err != nil {
+		log.Fatal().Err(err).Msgf("failed listen server on %s", config.AppAddr)
+	}
 
-	paymentRepo := repositories.NewRepositoryImpl()
-	minio := minio.NewMinioImpl()
-	paymentService := services.NewPaymentServiceImpl(paymentRepo, dbImpl, converter, validator, minio)
-
-	httpHandler := handlers.NewHttpHandler(paymentService)
-	http := httpProtocol.NewHttpImpl(httpHandler)
-	http.Listen()
 }
