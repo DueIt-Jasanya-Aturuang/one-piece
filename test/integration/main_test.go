@@ -89,18 +89,18 @@ func TestInit(t *testing.T) {
 		t.Run("GetByIDAndProfileID", GetByIDAndProfileIDSpendingHistory)
 	})
 
-	// t.Run("MINIO_REPO", func(t *testing.T) {
-	// 	t.Run("createBucket", createBucket)
-	// 	t.Run("MinioRepo", minioRepo)
-	// })
-	//
-	// t.Run("PAYMENT_USECASE", func(t *testing.T) {
-	// 	t.Run("Create", UsecaseCreatePayment)
-	// 	t.Run("CreatePayment409ERROR", UsecaseCreatePayment409ERROR)
-	// 	t.Run("Update", UsecaseUpdatePayment)
-	// 	t.Run("UpdatePaymentERROR", UsecaseUpdatePaymentERROR)
-	// 	t.Run("GetAll", UsecaseGetAllPayment)
-	// })
+	t.Run("MINIO_REPO", func(t *testing.T) {
+		t.Run("createBucket", createBucket)
+		t.Run("MinioRepo", minioRepo)
+	})
+
+	t.Run("PAYMENT_USECASE", func(t *testing.T) {
+		t.Run("Create", UsecaseCreatePayment)
+		t.Run("CreatePayment409ERROR", UsecaseCreatePayment409ERROR)
+		t.Run("Update", UsecaseUpdatePayment)
+		t.Run("UpdatePaymentERROR", UsecaseUpdatePaymentERROR)
+		t.Run("GetAll", UsecaseGetAllPayment)
+	})
 }
 
 func newFileHeader() *multipart.FileHeader {
