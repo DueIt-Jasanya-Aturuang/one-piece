@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
@@ -21,11 +22,8 @@ func ErrorResponseEncode(w http.ResponseWriter, err error) {
 
 	switch {
 	case errors.As(err, &errUnmarshalType):
-		err = util.ErrHTTP422(map[string][]string{
-			errUnmarshalType.Field: {
-				"invalid tipe input, tipe harus tipe data ", errUnmarshalType.Type.String(),
-			},
-		})
+		msg := fmt.Sprintf("UnprocessableEntity : %s", err.Error())
+		err = util.ErrHTTPString(msg, http.StatusUnprocessableEntity)
 	case errors.As(err, &errSyntak):
 		err = util.ErrHTTP400(map[string][]string{
 			"unexpected": {
