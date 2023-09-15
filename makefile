@@ -4,7 +4,7 @@
 # Variabel untuk parameter koneksi database
 DB_URL := "postgres://dueit_user:dueit_password@27.112.78.47:5432/dueit_db?search_path=dueit&sslmode=disable"
 
-name := "m_default_spending_type"
+name := "m_balance"
 # Variabel untuk direktori migrations
 MIGRATIONS_DIR := infra/migrations
 
