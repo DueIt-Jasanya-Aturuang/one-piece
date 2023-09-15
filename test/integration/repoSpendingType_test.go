@@ -18,6 +18,7 @@ func CreateSpendingType(t *testing.T) {
 		ProfileID:    "profileID1",
 		Title:        "title",
 		MaximumLimit: 15000000,
+		Icon:         "icon",
 		AuditInfo: domain.AuditInfo{
 			CreatedAt: time.Now().Unix(),
 			CreatedBy: "profileID1",
@@ -51,6 +52,7 @@ func UpdateSpendingType(t *testing.T) {
 		ID:           "spendingType1",
 		ProfileID:    "profileID1",
 		Title:        "title",
+		Icon:         "icon",
 		MaximumLimit: 15000000,
 		AuditInfo: domain.AuditInfo{
 			UpdatedAt: time.Now().Unix(),

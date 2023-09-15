@@ -10,6 +10,7 @@ type SpendingType struct {
 	ProfileID    string
 	Title        string
 	MaximumLimit int
+	Icon         string
 	AuditInfo
 }
 
@@ -18,6 +19,7 @@ type RequestCreateSpendingType struct {
 	ProfileID    string `json:"profile_id"`
 	Title        string `json:"title"`
 	MaximumLimit int    `json:"maximum_limit"`
+	Icon         string `json:"icon"`
 }
 
 // RequestUpdateSpendingType request update spending type
@@ -26,6 +28,7 @@ type RequestUpdateSpendingType struct {
 	ProfileID    string
 	Title        string `json:"title"`
 	MaximumLimit int    `json:"maximum_limit"`
+	Icon         string `json:"icon"`
 }
 
 // ResponseSpendingType response spending type
@@ -34,6 +37,7 @@ type ResponseSpendingType struct {
 	ProfileID    string `json:"profile_id"`
 	Title        string `json:"title"`
 	MaximumLimit int    `json:"maximum_limit"`
+	Icon         string `json:"icon"`
 }
 
 // SpendingTypeRepository spending history repository interface

@@ -22,13 +22,14 @@ func TestRepoSpendingTypeCreate(t *testing.T) {
 	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
 	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
 
-	query := regexp.QuoteMeta(`INSERT INTO m_spending_type (id, profile_id, title, maximum_limit, created_at, created_by, updated_at) 
-				VALUES ($1, $2, $3, $4, $5, $6, $7)`)
+	query := regexp.QuoteMeta(`INSERT INTO m_spending_type (id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at) 
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`)
 	spendingType := &domain.SpendingType{
 		ID:           "test",
 		ProfileID:    "test",
 		Title:        "test",
 		MaximumLimit: 123,
+		Icon:         "test",
 		AuditInfo: domain.AuditInfo{
 			CreatedAt: 0,
 			CreatedBy: "test",
@@ -39,7 +40,7 @@ func TestRepoSpendingTypeCreate(t *testing.T) {
 		mocksql.ExpectBegin()
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectExec(query).WithArgs(
-			"test", "test", "test", 123, 0, "test", 0,
+			"test", "test", "test", 123, "test", 0, "test", 0,
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 		mocksql.ExpectCommit()
 
@@ -65,13 +66,14 @@ func TestRepoSpendingTypeUpdate(t *testing.T) {
 	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
 	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
 
-	query := regexp.QuoteMeta(`UPDATE m_spending_type SET title = $1, maximum_limit = $2, updated_at = $3, updated_by = $4 
-                    WHERE id = $5 AND profile_id = $6 AND deleted_at IS NULL`)
+	query := regexp.QuoteMeta(`UPDATE m_spending_type SET title = $1, maximum_limit = $2, icon = $3, updated_at = $4, updated_by = $5 
+                    WHERE id = $6 AND profile_id = $7 AND deleted_at IS NULL`)
 	spendingType := &domain.SpendingType{
 		ID:           "test",
 		ProfileID:    "test",
 		Title:        "test",
 		MaximumLimit: 123,
+		Icon:         "test",
 		AuditInfo: domain.AuditInfo{
 			UpdatedAt: 0,
 			UpdatedBy: sql.NullString{String: "test", Valid: true},
@@ -81,7 +83,7 @@ func TestRepoSpendingTypeUpdate(t *testing.T) {
 		mocksql.ExpectBegin()
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectExec(query).WithArgs(
-			"test", 123, 0, "test", "test", "test",
+			"test", 123, "test", 0, "test", "test", "test",
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 		mocksql.ExpectCommit()
 
@@ -140,13 +142,13 @@ func TestRepoSpendingTypeGetByID(t *testing.T) {
 	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
 	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
 
-	query := regexp.QuoteMeta(`SELECT id, profile_id, title, maximum_limit, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
+	query := regexp.QuoteMeta(`SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_spending_type WHERE id = $1 AND deleted_at IS NULL`)
-	rows := sqlmock.NewRows([]string{"id", "profile_id", "title", "maximum_limit", "created_at", "created_by",
+	rows := sqlmock.NewRows([]string{"id", "profile_id", "title", "maximum_limit", "icon", "created_at", "created_by",
 		"updated_at", "updated_by", "deleted_at", "deleted_by"})
 
 	t.Run("SUCCESS", func(t *testing.T) {
-		rows.AddRow("test", "test", "test", 123, 0, "test", 0, nil, nil, nil)
+		rows.AddRow("test", "test", "test", 123, "test", 0, "test", 0, nil, nil, nil)
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs("test").WillReturnRows(rows)
 
@@ -184,13 +186,13 @@ func TestRepoSpendingTypeGetByIDAndProfileID(t *testing.T) {
 	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
 	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
 
-	query := regexp.QuoteMeta(`SELECT id, profile_id, title, maximum_limit, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
+	query := regexp.QuoteMeta(`SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_spending_type WHERE id = $1 AND profile_id = $2 AND deleted_at IS NULL`)
-	rows := sqlmock.NewRows([]string{"id", "profile_id", "title", "maximum_limit", "created_at", "created_by",
+	rows := sqlmock.NewRows([]string{"id", "profile_id", "title", "maximum_limit", "icon", "created_at", "created_by",
 		"updated_at", "updated_by", "deleted_at", "deleted_by"})
 
 	t.Run("SUCCESS", func(t *testing.T) {
-		rows.AddRow("test", "test", "test", 123, 0, "test", 0, nil, nil, nil)
+		rows.AddRow("test", "test", "test", 123, "test", 0, "test", 0, nil, nil, nil)
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs("test", "test").WillReturnRows(rows)
 
@@ -228,15 +230,15 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
 	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
 	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
 
-	query := regexp.QuoteMeta(`SELECT id, profile_id, title, maximum_limit, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
+	query := regexp.QuoteMeta(`SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_spending_type WHERE profile_id = $1 AND deleted_at IS NULL`)
-	rows := sqlmock.NewRows([]string{"id", "profile_id", "title", "maximum_limit", "created_at", "created_by",
+	rows := sqlmock.NewRows([]string{"id", "profile_id", "title", "maximum_limit", "icon", "created_at", "created_by",
 		"updated_at", "updated_by", "deleted_at", "deleted_by"})
 
 	t.Run("SUCCESS", func(t *testing.T) {
-		rows.AddRow("test", "test", "test", 123, 0, "test", 0, nil, nil, nil)
-		rows.AddRow("test1", "test", "test1", 123, 0, "test1", 0, nil, nil, nil)
-		rows.AddRow("test2", "test", "test2", 123, 0, "test2", 0, nil, nil, nil)
+		rows.AddRow("test", "test", "test", 123, "test", 0, "test", 0, nil, nil, nil)
+		rows.AddRow("test1", "test", "test1", 123, "test", 0, "test1", 0, nil, nil, nil)
+		rows.AddRow("test2", "test", "test2", 123, "test", 0, "test2", 0, nil, nil, nil)
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs("test").WillReturnRows(rows)
 

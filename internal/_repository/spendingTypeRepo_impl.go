@@ -25,8 +25,8 @@ func NewSpendingTypeRepositoryImpl(
 }
 
 func (s *SpendingTypeRepositoryImpl) Create(ctx context.Context, spendingType *domain.SpendingType) error {
-	query := `INSERT INTO m_spending_type (id, profile_id, title, maximum_limit, created_at, created_by, updated_at) 
-				VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	query := `INSERT INTO m_spending_type (id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at) 
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	tx, err := s.GetTx()
 	if err != nil {
@@ -50,6 +50,7 @@ func (s *SpendingTypeRepositoryImpl) Create(ctx context.Context, spendingType *d
 		spendingType.ProfileID,
 		spendingType.Title,
 		spendingType.MaximumLimit,
+		spendingType.Icon,
 		spendingType.CreatedAt,
 		spendingType.CreatedBy,
 		spendingType.UpdatedAt,
@@ -62,8 +63,8 @@ func (s *SpendingTypeRepositoryImpl) Create(ctx context.Context, spendingType *d
 }
 
 func (s *SpendingTypeRepositoryImpl) Update(ctx context.Context, spendingType *domain.SpendingType) error {
-	query := `UPDATE m_spending_type SET title = $1, maximum_limit = $2, updated_at = $3, updated_by = $4 
-                    WHERE id = $5 AND profile_id = $6 AND deleted_at IS NULL`
+	query := `UPDATE m_spending_type SET title = $1, maximum_limit = $2, icon = $3, updated_at = $4, updated_by = $5 
+                    WHERE id = $6 AND profile_id = $7 AND deleted_at IS NULL`
 
 	tx, err := s.GetTx()
 	if err != nil {
@@ -85,6 +86,7 @@ func (s *SpendingTypeRepositoryImpl) Update(ctx context.Context, spendingType *d
 		ctx,
 		spendingType.Title,
 		spendingType.MaximumLimit,
+		spendingType.Icon,
 		spendingType.UpdatedAt,
 		spendingType.UpdatedBy,
 		spendingType.ID,
@@ -131,7 +133,7 @@ func (s *SpendingTypeRepositoryImpl) Delete(ctx context.Context, id string, prof
 }
 
 func (s *SpendingTypeRepositoryImpl) GetByID(ctx context.Context, id string) (*domain.SpendingType, error) {
-	query := `SELECT id, profile_id, title, maximum_limit, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
+	query := `SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_spending_type WHERE id = $1 AND deleted_at IS NULL`
 
 	conn, err := s.GetConn()
@@ -156,6 +158,7 @@ func (s *SpendingTypeRepositoryImpl) GetByID(ctx context.Context, id string) (*d
 		&spendingType.ProfileID,
 		&spendingType.Title,
 		&spendingType.MaximumLimit,
+		&spendingType.Icon,
 		&spendingType.CreatedAt,
 		&spendingType.CreatedBy,
 		&spendingType.UpdatedAt,
@@ -173,7 +176,7 @@ func (s *SpendingTypeRepositoryImpl) GetByID(ctx context.Context, id string) (*d
 }
 
 func (s *SpendingTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.SpendingType, error) {
-	query := `SELECT id, profile_id, title, maximum_limit, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
+	query := `SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_spending_type WHERE id = $1 AND profile_id = $2 AND deleted_at IS NULL`
 
 	conn, err := s.GetConn()
@@ -198,6 +201,7 @@ func (s *SpendingTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id
 		&spendingType.ProfileID,
 		&spendingType.Title,
 		&spendingType.MaximumLimit,
+		&spendingType.Icon,
 		&spendingType.CreatedAt,
 		&spendingType.CreatedBy,
 		&spendingType.UpdatedAt,
@@ -215,7 +219,7 @@ func (s *SpendingTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id
 }
 
 func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.SpendingType, error) {
-	query := `SELECT id, profile_id, title, maximum_limit, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
+	query := `SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_spending_type WHERE profile_id = $1 AND deleted_at IS NULL`
 
 	conn, err := s.GetConn()
@@ -253,6 +257,7 @@ func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, prof
 			&spendingType.ProfileID,
 			&spendingType.Title,
 			&spendingType.MaximumLimit,
+			&spendingType.Icon,
 			&spendingType.CreatedAt,
 			&spendingType.CreatedBy,
 			&spendingType.UpdatedAt,
