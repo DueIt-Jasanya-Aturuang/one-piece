@@ -142,7 +142,7 @@ func (s *SpendingTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id st
 	return resp, nil
 }
 
-func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string, periode int) (*[]domain.ResponseSpendingType, error) {
+func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string, periode int) (*domain.ResponseAllSpendingType, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
 		return nil, err
@@ -188,12 +188,21 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 
 	var resps []domain.ResponseSpendingType
 	var resp domain.ResponseSpendingType
+	var budgetAmount int
+
 	for _, spendingType := range *spendingTypes {
+		budgetAmount += spendingType.Used
 		formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
 		persentaseMaximumLimit := helper.Persentase(spendingType.Used, spendingType.MaximumLimit)
+
 		resp = converter.SpendingTypeModelJoinToResponse(spendingType, persentaseMaximumLimit, formatMaximumLimit)
 		resps = append(resps, resp)
 	}
 
-	return &resps, nil
+	respAll := &domain.ResponseAllSpendingType{
+		ResponseSpendingType: &resps,
+		BudgetAmount:         budgetAmount,
+		FormatBudgetAmount:   helper.FormatRupiah(budgetAmount),
+	}
+	return respAll, nil
 }

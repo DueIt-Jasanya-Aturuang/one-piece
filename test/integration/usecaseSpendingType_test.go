@@ -93,12 +93,12 @@ func GetAllByProfileIDSpendingTypeUsecase(t *testing.T) {
 	resp, err := SpendingTypeUsecase.GetAllByProfileID(context.TODO(), "profileID1", 14)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
-	t.Log(resp)
+	t.Log(resp.ResponseSpendingType)
 }
 
 func GetAllByProfileIDSpendingTypeUsecaseWithCreateDefaultType(t *testing.T) {
 	resp, err := SpendingTypeUsecase.GetAllByProfileID(context.TODO(), "profileID2", 14)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.Equal(t, 3, len(*resp))
+	assert.Equal(t, 3, len(*resp.ResponseSpendingType))
 }

@@ -27,6 +27,7 @@ var SpendingHistoryRepo = _repository2.NewSpendingHistoryRepositoryImpl(Uow)
 var SpendingTypeUsecase = _usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
 
 func TestMain(m *testing.M) {
+	config.LogInit()
 	dockerpool := setup.SetupDocker()
 	var resources []*dockertest.Resource
 

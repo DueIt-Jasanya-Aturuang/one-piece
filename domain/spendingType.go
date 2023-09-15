@@ -61,6 +61,13 @@ type ResponseSpendingType struct {
 	PersentaseUsed     string `json:"persentase_used,omitempty"`
 }
 
+// ResponseAllSpendingType response get all spending type per periode
+type ResponseAllSpendingType struct {
+	ResponseSpendingType *[]ResponseSpendingType `json:"response_spending_type"`
+	BudgetAmount         int                     `json:"budget_amount"`
+	FormatBudgetAmount   string                  `json:"format_budget_amount"`
+}
+
 // SpendingTypeRepository spending history repository interface
 type SpendingTypeRepository interface {
 	Create(ctx context.Context, spendingType *SpendingType) error
@@ -81,5 +88,5 @@ type SpendingTypeUsecase interface {
 	Update(ctx context.Context, req *RequestUpdateSpendingType) (*ResponseSpendingType, error)
 	Delete(ctx context.Context, id string, profileID string) error
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseSpendingType, error)
-	GetAllByProfileID(ctx context.Context, profileID string, periode int) (*[]ResponseSpendingType, error)
+	GetAllByProfileID(ctx context.Context, profileID string, periode int) (*ResponseAllSpendingType, error)
 }
