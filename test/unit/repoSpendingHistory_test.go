@@ -145,3 +145,126 @@ func TestSpendingHistoryDelete(t *testing.T) {
 	err = mocksql.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
+
+func TestSpendingHistoryGetAllByTimeAndProfileID(t *testing.T) {
+	db, mocksql, err := sqlmock.New()
+	assert.NoError(t, err)
+	defer db.Close()
+
+	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
+	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
+
+	query := regexp.QuoteMeta(`SELECT tsh.id, tsh.profile_id, tsh.spending_type_id, tsh.payment_method_id, tsh.payment_name, tsh.before_balance, 
+       				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.location, tsh.time_spending_history, tsh.show_time_spending_history, 
+       				tsh.created_at, tsh.created_by, tsh.updated_at, tsh.updated_by, tsh.deleted_at, tsh.deleted_by,
+       				mst.title, mpm.name
+				FROM t_spending_history tsh 
+				JOIN m_spending_type mst ON tsh.spending_type_id = mst.id
+				JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
+				WHERE tsh.profile_id = $1 AND tsh.time_spending_history BETWEEN $2 AND $3 AND tsh.deleted_at IS NULL`)
+
+	rows := sqlmock.NewRows([]string{"id", "profile_id", "spending_type_id", "payment_method_id", "payment_name",
+		"before_balance", "spending_amount", "after_balance", "description", "location", "time_spending_history", "show_time_spending_history",
+		"created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by", "title", "name",
+	})
+	start := time.Now()
+	end := time.Now()
+	t.Run("SUCCESS", func(t *testing.T) {
+		rows.AddRow("test", "test", "test", "test", nil, 0, 123, 123, "test", "depok", time.Now(), "test", 0, "test", 0, nil, nil, nil, "test", "test")
+		mocksql.ExpectPrepare(query)
+		mocksql.ExpectQuery(query).WithArgs(
+			"profileID", start, end,
+		).WillReturnRows(rows)
+
+		err = spendingHistoryRepo.OpenConn(context.TODO())
+		defer spendingHistoryRepo.CloseConn()
+
+		spendingHistories, err := spendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.RequestGetFilteredDataSpendingHistory{
+			ProfileID: "profileID",
+			StartTime: start,
+			EndTime:   end,
+		})
+		assert.NoError(t, err)
+		assert.NotNil(t, spendingHistories)
+		assert.Equal(t, 1, len(*spendingHistories))
+		err = mocksql.ExpectationsWereMet()
+		assert.NoError(t, err)
+	})
+
+	t.Run("SUCCESS_nil", func(t *testing.T) {
+		mocksql.ExpectPrepare(query)
+		mocksql.ExpectQuery(query).WithArgs(
+			"profileID", start, end,
+		).WillReturnRows(rows)
+
+		err = spendingHistoryRepo.OpenConn(context.TODO())
+		defer spendingHistoryRepo.CloseConn()
+
+		spendingHistories, err := spendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.RequestGetFilteredDataSpendingHistory{
+			ProfileID: "profileID",
+			StartTime: start,
+			EndTime:   end,
+		})
+		assert.NoError(t, err)
+		assert.NotNil(t, spendingHistories)
+		assert.Equal(t, 0, len(*spendingHistories))
+		err = mocksql.ExpectationsWereMet()
+		assert.NoError(t, err)
+	})
+}
+
+func TestSpendingHistoryGetByIDAndProfileID(t *testing.T) {
+	db, mocksql, err := sqlmock.New()
+	assert.NoError(t, err)
+	defer db.Close()
+
+	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
+	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
+
+	query := regexp.QuoteMeta(`SELECT tsh.id, tsh.profile_id, tsh.spending_type_id, tsh.payment_method_id, tsh.payment_name, tsh.before_balance, 
+       				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.location, tsh.time_spending_history, tsh.show_time_spending_history, 
+       				tsh.created_at, tsh.created_by, tsh.updated_at, tsh.updated_by, tsh.deleted_at, tsh.deleted_by,
+       				mst.title, mpm.name
+				FROM t_spending_history tsh 
+				JOIN m_spending_type mst ON tsh.spending_type_id = mst.id
+				JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
+				WHERE tsh.profile_id = $1 AND id = $2 AND tsh.deleted_at IS NULL`)
+
+	rows := sqlmock.NewRows([]string{"id", "profile_id", "spending_type_id", "payment_method_id", "payment_name",
+		"before_balance", "spending_amount", "after_balance", "description", "location", "time_spending_history", "show_time_spending_history",
+		"created_at", "created_by", "updated_at", "updated_by", "deleted_at", "deleted_by", "title", "name",
+	})
+	t.Run("SUCCESS", func(t *testing.T) {
+		rows.AddRow("test", "test", "test", "test", nil, 0, 123, 123, "test", "depok", time.Now(), "test", 0, "test", 0, nil, nil, nil, "test", "test")
+		mocksql.ExpectPrepare(query)
+		mocksql.ExpectQuery(query).WithArgs(
+			"profileID", "id",
+		).WillReturnRows(rows)
+
+		err = spendingHistoryRepo.OpenConn(context.TODO())
+		defer spendingHistoryRepo.CloseConn()
+
+		spendingHistory, err := spendingHistoryRepo.GetByIDAndProfileID(context.TODO(), "id", "profileID")
+		assert.NoError(t, err)
+		assert.NotNil(t, spendingHistory)
+		err = mocksql.ExpectationsWereMet()
+		assert.NoError(t, err)
+	})
+
+	t.Run("ERROR_sqlnorows", func(t *testing.T) {
+		mocksql.ExpectPrepare(query)
+		mocksql.ExpectQuery(query).WithArgs(
+			"profileID", "nil",
+		).WillReturnError(sql.ErrNoRows)
+
+		err = spendingHistoryRepo.OpenConn(context.TODO())
+		defer spendingHistoryRepo.CloseConn()
+
+		spendingHistory, err := spendingHistoryRepo.GetByIDAndProfileID(context.TODO(), "nil", "profileID")
+		assert.Error(t, err)
+		assert.Nil(t, spendingHistory)
+		assert.Equal(t, sql.ErrNoRows, err)
+		err = mocksql.ExpectationsWereMet()
+		assert.NoError(t, err)
+	})
+}

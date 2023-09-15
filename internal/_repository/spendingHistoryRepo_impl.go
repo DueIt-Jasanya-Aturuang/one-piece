@@ -2,6 +2,8 @@ package _repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -226,7 +228,7 @@ func (s *SpendingHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context,
 				FROM t_spending_history tsh 
 				JOIN m_spending_type mst ON tsh.spending_type_id = mst.id
 				JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
-				WHERE tsh.profile_id = $1 AND id = $2`
+				WHERE tsh.profile_id = $1 AND id = $2 AND tsh.deleted_at IS NULL`
 
 	conn, err := s.GetConn()
 	if err != nil {
@@ -266,7 +268,10 @@ func (s *SpendingHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context,
 		&spendingHistory.SpendingTypeTitle,
 		&spendingHistory.PaymentMethodName,
 	); err != nil {
-		log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
+		if errors.Is(err, sql.ErrNoRows) {
+			log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
+		}
+		return nil, err
 	}
 
 	return &spendingHistory, nil
