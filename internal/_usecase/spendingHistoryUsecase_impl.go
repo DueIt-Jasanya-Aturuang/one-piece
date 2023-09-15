@@ -36,7 +36,7 @@ func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, prof
 	panic("implement me")
 }
 
-func (s *SpendingHistoryUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.ResponseSpendingHistory, error) {
+func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.RequestGetFilteredDataSpendingHistory) (*[]domain.ResponseSpendingHistory, error) {
 	// TODO implement me
 	panic("implement me")
 }
