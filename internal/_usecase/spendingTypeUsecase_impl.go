@@ -28,7 +28,7 @@ func NewSpendingTypeUsecaseImpl(
 func (s *SpendingTypeUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreateSpendingType) (*domain.ResponseSpendingType, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return nil, util.ErrHTTPString("", 500)
 	}
 	defer s.spendingTypeRepo.CloseConn()
 
@@ -59,7 +59,7 @@ func (s *SpendingTypeUsecaseImpl) Create(ctx context.Context, req *domain.Reques
 func (s *SpendingTypeUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpdateSpendingType) (*domain.ResponseSpendingType, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return nil, util.ErrHTTPString("", 500)
 	}
 	defer s.spendingTypeRepo.CloseConn()
 
@@ -100,7 +100,7 @@ func (s *SpendingTypeUsecaseImpl) Update(ctx context.Context, req *domain.Reques
 func (s *SpendingTypeUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return err
+		return util.ErrHTTPString("", 500)
 	}
 	defer s.spendingTypeRepo.CloseConn()
 
@@ -119,7 +119,7 @@ func (s *SpendingTypeUsecaseImpl) Delete(ctx context.Context, id string, profile
 func (s *SpendingTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseSpendingType, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return nil, util.ErrHTTPString("", 500)
 	}
 
 	spendingType, err := s.spendingTypeRepo.GetByIDAndProfileID(ctx, id, profileID)
@@ -139,7 +139,7 @@ func (s *SpendingTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id st
 func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string, periode int) (*domain.ResponseAllSpendingType, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return nil, util.ErrHTTPString("", 500)
 	}
 
 	exist, err := s.spendingTypeRepo.CheckData(ctx, profileID)

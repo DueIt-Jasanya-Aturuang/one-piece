@@ -74,6 +74,7 @@ type RequestGetFilteredDataSpendingHistory struct {
 	ProfileID string
 	StartTime time.Time
 	EndTime   time.Time
+	Type      string
 }
 
 // ResponseSpendingHistory response spending history

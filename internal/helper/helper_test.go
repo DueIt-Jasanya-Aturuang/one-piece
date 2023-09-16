@@ -6,6 +6,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
 func TestPersentase(t *testing.T) {
@@ -43,4 +45,32 @@ func TestTime(t *testing.T) {
 	t.Log(startTime)
 	t.Log(endTime)
 	t.Log(time.Now().Add(-24 * time.Hour).UTC())
+}
+
+func TestTimeDateByTypeFilter(t *testing.T) {
+	t.Run(util.DayNow, func(t *testing.T) {
+		startTime, endTime, err := TimeDateByTypeFilter("hari-ini")
+		assert.NoError(t, err)
+		t.Logf("start : %v | end : %v", startTime, endTime)
+	})
+	t.Run(util.Kemarin, func(t *testing.T) {
+		startTime, endTime, err := TimeDateByTypeFilter("kemarin")
+		assert.NoError(t, err)
+		t.Logf("start : %v | end : %v", startTime, endTime)
+	})
+	t.Run(util.MingguNow, func(t *testing.T) {
+		startTime, endTime, err := TimeDateByTypeFilter("minggu-ini")
+		assert.NoError(t, err)
+		t.Logf("start : %v | end : %v", startTime, endTime)
+	})
+	t.Run(util.BulanNow, func(t *testing.T) {
+		startTime, endTime, err := TimeDateByTypeFilter("bulan-ini")
+		assert.NoError(t, err)
+		t.Logf("start : %v | end : %v", startTime, endTime)
+	})
+	t.Run(util.BulanNow, func(t *testing.T) {
+		startTime, endTime, err := TimeDateByTypeFilter("bulanasd-ini")
+		assert.NoError(t, err)
+		t.Logf("start : %v | end : %v", startTime, endTime)
+	})
 }

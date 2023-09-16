@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
@@ -32,7 +33,7 @@ func NewSpendingHistoryUsecaseImpl(
 func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreateSpendingHistory) (*domain.ResponseSpendingHistory, error) {
 	err := s.spendingHistoryRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return nil, util.ErrHTTPString("", 500)
 	}
 	defer s.spendingHistoryRepo.CloseConn()
 
@@ -90,7 +91,7 @@ func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Req
 		return nil, util.ErrHTTPString("", 404)
 	}
 
-	resp := converter.SpendingHistoryModelToResponse(spendingHistoryJoin)
+	resp := converter.SpendingHistoryJoinModelToResponse(spendingHistoryJoin)
 
 	return resp, nil
 }
@@ -98,7 +99,7 @@ func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Req
 func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpdateSpendingHistory) (*domain.ResponseSpendingHistory, error) {
 	err := s.spendingHistoryRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return nil, util.ErrHTTPString("", 500)
 	}
 	defer s.spendingHistoryRepo.CloseConn()
 
@@ -163,24 +164,89 @@ func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Req
 		return nil, util.ErrHTTPString("", 404)
 	}
 
-	resp := converter.SpendingHistoryModelToResponse(spendingHistoryJoin)
+	resp := converter.SpendingHistoryJoinModelToResponse(spendingHistoryJoin)
 
 	return resp, nil
 }
 
 func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
-	// TODO implement me
-	panic("implement me")
+	err := s.spendingHistoryRepo.OpenConn(ctx)
+	if err != nil {
+		return util.ErrHTTPString("", 500)
+	}
+	defer s.spendingHistoryRepo.CloseConn()
+
+	err = s.spendingHistoryRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+		err = s.spendingHistoryRepo.Delete(ctx, id, profileID)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return util.ErrHTTPString("", 500)
+	}
+
+	return nil
 }
 
 func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.RequestGetFilteredDataSpendingHistory) (*[]domain.ResponseSpendingHistory, error) {
-	// TODO implement me
-	panic("implement me")
+	err := s.spendingHistoryRepo.OpenConn(ctx)
+	if err != nil {
+		return nil, util.ErrHTTPString("", 500)
+	}
+	defer s.spendingHistoryRepo.CloseConn()
+
+	var startTime, endTime time.Time
+	if req.Type != "" {
+		startTime, endTime, err = helper.TimeDateByTypeFilter(req.Type)
+		if err != nil {
+			return nil, util.ErrHTTPString("", 422)
+		}
+	} else {
+		startTime, endTime, err = helper.FormatDate(req.StartTime, req.EndTime)
+		if err != nil {
+			return nil, util.ErrHTTPString("", 422)
+		}
+	}
+	req.StartTime = startTime
+	req.EndTime = endTime
+
+	spendingHistories, err := s.spendingHistoryRepo.GetAllByTimeAndProfileID(ctx, req)
+	if err != nil {
+		return nil, util.ErrHTTPString("", 500)
+	}
+
+	var resps []domain.ResponseSpendingHistory
+
+	for _, spendingHistory := range *spendingHistories {
+		resp := converter.GetAllSpendingHistoryJoinModelToResponse(spendingHistory)
+		resps = append(resps, resp)
+	}
+
+	return &resps, nil
 }
 
 func (s *SpendingHistoryUsecaseImpl) GetByIDAndProfileID(
 	ctx context.Context, id string, profileID string,
 ) (*domain.ResponseSpendingHistory, error) {
-	// TODO implement me
-	panic("implement me")
+	err := s.spendingHistoryRepo.OpenConn(ctx)
+	if err != nil {
+		return nil, util.ErrHTTPString("", 500)
+	}
+	defer s.spendingHistoryRepo.CloseConn()
+
+	spendingHistory, err := s.spendingHistoryRepo.GetByIDAndProfileID(ctx, id, profileID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, util.ErrHTTPString("", 404)
+		}
+		return nil, util.ErrHTTPString("", 500)
+	}
+
+	resp := converter.SpendingHistoryJoinModelToResponse(spendingHistory)
+
+	return resp, nil
 }

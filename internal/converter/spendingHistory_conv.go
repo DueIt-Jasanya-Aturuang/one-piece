@@ -22,7 +22,7 @@ func CreateSpendingHistoryToModel(req *domain.RequestCreateSpendingHistory, bala
 		AfterBalance:            balance - req.SpendingAmount,
 		Description:             req.Description,
 		Location:                req.Location,
-		TimeSpendingHistory:     req.TimeSpendingHistory,
+		TimeSpendingHistory:     req.TimeSpendingHistory.UTC(),
 		ShowTimeSpendingHistory: req.ShowTimeSpendingHistory,
 		AuditInfo: domain.AuditInfo{
 			CreatedAt: time.Now().Unix(),
@@ -45,7 +45,7 @@ func UpdateSpendingHistoryToModel(req *domain.RequestUpdateSpendingHistory, bala
 		AfterBalance:            balance - req.SpendingAmount,
 		Description:             req.Description,
 		Location:                req.Location,
-		TimeSpendingHistory:     req.TimeSpendingHistory,
+		TimeSpendingHistory:     req.TimeSpendingHistory.UTC(),
 		ShowTimeSpendingHistory: req.ShowTimeSpendingHistory,
 		AuditInfo: domain.AuditInfo{
 			UpdatedAt: time.Now().Unix(),
@@ -55,8 +55,29 @@ func UpdateSpendingHistoryToModel(req *domain.RequestUpdateSpendingHistory, bala
 	return spendingHistory
 }
 
-func SpendingHistoryModelToResponse(spendingHistory *domain.SpendingHistoryJoin) *domain.ResponseSpendingHistory {
+func SpendingHistoryJoinModelToResponse(spendingHistory *domain.SpendingHistoryJoin) *domain.ResponseSpendingHistory {
 	resp := &domain.ResponseSpendingHistory{
+		ID:                      spendingHistory.ID,
+		ProfileID:               spendingHistory.ProfileID,
+		SpendingTypeID:          spendingHistory.SpendingTypeID,
+		SpendingTypeTitle:       spendingHistory.SpendingTypeTitle,
+		PaymentMethodID:         helper.GetNullString(spendingHistory.PaymentMethodID),
+		PaymentMethodName:       helper.GetNullString(spendingHistory.PaymentMethodName),
+		PaymentName:             helper.GetNullString(spendingHistory.PaymentName),
+		BeforeBalance:           spendingHistory.BeforeBalance,
+		SpendingAmount:          spendingHistory.SpendingAmount,
+		AfterBalance:            spendingHistory.AfterBalance,
+		Description:             spendingHistory.Description,
+		Location:                spendingHistory.Description,
+		TimeSpendingHistory:     spendingHistory.TimeSpendingHistory,
+		ShowTimeSpendingHistory: spendingHistory.ShowTimeSpendingHistory,
+	}
+
+	return resp
+}
+
+func GetAllSpendingHistoryJoinModelToResponse(spendingHistory domain.SpendingHistoryJoin) domain.ResponseSpendingHistory {
+	resp := domain.ResponseSpendingHistory{
 		ID:                      spendingHistory.ID,
 		ProfileID:               spendingHistory.ProfileID,
 		SpendingTypeID:          spendingHistory.SpendingTypeID,
