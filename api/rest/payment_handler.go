@@ -35,7 +35,7 @@ func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 	_, fileHeader, _ := r.FormFile("image")
 	req.Image = fileHeader
 
-	err = validation.CreatePaymentValidation(req)
+	err = validation.CreatePayment(req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
@@ -74,7 +74,7 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 	_, fileHeader, _ := r.FormFile("image")
 	req.Image = fileHeader
 
-	err = validation.UpdatePaymentValidation(req)
+	err = validation.UpdatePayment(req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return

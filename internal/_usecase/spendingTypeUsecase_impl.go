@@ -40,6 +40,7 @@ func (s *SpendingTypeUsecaseImpl) Create(ctx context.Context, req *domain.Reques
 	if exist {
 		return nil, util.ErrHTTPString("kategori title sudah tersedia", 409)
 	}
+
 	spendingType := converter.SpendingTypeRequestCreateToModel(req)
 	err = s.spendingTypeRepo.StartTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
@@ -68,6 +69,9 @@ func (s *SpendingTypeUsecaseImpl) Update(ctx context.Context, req *domain.Reques
 
 	spendingType, err := s.spendingTypeRepo.GetByIDAndProfileID(ctx, req.ID, req.ProfileID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, util.ErrHTTPString("", 404)
+		}
 		return nil, err
 	}
 

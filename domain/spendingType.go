@@ -36,8 +36,8 @@ type RequestCreateSpendingType struct {
 
 // RequestUpdateSpendingType request update spending type
 type RequestUpdateSpendingType struct {
-	ID           string
-	ProfileID    string
+	ID           string // ID get in url parameter
+	ProfileID    string `json:"profile_id"`
 	Title        string `json:"title"`
 	MaximumLimit int    `json:"maximum_limit"`
 	Icon         string `json:"icon"`
@@ -63,7 +63,7 @@ type ResponseSpendingType struct {
 
 // ResponseAllSpendingType response get all spending type per periode
 type ResponseAllSpendingType struct {
-	ResponseSpendingType *[]ResponseSpendingType `json:"response_spending_type"`
+	ResponseSpendingType *[]ResponseSpendingType `json:"spending_type"`
 	BudgetAmount         int                     `json:"budget_amount"`
 	FormatBudgetAmount   string                  `json:"format_budget_amount"`
 }

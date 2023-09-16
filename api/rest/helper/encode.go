@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
@@ -18,6 +19,7 @@ func ErrorResponseEncode(w http.ResponseWriter, err error) {
 		errHTTP          *domain.ErrHTTP
 		errUnmarshalType *json.UnmarshalTypeError
 		errSyntak        *json.SyntaxError
+		errPQ            *pq.Error
 	)
 
 	switch {
@@ -31,6 +33,13 @@ func ErrorResponseEncode(w http.ResponseWriter, err error) {
 				errSyntak.Error(),
 			},
 		})
+	case errors.As(err, &errPQ):
+		log.Warn().Msgf("pqerror | err : %v", err)
+		if errPQ.Code == "23503" {
+			err = util.ErrHTTPString("", http.StatusForbidden)
+		} else {
+			err = util.ErrHTTPString("", http.StatusInternalServerError)
+		}
 	case errors.Is(err, context.DeadlineExceeded):
 		err = util.ErrHTTPString("", http.StatusRequestTimeout)
 	}
