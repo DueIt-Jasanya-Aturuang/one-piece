@@ -2,8 +2,10 @@ package helper
 
 import (
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPersentase(t *testing.T) {
@@ -28,4 +30,17 @@ func TestUUID(t *testing.T) {
 	res, err := uuid.Parse(randomUUID)
 	t.Log(err)
 	t.Log(res)
+}
+
+func TestTime(t *testing.T) {
+
+	startTime, endTime, err := TimeDate(time.Now().UTC().Day())
+	assert.NoError(t, err)
+	t.Log(startTime)
+	t.Log(endTime)
+	startTime = startTime.Add(-24 * time.Hour)
+	endTime = endTime.Add(-24 * time.Hour)
+	t.Log(startTime)
+	t.Log(endTime)
+	t.Log(time.Now().Add(-24 * time.Hour).UTC())
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	uuid "github.com/satori/go.uuid"
 
@@ -179,9 +178,10 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 		return nil
 	})
 
-	now := time.Now().UTC()
-	startTime := time.Date(now.Year(), now.Month(), periode, 0, 0, 0, 0, time.UTC)
-	endTime := startTime.AddDate(0, 1, 0)
+	startTime, endTime, err := helper.TimeDate(periode)
+	if err != nil {
+		return nil, err
+	}
 
 	req := &domain.RequestGetAllSpendingType{
 		ProfileID: profileID,
