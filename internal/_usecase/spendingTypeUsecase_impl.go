@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
@@ -179,6 +180,7 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 		StartTime: startTime,
 		EndTime:   endTime,
 	}
+	log.Info().Msgf("%v", req)
 	spendingTypes, err := s.spendingTypeRepo.GetAllByProfileID(ctx, req)
 
 	var resps []domain.ResponseSpendingType
@@ -188,9 +190,10 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 	for _, spendingType := range *spendingTypes {
 		budgetAmount += spendingType.Used
 		formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
+		formatUsed := helper.FormatRupiah(spendingType.Used)
 		persentaseMaximumLimit := helper.Persentase(spendingType.Used, spendingType.MaximumLimit)
 
-		resp = converter.SpendingTypeModelJoinToResponse(spendingType, persentaseMaximumLimit, formatMaximumLimit)
+		resp = converter.SpendingTypeModelJoinToResponse(spendingType, persentaseMaximumLimit, formatMaximumLimit, formatUsed)
 		resps = append(resps, resp)
 	}
 

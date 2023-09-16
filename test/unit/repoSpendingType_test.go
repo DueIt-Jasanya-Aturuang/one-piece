@@ -235,7 +235,7 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
        				COALESCE(SUM(CASE WHEN tsh.time_spending_history BETWEEN $2 AND $3 AND tsh.deleted_at IS NULL THEN tsh.spending_amount ELSE 0 END), 0)
 				FROM m_spending_type mst
 				LEFT JOIN t_spending_history tsh ON mst.id = tsh.spending_type_id
-				WHERE mst.profile_id = $1 AND tsh.deleted_at IS NULL AND mst.deleted_at IS NULL
+				WHERE mst.profile_id = $1 AND mst.deleted_at IS NULL
 				GROUP BY mst.id`)
 	rows := sqlmock.NewRows([]string{"id", "profile_id", "title", "maximum_limit", "icon", "created_at", "created_by",
 		"updated_at", "updated_by", "deleted_at", "deleted_by", "used"})

@@ -58,6 +58,7 @@ type ResponseSpendingType struct {
 	FormatMaximumLimit string `json:"format_maximum_limit"`
 	Icon               string `json:"icon"`
 	Used               int    `json:"used,omiempty"`
+	FormatUsed         string `json:"format_used,omiempty"`
 	PersentaseUsed     string `json:"persentase_used,omitempty"`
 }
 

@@ -56,7 +56,7 @@ func SpendingTypeModelToResponse(spendingType *domain.SpendingType, formatMaximu
 	return resp
 }
 
-func SpendingTypeModelJoinToResponse(spendingType domain.SpendingTypeJoin, usedPersentase string, formatMaximumLimit string) domain.ResponseSpendingType {
+func SpendingTypeModelJoinToResponse(spendingType domain.SpendingTypeJoin, usedPersentase string, formatMaximumLimit string, formatUsed string) domain.ResponseSpendingType {
 	resp := domain.ResponseSpendingType{
 		ID:                 spendingType.ID,
 		ProfileID:          spendingType.ProfileID,
@@ -65,6 +65,7 @@ func SpendingTypeModelJoinToResponse(spendingType domain.SpendingTypeJoin, usedP
 		FormatMaximumLimit: formatMaximumLimit,
 		Icon:               spendingType.Icon,
 		Used:               spendingType.Used,
+		FormatUsed:         formatUsed,
 		PersentaseUsed:     usedPersentase,
 	}
 

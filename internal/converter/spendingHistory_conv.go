@@ -11,6 +11,7 @@ import (
 
 func CreateSpendingHistoryToModel(req *domain.RequestCreateSpendingHistory, balance int) *domain.SpendingHistory {
 	id := uuid.NewV4().String()
+	timeSpendingHistory, _ := time.Parse("2006-01-02", req.TimeSpendingHistory)
 	spendingHistory := &domain.SpendingHistory{
 		ID:                      id,
 		ProfileID:               req.ProfileID,
@@ -22,7 +23,7 @@ func CreateSpendingHistoryToModel(req *domain.RequestCreateSpendingHistory, bala
 		AfterBalance:            balance - req.SpendingAmount,
 		Description:             req.Description,
 		Location:                req.Location,
-		TimeSpendingHistory:     req.TimeSpendingHistory.UTC(),
+		TimeSpendingHistory:     timeSpendingHistory.UTC(),
 		ShowTimeSpendingHistory: req.ShowTimeSpendingHistory,
 		AuditInfo: domain.AuditInfo{
 			CreatedAt: time.Now().Unix(),
@@ -34,6 +35,7 @@ func CreateSpendingHistoryToModel(req *domain.RequestCreateSpendingHistory, bala
 }
 
 func UpdateSpendingHistoryToModel(req *domain.RequestUpdateSpendingHistory, balance int) *domain.SpendingHistory {
+	timeSpendingHistory, _ := time.Parse("2006-01-02", req.TimeSpendingHistory)
 	spendingHistory := &domain.SpendingHistory{
 		ID:                      req.ID,
 		ProfileID:               req.ProfileID,
@@ -45,7 +47,7 @@ func UpdateSpendingHistoryToModel(req *domain.RequestUpdateSpendingHistory, bala
 		AfterBalance:            balance - req.SpendingAmount,
 		Description:             req.Description,
 		Location:                req.Location,
-		TimeSpendingHistory:     req.TimeSpendingHistory.UTC(),
+		TimeSpendingHistory:     timeSpendingHistory.UTC(),
 		ShowTimeSpendingHistory: req.ShowTimeSpendingHistory,
 		AuditInfo: domain.AuditInfo{
 			UpdatedAt: time.Now().Unix(),
@@ -69,7 +71,7 @@ func SpendingHistoryJoinModelToResponse(spendingHistory *domain.SpendingHistoryJ
 		AfterBalance:            spendingHistory.AfterBalance,
 		Description:             spendingHistory.Description,
 		Location:                spendingHistory.Description,
-		TimeSpendingHistory:     spendingHistory.TimeSpendingHistory,
+		TimeSpendingHistory:     spendingHistory.TimeSpendingHistory.UTC(),
 		ShowTimeSpendingHistory: spendingHistory.ShowTimeSpendingHistory,
 	}
 
@@ -90,7 +92,7 @@ func GetAllSpendingHistoryJoinModelToResponse(spendingHistory domain.SpendingHis
 		AfterBalance:            spendingHistory.AfterBalance,
 		Description:             spendingHistory.Description,
 		Location:                spendingHistory.Description,
-		TimeSpendingHistory:     spendingHistory.TimeSpendingHistory,
+		TimeSpendingHistory:     spendingHistory.TimeSpendingHistory.UTC(),
 		ShowTimeSpendingHistory: spendingHistory.ShowTimeSpendingHistory,
 	}
 

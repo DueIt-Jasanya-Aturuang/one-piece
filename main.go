@@ -32,7 +32,7 @@ func main() {
 	// usecase
 	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 	spendingTypeUsecase := _usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
-	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo)
+	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
 
 	// handler
 	paymentHandler := rest.NewPaymentHandlerImpl(paymentUsecase)
@@ -59,8 +59,8 @@ func main() {
 		r.Get("/spending-history/{profile-id}", spendingHistoryHandler.GetAllByProfileID)
 		r.Get("/spending-history/{profile-id}/{id}", spendingHistoryHandler.GetByIDAndProfileID)
 		r.Post("/spending-history", spendingHistoryHandler.Create)
-		r.Put("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Update)
-		r.Delete("/spending-history/{id}", spendingHistoryHandler.Delete)
+		r.Put("/spending-history/{id}", spendingHistoryHandler.Update)
+		r.Delete("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Delete)
 	})
 
 	log.Info().Msgf("Server is running on port %s", config.AppAddr)

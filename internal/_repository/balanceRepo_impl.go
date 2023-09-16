@@ -25,7 +25,7 @@ func NewBalanceRepositoryImpl(
 
 func (b *BalanceRepositoryImpl) Create(ctx context.Context, balance *domain.Balance) error {
 	query := `INSERT INTO m_balance (id, profile_id, total_income_amount, total_spending_amount, balance, 
-                       created_at, created_by, updated_at)`
+                       created_at, created_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	tx, err := b.GetTx()
 	if err != nil {
@@ -101,7 +101,7 @@ func (b *BalanceRepositoryImpl) UpdateByProfileID(ctx context.Context, balance *
 func (b *BalanceRepositoryImpl) GetByProfileID(ctx context.Context, profileID string) (*domain.Balance, error) {
 	query := `SELECT id, profile_id, total_income_amount, total_spending_amount, balance,
 					created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
-       FROM m_balance WHERE profile = $1`
+       FROM m_balance WHERE profile_id = $1`
 
 	conn, err := b.GetConn()
 	if err != nil {

@@ -44,29 +44,29 @@ type SpendingHistoryJoin struct {
 
 // RequestCreateSpendingHistory request create spending history
 type RequestCreateSpendingHistory struct {
-	ProfileID               string    `json:"profile_id"`
-	SpendingTypeID          string    `json:"spending_type_id"`
-	PaymentMethodID         string    `json:"payment_method_id"`
-	PaymentName             string    `json:"payment_name"`
-	SpendingAmount          int       `json:"spending_amount"`
-	Description             string    `json:"description"`
-	Location                string    `json:"location"`
-	TimeSpendingHistory     time.Time `json:"time_spending_history"`
-	ShowTimeSpendingHistory string    `json:"show_time_spending_history"`
+	ProfileID               string `json:"profile_id"`
+	SpendingTypeID          string `json:"spending_type_id"`
+	PaymentMethodID         string `json:"payment_method_id"`
+	PaymentName             string `json:"payment_name"`
+	SpendingAmount          int    `json:"spending_amount"`
+	Description             string `json:"description"`
+	Location                string `json:"location"`
+	TimeSpendingHistory     string `json:"time_spending_history"`
+	ShowTimeSpendingHistory string `json:"show_time_spending_history"`
 }
 
 // RequestUpdateSpendingHistory request update spending history
 type RequestUpdateSpendingHistory struct {
 	ID                      string
-	ProfileID               string
-	SpendingTypeID          string    `json:"spending_type_id"`
-	PaymentMethodID         string    `json:"payment_method_id"`
-	PaymentName             string    `json:"payment_name"`
-	SpendingAmount          int       `json:"spending_amount"`
-	Description             string    `json:"description"`
-	Location                string    `json:"location"`
-	TimeSpendingHistory     time.Time `json:"time_spending_history"`
-	ShowTimeSpendingHistory string    `json:"show_time_spending_history"`
+	ProfileID               string `json:"profile_id"`
+	SpendingTypeID          string `json:"spending_type_id"`
+	PaymentMethodID         string `json:"payment_method_id"`
+	PaymentName             string `json:"payment_name"`
+	SpendingAmount          int    `json:"spending_amount"`
+	Description             string `json:"description"`
+	Location                string `json:"location"`
+	TimeSpendingHistory     string `json:"time_spending_history"`
+	ShowTimeSpendingHistory string `json:"show_time_spending_history"`
 }
 
 // RequestGetFilteredDataSpendingHistory request get filtered data spending history
@@ -75,6 +75,13 @@ type RequestGetFilteredDataSpendingHistory struct {
 	StartTime time.Time
 	EndTime   time.Time
 	Type      string
+}
+
+// RequestValidatePaymentAndSpendingTypeID untuk validasi
+type RequestValidatePaymentAndSpendingTypeID struct {
+	ProfileID       string
+	SpendingTypeID  string
+	PaymentMethodID string
 }
 
 // ResponseSpendingHistory response spending history
