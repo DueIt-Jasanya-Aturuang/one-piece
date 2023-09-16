@@ -215,7 +215,7 @@ func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, prof
 
 	err = s.spendingHistoryRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		spendingAmount := balance.TotalSpendingAmount - spendingHistoryJoin.SpendingAmount
-		balanceAmount := balance.Balance - spendingHistoryJoin.SpendingAmount
+		balanceAmount := balance.Balance + spendingHistoryJoin.SpendingAmount
 		balance = converter.UpdateBalanceToModel(balance.ID, profileID, spendingAmount, balanceAmount)
 
 		err = s.balanceRepo.UpdateByProfileID(ctx, balance)
