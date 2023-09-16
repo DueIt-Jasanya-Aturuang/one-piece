@@ -161,7 +161,7 @@ func (s *SpendingTypeRepositoryImpl) CheckData(ctx context.Context, profileID st
 }
 
 func (s *SpendingTypeRepositoryImpl) CheckByTitleAndProfileID(ctx context.Context, profileID string, title string) (bool, error) {
-	query := `SELECT EXISTS(SELECT id FROM m_spending_type WHERE profile_id = $1 AND title = $2);`
+	query := `SELECT EXISTS(SELECT id FROM m_spending_type WHERE profile_id = $1 AND title = $2 AND deleted_at IS NULL);`
 
 	conn, err := s.GetConn()
 	if err != nil {

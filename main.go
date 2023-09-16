@@ -27,11 +27,12 @@ func main() {
 	minioRepo := _repository.NewMinioImpl(minioConn)
 	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
 	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
+	balanceRepo := _repository.NewBalanceRepositoryImpl(uow)
 
 	// usecase
 	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 	spendingTypeUsecase := _usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
-	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo)
+	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo)
 
 	// handler
 	paymentHandler := rest.NewPaymentHandlerImpl(paymentUsecase)

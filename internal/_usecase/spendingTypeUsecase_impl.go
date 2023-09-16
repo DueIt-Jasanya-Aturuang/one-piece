@@ -41,10 +41,7 @@ func (s *SpendingTypeUsecaseImpl) Create(ctx context.Context, req *domain.Reques
 	}
 
 	spendingType := converter.SpendingTypeRequestCreateToModel(req)
-	err = s.spendingTypeRepo.StartTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelReadCommitted,
-		ReadOnly:  false,
-	}, func() error {
+	err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		err = s.spendingTypeRepo.Create(ctx, spendingType)
 		return err
 	})
@@ -85,10 +82,7 @@ func (s *SpendingTypeUsecaseImpl) Update(ctx context.Context, req *domain.Reques
 	}
 
 	spendingType = converter.SpendingTypeRequestUpdateToModel(req)
-	err = s.spendingTypeRepo.StartTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelReadCommitted,
-		ReadOnly:  false,
-	}, func() error {
+	err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		err = s.spendingTypeRepo.Update(ctx, spendingType)
 		return err
 	})
@@ -110,10 +104,7 @@ func (s *SpendingTypeUsecaseImpl) Delete(ctx context.Context, id string, profile
 	}
 	defer s.spendingTypeRepo.CloseConn()
 
-	err = s.spendingTypeRepo.StartTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelReadCommitted,
-		ReadOnly:  false,
-	}, func() error {
+	err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		err = s.spendingTypeRepo.Delete(ctx, id, profileID)
 		return err
 	})
@@ -151,16 +142,13 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 		return nil, err
 	}
 
-	err = s.spendingTypeRepo.StartTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelReadCommitted,
-		ReadOnly:  false,
-	}, func() error {
-		exist, err := s.spendingTypeRepo.CheckData(ctx, profileID)
-		if err != nil {
-			return err
-		}
+	exist, err := s.spendingTypeRepo.CheckData(ctx, profileID)
+	if err != nil {
+		return nil, err
+	}
 
-		if !exist {
+	if !exist {
+		err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 			spendingTypes, err := s.spendingTypeRepo.GetDefault(ctx)
 			if err != nil {
 				return err
@@ -174,9 +162,12 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 					return err
 				}
 			}
+			return nil
+		})
+		if err != nil {
+			return nil, util.ErrHTTPString("", 500)
 		}
-		return nil
-	})
+	}
 
 	startTime, endTime, err := helper.TimeDate(periode)
 	if err != nil {

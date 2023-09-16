@@ -1,10 +1,12 @@
 package helper
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
 
+	"github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
@@ -66,4 +68,14 @@ func TimeDate(periode int) (time.Time, time.Time, error) {
 	}
 
 	return startTimeNew, endTimeNew, nil
+}
+
+func GetCodePqError(err error) pq.ErrorCode {
+	var errPQ *pq.Error
+
+	if errors.As(err, &errPQ) {
+		return errPQ.Code
+	}
+
+	return ""
 }
