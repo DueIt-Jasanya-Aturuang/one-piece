@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	resp "github.com/jasanya-tech/jasanya-response-backend-golang"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
@@ -18,9 +19,9 @@ func CreateSpendingTypeUsecase(t *testing.T) {
 		Icon:         "icon.png",
 	}
 
-	resp, err := SpendingTypeUsecase.Create(context.TODO(), req)
+	response, err := SpendingTypeUsecase.Create(context.TODO(), req)
 	assert.NoError(t, err)
-	assert.NotNil(t, resp)
+	assert.NotNil(t, response)
 }
 
 func CreateSpendingTypeUsecaseERRORNameAlready(t *testing.T) {
@@ -31,10 +32,10 @@ func CreateSpendingTypeUsecaseERRORNameAlready(t *testing.T) {
 		Icon:         "icon.png",
 	}
 
-	resp, err := SpendingTypeUsecase.Create(context.TODO(), req)
+	response, err := SpendingTypeUsecase.Create(context.TODO(), req)
 	assert.Error(t, err)
-	assert.Nil(t, resp)
-	var errHTTP *domain.ErrHTTP
+	assert.Nil(t, response)
+	var errHTTP *resp.HttpError
 	assert.Equal(t, true, errors.As(err, &errHTTP))
 }
 
@@ -47,9 +48,9 @@ func UpdateSpendingTypeUsecase(t *testing.T) {
 		Icon:         "icon.png",
 	}
 
-	resp, err := SpendingTypeUsecase.Update(context.TODO(), req)
+	response, err := SpendingTypeUsecase.Update(context.TODO(), req)
 	assert.NoError(t, err)
-	assert.NotNil(t, resp)
+	assert.NotNil(t, response)
 }
 
 func UpdateSpendingTypeUsecaseERRORNameAlready(t *testing.T) {
@@ -61,10 +62,10 @@ func UpdateSpendingTypeUsecaseERRORNameAlready(t *testing.T) {
 		Icon:         "icon.png",
 	}
 
-	resp, err := SpendingTypeUsecase.Update(context.TODO(), req)
+	response, err := SpendingTypeUsecase.Update(context.TODO(), req)
 	assert.Error(t, err)
-	assert.Nil(t, resp)
-	var errHTTP *domain.ErrHTTP
+	assert.Nil(t, response)
+	var errHTTP *resp.HttpError
 	assert.Equal(t, true, errors.As(err, &errHTTP))
 }
 
@@ -74,31 +75,31 @@ func DeleteSpendingTypeUsecase(t *testing.T) {
 }
 
 func GetByIDAndProfileIDSpendingTypeUsecase(t *testing.T) {
-	resp, err := SpendingTypeUsecase.GetByIDAndProfileID(context.TODO(), "spendingType2", "profileID1")
+	response, err := SpendingTypeUsecase.GetByIDAndProfileID(context.TODO(), "spendingType2", "profileID1")
 	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	t.Log(resp)
+	assert.NotNil(t, response)
+	t.Log(response)
 }
 
 func GetByIDAndProfileIDSpendingTypeUsecaseERRORNoRow(t *testing.T) {
-	resp, err := SpendingTypeUsecase.GetByIDAndProfileID(context.TODO(), "spendingType3", "profileID1")
+	response, err := SpendingTypeUsecase.GetByIDAndProfileID(context.TODO(), "spendingType3", "profileID1")
 	assert.Error(t, err)
-	assert.Nil(t, resp)
-	var errHTTP *domain.ErrHTTP
+	assert.Nil(t, response)
+	var errHTTP *resp.HttpError
 	assert.Equal(t, true, errors.As(err, &errHTTP))
 	assert.Equal(t, 404, errHTTP.Code)
 }
 
 func GetAllByProfileIDSpendingTypeUsecase(t *testing.T) {
-	resp, err := SpendingTypeUsecase.GetAllByProfileID(context.TODO(), "profileID1", 14)
+	response, err := SpendingTypeUsecase.GetAllByProfileID(context.TODO(), "profileID1", 14)
 	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	t.Log(resp.ResponseSpendingType)
+	assert.NotNil(t, response)
+	t.Log(response.ResponseSpendingType)
 }
 
 func GetAllByProfileIDSpendingTypeUsecaseWithCreateDefaultType(t *testing.T) {
-	resp, err := SpendingTypeUsecase.GetAllByProfileID(context.TODO(), "profileID2", 14)
+	response, err := SpendingTypeUsecase.GetAllByProfileID(context.TODO(), "profileID2", 14)
 	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Equal(t, 3, len(*resp.ResponseSpendingType))
+	assert.NotNil(t, response)
+	assert.Equal(t, 3, len(*response.ResponseSpendingType))
 }

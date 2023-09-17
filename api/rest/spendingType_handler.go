@@ -6,11 +6,11 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	resp "github.com/jasanya-tech/jasanya-response-backend-golang"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/validation"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
 type SpendingTypeHandlerImpl struct {
@@ -46,12 +46,7 @@ func (h *SpendingTypeHandlerImpl) Create(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: spendingType,
-		Code: 201,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, spendingType, "crete spending type berhasil")
 }
 
 func (h *SpendingTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
@@ -76,12 +71,7 @@ func (h *SpendingTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: spendingType,
-		Code: 200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, spendingType, "update spending type berhasil")
 }
 
 func (h *SpendingTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
@@ -90,12 +80,12 @@ func (h *SpendingTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request)
 
 	_, err := uuid.Parse(profileID)
 	if err != nil {
-		helper.ErrorResponseEncode(w, util.ErrHTTPString("", http.StatusNotFound))
+		helper.ErrorResponseEncode(w, resp.HttpErrString(string(resp.S404), resp.S404))
 		return
 	}
 	_, err = uuid.Parse(id)
 	if err != nil {
-		helper.ErrorResponseEncode(w, util.ErrHTTPString("", http.StatusNotFound))
+		helper.ErrorResponseEncode(w, resp.HttpErrString(string(resp.S404), resp.S404))
 		return
 	}
 
@@ -105,12 +95,7 @@ func (h *SpendingTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Message: "deleted data spending type successfully",
-		Code:    200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, nil, "deleted spending type berhasil")
 }
 
 func (h *SpendingTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
@@ -119,12 +104,12 @@ func (h *SpendingTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *
 
 	_, err := uuid.Parse(profileID)
 	if err != nil {
-		helper.ErrorResponseEncode(w, util.ErrHTTPString("", http.StatusNotFound))
+		helper.ErrorResponseEncode(w, resp.HttpErrString(string(resp.S404), resp.S404))
 		return
 	}
 	_, err = uuid.Parse(id)
 	if err != nil {
-		helper.ErrorResponseEncode(w, util.ErrHTTPString("", http.StatusNotFound))
+		helper.ErrorResponseEncode(w, resp.HttpErrString(string(resp.S404), resp.S404))
 		return
 	}
 
@@ -134,12 +119,7 @@ func (h *SpendingTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: spendingType,
-		Code: 200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, spendingType, "data spending type")
 }
 
 func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
@@ -147,13 +127,13 @@ func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *ht
 
 	_, err := uuid.Parse(profileID)
 	if err != nil {
-		helper.ErrorResponseEncode(w, util.ErrHTTPString("", http.StatusNotFound))
+		helper.ErrorResponseEncode(w, resp.HttpErrString(string(resp.S404), resp.S404))
 		return
 	}
 	periode := r.URL.Query().Get("periode")
 	periodInt, err := strconv.Atoi(periode)
 	if err != nil {
-		helper.ErrorResponseEncode(w, util.ErrHTTPString("", http.StatusNotFound))
+		helper.ErrorResponseEncode(w, resp.HttpErrString(string(resp.S404), resp.S404))
 		return
 	}
 
@@ -163,10 +143,5 @@ func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *ht
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: spendingTypes,
-		Code: 200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, spendingTypes, "data spending types")
 }

@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	errResp "github.com/jasanya-tech/jasanya-response-backend-golang"
+
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
 func CreatePayment(req *domain.RequestCreatePayment) error {
@@ -39,7 +40,7 @@ func CreatePayment(req *domain.RequestCreatePayment) error {
 	}
 
 	if len(err) != 0 {
-		return util.ErrHTTP400(err)
+		return errResp.HttpErrMapOfSlices(err, errResp.S400)
 	}
 	return nil
 }
@@ -74,7 +75,7 @@ func UpdatePayment(req *domain.RequestUpdatePayment) error {
 	}
 
 	if len(err) != 0 {
-		return util.ErrHTTP400(err)
+		return errResp.HttpErrMapOfSlices(err, errResp.S400)
 	}
 	return nil
 }

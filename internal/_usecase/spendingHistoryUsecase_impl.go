@@ -6,10 +6,11 @@ import (
 	"errors"
 	"time"
 
+	resp "github.com/jasanya-tech/jasanya-response-backend-golang"
+
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
 type SpendingHistoryUsecaseImpl struct {
@@ -36,7 +37,7 @@ func NewSpendingHistoryUsecaseImpl(
 func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreateSpendingHistory) (*domain.ResponseSpendingHistory, error) {
 	err := s.spendingHistoryRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 	defer s.spendingHistoryRepo.CloseConn()
 
@@ -52,7 +53,7 @@ func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Req
 	balance, err := s.balanceRepo.GetByProfileID(ctx, req.ProfileID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, util.ErrHTTPString("", 500)
+			return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 	}
 
@@ -63,14 +64,14 @@ func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Req
 			balance = converter.CreateBalanceToModel(req.ProfileID)
 			err = s.balanceRepo.Create(ctx, balance)
 			if err != nil {
-				return err
+				return resp.HttpErrString(string(resp.S500), resp.S500)
 			}
 		}
 
 		spendingHistory := converter.CreateSpendingHistoryToModel(req, balance.Balance)
 		err = s.spendingHistoryRepo.Create(ctx, spendingHistory)
 		if err != nil {
-			return err
+			return resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 		id = spendingHistory.ID
 
@@ -79,39 +80,33 @@ func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Req
 		balance = converter.UpdateBalanceToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
 		err = s.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
-			return err
+			return resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		code := helper.GetCodePqError(err)
-		switch code {
-		case "23503":
-			return nil, util.ErrHTTPString("", 403)
-		default:
-			return nil, util.ErrHTTPString("", 500)
-		}
+		return nil, err
 	}
 
 	spendingHistoryJoin, err := s.spendingHistoryRepo.GetByIDAndProfileID(ctx, id, req.ProfileID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, util.ErrHTTPString("", 500)
+			return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 		}
-		return nil, util.ErrHTTPString("", 404)
+		return nil, resp.HttpErrString(string(resp.S404), resp.S404)
 	}
 
-	resp := converter.SpendingHistoryJoinModelToResponse(spendingHistoryJoin)
+	spendingHistoryJoinResponse := converter.SpendingHistoryJoinModelToResponse(spendingHistoryJoin)
 
-	return resp, nil
+	return spendingHistoryJoinResponse, nil
 }
 
 func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpdateSpendingHistory) (*domain.ResponseSpendingHistory, error) {
 	err := s.spendingHistoryRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 	defer s.spendingHistoryRepo.CloseConn()
 
@@ -127,16 +122,16 @@ func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Req
 	balance, err := s.balanceRepo.GetByProfileID(ctx, req.ProfileID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, util.ErrHTTPString("", 500)
+			return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 	}
 
 	spendingHistoryJoin, err := s.spendingHistoryRepo.GetByIDAndProfileID(ctx, req.ID, req.ProfileID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, util.ErrHTTPString("", 500)
+			return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 		}
-		return nil, util.ErrHTTPString("", 404)
+		return nil, resp.HttpErrString(string(resp.S404), resp.S404)
 	}
 
 	err = s.spendingHistoryRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
@@ -144,7 +139,7 @@ func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Req
 			balance = converter.CreateBalanceToModel(req.ProfileID)
 			err = s.balanceRepo.Create(ctx, balance)
 			if err != nil {
-				return err
+				return resp.HttpErrString(string(resp.S500), resp.S500)
 			}
 		}
 
@@ -155,62 +150,56 @@ func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Req
 
 		err = s.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
-			return err
+			return resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 
 		spendingHistory := converter.UpdateSpendingHistoryToModel(req, beforeBalance)
 		err = s.spendingHistoryRepo.Update(ctx, spendingHistory)
 		if err != nil {
-			return err
+			return resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		code := helper.GetCodePqError(err)
-		switch code {
-		case "23503":
-			return nil, util.ErrHTTPString("", 403)
-		default:
-			return nil, util.ErrHTTPString("", 500)
-		}
+		return nil, err
 	}
 
 	spendingHistoryJoin, err = s.spendingHistoryRepo.GetByIDAndProfileID(ctx, req.ID, req.ProfileID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, util.ErrHTTPString("", 500)
+			return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 		}
-		return nil, util.ErrHTTPString("", 404)
+		return nil, resp.HttpErrString(string(resp.S404), resp.S404)
 	}
 
-	resp := converter.SpendingHistoryJoinModelToResponse(spendingHistoryJoin)
+	spendingHistoryJoinResponse := converter.SpendingHistoryJoinModelToResponse(spendingHistoryJoin)
 
-	return resp, nil
+	return spendingHistoryJoinResponse, nil
 }
 
 func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
 	err := s.spendingHistoryRepo.OpenConn(ctx)
 	if err != nil {
-		return util.ErrHTTPString("", 500)
+		return resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 	defer s.spendingHistoryRepo.CloseConn()
 
 	spendingHistoryJoin, err := s.spendingHistoryRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return util.ErrHTTPString("", 404)
+			return resp.HttpErrString(string(resp.S404), resp.S404)
 		}
-		return util.ErrHTTPString("", 500)
+		return resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 
 	balance, err := s.balanceRepo.GetByProfileID(ctx, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return util.ErrHTTPString("", 404)
+			return resp.HttpErrString(string(resp.S404), resp.S404)
 		}
-		return util.ErrHTTPString("", 500)
+		return resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 
 	err = s.spendingHistoryRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
@@ -220,19 +209,19 @@ func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, prof
 
 		err = s.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
-			return err
+			return resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 
 		err = s.spendingHistoryRepo.Delete(ctx, id, profileID)
 		if err != nil {
-			return err
+			return resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return util.ErrHTTPString("", 500)
+		return err
 	}
 
 	return nil
@@ -241,7 +230,7 @@ func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, prof
 func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.RequestGetFilteredDataSpendingHistory) (*[]domain.ResponseSpendingHistory, error) {
 	err := s.spendingHistoryRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 	defer s.spendingHistoryRepo.CloseConn()
 
@@ -249,12 +238,14 @@ func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Contex
 	if req.Type != "" {
 		startTime, endTime, err = helper.TimeDateByTypeFilter(req.Type)
 		if err != nil {
-			return nil, util.ErrHTTPString("", 422)
+			return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 	} else {
 		startTime, endTime, err = helper.FormatDate(req.StartTime, req.EndTime)
 		if err != nil {
-			return nil, util.ErrHTTPString("", 422)
+			msg := resp.RegisterErrMapOfSlices("start", "invalid start time query param")
+			msg2 := resp.RegisterErrMapOfSlices("start", "invalid start time query param")
+			return nil, resp.HttpErrMapOfSlices(resp.MergeMapOfSlices(msg, msg2), resp.S400)
 		}
 	}
 	req.StartTime = startTime
@@ -262,39 +253,37 @@ func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Contex
 
 	spendingHistories, err := s.spendingHistoryRepo.GetAllByTimeAndProfileID(ctx, req)
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 
-	var resps []domain.ResponseSpendingHistory
+	var spendingHistoryJoinResponses []domain.ResponseSpendingHistory
 
 	for _, spendingHistory := range *spendingHistories {
-		resp := converter.GetAllSpendingHistoryJoinModelToResponse(spendingHistory)
-		resps = append(resps, resp)
+		spendingHistoryJoinResponse := converter.GetAllSpendingHistoryJoinModelToResponse(spendingHistory)
+		spendingHistoryJoinResponses = append(spendingHistoryJoinResponses, spendingHistoryJoinResponse)
 	}
 
-	return &resps, nil
+	return &spendingHistoryJoinResponses, nil
 }
 
-func (s *SpendingHistoryUsecaseImpl) GetByIDAndProfileID(
-	ctx context.Context, id string, profileID string,
-) (*domain.ResponseSpendingHistory, error) {
+func (s *SpendingHistoryUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseSpendingHistory, error) {
 	err := s.spendingHistoryRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 	defer s.spendingHistoryRepo.CloseConn()
 
 	spendingHistory, err := s.spendingHistoryRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, util.ErrHTTPString("", 404)
+			return nil, resp.HttpErrString(string(resp.S404), resp.S404)
 		}
-		return nil, util.ErrHTTPString("", 500)
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 
-	resp := converter.SpendingHistoryJoinModelToResponse(spendingHistory)
+	spendingHistoryJoinResponse := converter.SpendingHistoryJoinModelToResponse(spendingHistory)
 
-	return resp, nil
+	return spendingHistoryJoinResponse, nil
 }
 
 func (s *SpendingHistoryUsecaseImpl) validatePaymentAndSpendingTypeID(ctx context.Context, req *domain.RequestValidatePaymentAndSpendingTypeID) error {
@@ -302,7 +291,7 @@ func (s *SpendingHistoryUsecaseImpl) validatePaymentAndSpendingTypeID(ctx contex
 	_, err := s.spendingTypeRepo.GetByIDAndProfileID(ctx, req.SpendingTypeID, req.ProfileID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return util.ErrHTTPString("", 500)
+			return resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 		errBad["spending_type_id"] = append(errBad["spending_type_id"], "invalid spending type id")
 	}
@@ -311,14 +300,14 @@ func (s *SpendingHistoryUsecaseImpl) validatePaymentAndSpendingTypeID(ctx contex
 		_, err = s.paymentRepo.GetByID(ctx, req.PaymentMethodID)
 		if err != nil {
 			if !errors.Is(err, sql.ErrNoRows) {
-				return util.ErrHTTPString("", 500)
+				return resp.HttpErrString(string(resp.S500), resp.S500)
 			}
 			errBad["payment_method_id"] = append(errBad["payment_method_id"], "invalid payment method id")
 		}
 	}
 
 	if len(errBad) != 0 {
-		return util.ErrHTTP400(errBad)
+		return resp.HttpErrMapOfSlices(errBad, resp.S400)
 	}
 
 	return nil

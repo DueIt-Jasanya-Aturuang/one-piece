@@ -1,20 +1,19 @@
 package validation
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/google/uuid"
+	errResp "github.com/jasanya-tech/jasanya-response-backend-golang"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
 func CreateSpendingHistory(req *domain.RequestCreateSpendingHistory) error {
 	err := map[string][]string{}
 
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return util.ErrHTTPString("", http.StatusForbidden)
+		return errResp.HttpErrString("invalid profile id", errResp.S403)
 	}
 	if _, errParse := uuid.Parse(req.SpendingTypeID); errParse != nil {
 		err["spending_type_id"] = append(err["spending_type_id"], "invalid spending type id")
@@ -69,7 +68,7 @@ func CreateSpendingHistory(req *domain.RequestCreateSpendingHistory) error {
 	}
 
 	if len(err) != 0 {
-		return util.ErrHTTP400(err)
+		return errResp.HttpErrMapOfSlices(err, errResp.S400)
 	}
 
 	return nil
@@ -79,13 +78,13 @@ func UpdateSpendingHistory(req *domain.RequestUpdateSpendingHistory) error {
 	err := map[string][]string{}
 
 	if _, errParse := uuid.Parse(req.ProfileID); errParse != nil {
-		return util.ErrHTTPString("", http.StatusForbidden)
+		return errResp.HttpErrString("invalid profile id", errResp.S403)
 	}
 	if _, errParse := uuid.Parse(req.SpendingTypeID); errParse != nil {
 		err["spending_type_id"] = append(err["spending_type_id"], "invalid spending type id")
 	}
 	if _, errParse := uuid.Parse(req.ID); errParse != nil {
-		return util.ErrHTTPString("", http.StatusNotFound)
+		return errResp.HttpErrString("spending history tidak ditemukan", errResp.S404)
 	}
 
 	if req.PaymentName == "" && req.PaymentMethodID == "" {
@@ -137,7 +136,7 @@ func UpdateSpendingHistory(req *domain.RequestUpdateSpendingHistory) error {
 	}
 
 	if len(err) != 0 {
-		return util.ErrHTTP400(err)
+		return errResp.HttpErrMapOfSlices(err, errResp.S400)
 	}
 
 	return nil

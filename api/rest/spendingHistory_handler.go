@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/validation"
@@ -45,12 +44,7 @@ func (h *SpendingHistoryHandlerImpl) Create(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: spendingHistory,
-		Code: 201,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, spendingHistory, "create spending history berhasil")
 }
 
 func (h *SpendingHistoryHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
@@ -75,12 +69,7 @@ func (h *SpendingHistoryHandlerImpl) Update(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: spendingHistory,
-		Code: 201,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, spendingHistory, "update spending history berhasil")
 }
 
 func (h *SpendingHistoryHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
@@ -93,12 +82,7 @@ func (h *SpendingHistoryHandlerImpl) Delete(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Message: "successfully deleted data",
-		Code:    200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, nil, "delete spending history berhasil")
 }
 
 func (h *SpendingHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
@@ -119,20 +103,13 @@ func (h *SpendingHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r 
 		Type:      typeQuery,
 	}
 
-	log.Info().Msgf("%v", req)
-
 	spendingHistories, err := h.spendingHistoryUsecase.GetAllByTimeAndProfileID(r.Context(), req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: spendingHistories,
-		Code: 200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, spendingHistories, "data spending history")
 }
 
 func (h *SpendingHistoryHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
@@ -145,10 +122,5 @@ func (h *SpendingHistoryHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, 
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: spendingHistory,
-		Code: 200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, spendingHistory, "data spending history")
 }

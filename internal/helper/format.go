@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	resp "github.com/jasanya-tech/jasanya-response-backend-golang"
 	"github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 
@@ -100,12 +101,13 @@ func FormatDate(startTime, endTime time.Time) (time.Time, time.Time, error) {
 	startTimeNew, err := time.Parse("2006-01-02", startTimeStr)
 	if err != nil {
 		log.Warn().Msgf("error parse layout 2006-01-02 | err : %v", err)
-		return time.Time{}, time.Time{}, util.ErrHTTPString("", 500)
+
+		return time.Time{}, time.Time{}, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 	endTimeNew, err := time.Parse("2006-01-02", endTimeStr)
 	if err != nil {
 		log.Warn().Msgf("error parse layout 2006-01-02 | err : %v", err)
-		return time.Time{}, time.Time{}, util.ErrHTTPString("", 500)
+		return time.Time{}, time.Time{}, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 
 	return startTimeNew, endTimeNew, nil

@@ -1,22 +1,17 @@
 package validation
 
 import (
-	"net/http"
-
 	"github.com/google/uuid"
+	errResp "github.com/jasanya-tech/jasanya-response-backend-golang"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
 func CreateSpendingType(req *domain.RequestCreateSpendingType) error {
 	err := map[string][]string{}
 
-	if req.ProfileID == "" {
-		return util.ErrHTTPString("", http.StatusForbidden)
-	}
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return util.ErrHTTPString("", http.StatusForbidden)
+		return errResp.HttpErrString("invalid profile-id", errResp.S403)
 	}
 
 	if req.Title == "" {
@@ -40,7 +35,7 @@ func CreateSpendingType(req *domain.RequestCreateSpendingType) error {
 	}
 
 	if len(err) != 0 {
-		return util.ErrHTTP400(err)
+		return errResp.HttpErrMapOfSlices(err, errResp.S400)
 	}
 
 	return nil
@@ -49,18 +44,12 @@ func CreateSpendingType(req *domain.RequestCreateSpendingType) error {
 func UpdateSpendingType(req *domain.RequestUpdateSpendingType) error {
 	err := map[string][]string{}
 
-	if req.ProfileID == "" {
-		return util.ErrHTTPString("", http.StatusForbidden)
-	}
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return util.ErrHTTPString("", http.StatusForbidden)
+		return errResp.HttpErrString("invalid profile-id", errResp.S403)
 	}
 
-	if req.ID == "" {
-		return util.ErrHTTPString("", http.StatusForbidden)
-	}
 	if _, err := uuid.Parse(req.ID); err != nil {
-		return util.ErrHTTPString("", http.StatusForbidden)
+		return errResp.HttpErrString("invalid id", errResp.S403)
 	}
 
 	if req.Title == "" {
@@ -84,7 +73,7 @@ func UpdateSpendingType(req *domain.RequestUpdateSpendingType) error {
 	}
 
 	if len(err) != 0 {
-		return util.ErrHTTP400(err)
+		return errResp.HttpErrMapOfSlices(err, errResp.S400)
 	}
 
 	return nil

@@ -7,16 +7,16 @@ import (
 	"fmt"
 	"net/http"
 
+	resp "github.com/jasanya-tech/jasanya-response-backend-golang"
 	"github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
 func ErrorResponseEncode(w http.ResponseWriter, err error) {
 	var (
-		errHTTP          *domain.ErrHTTP
+		errHttp          *resp.HttpError
 		errUnmarshalType *json.UnmarshalTypeError
 		errSyntak        *json.SyntaxError
 		errPQ            *pq.Error
@@ -25,46 +25,42 @@ func ErrorResponseEncode(w http.ResponseWriter, err error) {
 	switch {
 	case errors.As(err, &errUnmarshalType):
 		msg := fmt.Sprintf("UnprocessableEntity : %s", err.Error())
-		err = util.ErrHTTPString(msg, http.StatusUnprocessableEntity)
+		err = resp.HttpErrString(msg, resp.S422)
 	case errors.As(err, &errSyntak):
-		err = util.ErrHTTP400(map[string][]string{
-			"unexpected": {
-				"unexpected end of json input",
-				errSyntak.Error(),
-			},
-		})
+		msg := fmt.Sprintf("unexpected end of json input : %s", err.Error())
+		err = resp.HttpErrString(msg, resp.S422)
 	case errors.As(err, &errPQ):
 		log.Warn().Msgf("pqerror | err : %v", err)
 		if errPQ.Code == "23503" {
-			err = util.ErrHTTPString("", http.StatusForbidden)
+			err = resp.HttpErrString(string(resp.S403), resp.S403)
 		} else {
-			err = util.ErrHTTPString("", http.StatusInternalServerError)
+			err = resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 	case errors.Is(err, context.DeadlineExceeded):
-		err = util.ErrHTTPString("", http.StatusRequestTimeout)
+		err = resp.HttpErrString("request time out", resp.S408)
 	}
 
-	ok := errors.As(err, &errHTTP)
+	ok := errors.As(err, &errHttp)
 	if !ok {
-		err = util.ErrHTTPString("", http.StatusInternalServerError)
-		errors.As(err, &errHTTP)
+		err = resp.HttpErrString(string(resp.S500), resp.S500)
+		errors.As(err, &errHttp)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(errHTTP.Code)
-	resp := &domain.ResponseErrorHTTP{
-		Errors: errHTTP.Message,
-	}
+	w.WriteHeader(errHttp.Code)
+	response := resp.ToResponseError(err)
 
-	if errEncode := json.NewEncoder(w).Encode(resp); errEncode != nil {
-		log.Err(errEncode).Msgf(util.LogErrEncode, resp, errEncode)
+	if errEncode := json.NewEncoder(w).Encode(response); errEncode != nil {
+		log.Err(errEncode).Msgf(util.LogErrEncode, response, errEncode)
 	}
 }
 
-func SuccessResponseEncode(w http.ResponseWriter, data domain.ResponseSuccessHTTP) {
+func SuccessResponseEncode(w http.ResponseWriter, data any, message string) {
+	response := resp.ToResponseSuccess(data, message)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(data.Code)
-	if errEncode := json.NewEncoder(w).Encode(data); errEncode != nil {
-		log.Err(errEncode).Msgf(util.LogErrEncode, data, errEncode)
+	w.WriteHeader(response.Status)
+	
+	if errEncode := json.NewEncoder(w).Encode(response); errEncode != nil {
+		log.Err(errEncode).Msgf(util.LogErrEncode, response, errEncode)
 	}
 }

@@ -5,13 +5,12 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/rs/zerolog/log"
+	resp "github.com/jasanya-tech/jasanya-response-backend-golang"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
 type SpendingTypeUsecaseImpl struct {
@@ -29,7 +28,7 @@ func NewSpendingTypeUsecaseImpl(
 func (s *SpendingTypeUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreateSpendingType) (*domain.ResponseSpendingType, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 	defer s.spendingTypeRepo.CloseConn()
 
@@ -38,13 +37,17 @@ func (s *SpendingTypeUsecaseImpl) Create(ctx context.Context, req *domain.Reques
 		return nil, err
 	}
 	if exist {
-		return nil, util.ErrHTTPString("kategori title sudah tersedia", 409)
+		msg := resp.RegisterErrMapOfSlices("title", "kategori title sudah tersedia")
+		return nil, resp.HttpErrMapOfSlices(msg, resp.S400)
 	}
 
 	spendingType := converter.SpendingTypeRequestCreateToModel(req)
 	err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		err = s.spendingTypeRepo.Create(ctx, spendingType)
-		return err
+		if err != nil {
+			return resp.HttpErrString(string(resp.S500), resp.S500)
+		}
+		return nil
 	})
 
 	if err != nil {
@@ -52,40 +55,44 @@ func (s *SpendingTypeUsecaseImpl) Create(ctx context.Context, req *domain.Reques
 	}
 
 	formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
-	resp := converter.SpendingTypeModelToResponse(spendingType, formatMaximumLimit)
+	spendingTypeResponse := converter.SpendingTypeModelToResponse(spendingType, formatMaximumLimit)
 
-	return resp, nil
+	return spendingTypeResponse, nil
 }
 
 func (s *SpendingTypeUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpdateSpendingType) (*domain.ResponseSpendingType, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 	defer s.spendingTypeRepo.CloseConn()
 
 	spendingType, err := s.spendingTypeRepo.GetByIDAndProfileID(ctx, req.ID, req.ProfileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, util.ErrHTTPString("", 404)
+			return nil, resp.HttpErrString(string(resp.S404), resp.S404)
 		}
-		return nil, err
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 
 	if spendingType.Title != req.Title {
 		exist, err := s.spendingTypeRepo.CheckByTitleAndProfileID(ctx, req.ProfileID, req.Title)
 		if err != nil {
-			return nil, err
+			return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 		}
 		if exist {
-			return nil, util.ErrHTTPString("kategori title sudah tersedia", 409)
+			msg := resp.RegisterErrMapOfSlices("title", "kategori title sudah tersedia")
+			return nil, resp.HttpErrMapOfSlices(msg, resp.S400)
 		}
 	}
 
 	spendingType = converter.SpendingTypeRequestUpdateToModel(req)
 	err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		err = s.spendingTypeRepo.Update(ctx, spendingType)
-		return err
+		if err != nil {
+			return resp.HttpErrString(string(resp.S500), resp.S500)
+		}
+		return nil
 	})
 
 	if err != nil {
@@ -93,21 +100,25 @@ func (s *SpendingTypeUsecaseImpl) Update(ctx context.Context, req *domain.Reques
 	}
 
 	formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
-	resp := converter.SpendingTypeModelToResponse(spendingType, formatMaximumLimit)
+	spendingTypeResponse := converter.SpendingTypeModelToResponse(spendingType, formatMaximumLimit)
 
-	return resp, nil
+	return spendingTypeResponse, nil
 }
 
 func (s *SpendingTypeUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return util.ErrHTTPString("", 500)
+		return resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 	defer s.spendingTypeRepo.CloseConn()
 
 	err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		err = s.spendingTypeRepo.Delete(ctx, id, profileID)
-		return err
+		if err != nil {
+			return resp.HttpErrString(string(resp.S500), resp.S500)
+		}
+
+		return nil
 	})
 
 	if err != nil {
@@ -120,27 +131,27 @@ func (s *SpendingTypeUsecaseImpl) Delete(ctx context.Context, id string, profile
 func (s *SpendingTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseSpendingType, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 
 	spendingType, err := s.spendingTypeRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, util.ErrHTTPString("data not found", 404)
+			return nil, resp.HttpErrString(string(resp.S404), resp.S404)
 		}
-		return nil, err
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 
 	formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
-	resp := converter.SpendingTypeModelToResponse(spendingType, formatMaximumLimit)
+	spendingTypeResponse := converter.SpendingTypeModelToResponse(spendingType, formatMaximumLimit)
 
-	return resp, nil
+	return spendingTypeResponse, nil
 }
 
 func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string, periode int) (*domain.ResponseAllSpendingType, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
 	}
 
 	exist, err := s.spendingTypeRepo.CheckData(ctx, profileID)
@@ -152,7 +163,7 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 		err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 			spendingTypes, err := s.spendingTypeRepo.GetDefault(ctx)
 			if err != nil {
-				return err
+				return resp.HttpErrString(string(resp.S500), resp.S500)
 			}
 
 			for _, spendingType := range *spendingTypes {
@@ -160,13 +171,13 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 				spendingType.ID = uuid.NewV4().String()
 				err = s.spendingTypeRepo.Create(ctx, &spendingType)
 				if err != nil {
-					return err
+					return resp.HttpErrString(string(resp.S500), resp.S500)
 				}
 			}
 			return nil
 		})
 		if err != nil {
-			return nil, util.ErrHTTPString("", 500)
+			return nil, err
 		}
 	}
 
@@ -180,11 +191,14 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 		StartTime: startTime,
 		EndTime:   endTime,
 	}
-	log.Info().Msgf("%v", req)
-	spendingTypes, err := s.spendingTypeRepo.GetAllByProfileID(ctx, req)
 
-	var resps []domain.ResponseSpendingType
-	var resp domain.ResponseSpendingType
+	spendingTypes, err := s.spendingTypeRepo.GetAllByProfileID(ctx, req)
+	if err != nil {
+		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
+	}
+
+	var spendingTypeResponses []domain.ResponseSpendingType
+	var spendingTypeResponse domain.ResponseSpendingType
 	var budgetAmount int
 
 	for _, spendingType := range *spendingTypes {
@@ -193,12 +207,12 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 		formatUsed := helper.FormatRupiah(spendingType.Used)
 		persentaseMaximumLimit := helper.Persentase(spendingType.Used, spendingType.MaximumLimit)
 
-		resp = converter.SpendingTypeModelJoinToResponse(spendingType, persentaseMaximumLimit, formatMaximumLimit, formatUsed)
-		resps = append(resps, resp)
+		spendingTypeResponse = converter.SpendingTypeModelJoinToResponse(spendingType, persentaseMaximumLimit, formatMaximumLimit, formatUsed)
+		spendingTypeResponses = append(spendingTypeResponses, spendingTypeResponse)
 	}
 
 	respAll := &domain.ResponseAllSpendingType{
-		ResponseSpendingType: &resps,
+		ResponseSpendingType: &spendingTypeResponses,
 		BudgetAmount:         budgetAmount,
 		FormatBudgetAmount:   helper.FormatRupiah(budgetAmount),
 	}

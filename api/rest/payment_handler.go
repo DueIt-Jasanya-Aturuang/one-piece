@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	resp "github.com/jasanya-tech/jasanya-response-backend-golang"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/validation"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
 type PaymentHandlerImpl struct {
@@ -47,12 +47,7 @@ func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: payment,
-		Code: 201,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, payment, "created payment berhasil")
 }
 
 func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +61,7 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		helper.ErrorResponseEncode(w, util.ErrHTTPString("not found", 404))
+		helper.ErrorResponseEncode(w, resp.HttpErrString(string(resp.S404), resp.S404))
 		return
 	}
 	req.ID = id
@@ -86,12 +81,7 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: payment,
-		Code: 200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, payment, "update payment berhasil")
 }
 
 func (h *PaymentHandlerImpl) GetAll(w http.ResponseWriter, r *http.Request) {
@@ -101,10 +91,5 @@ func (h *PaymentHandlerImpl) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: payments,
-		Code: 200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, payments, "data payment")
 }
