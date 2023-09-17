@@ -8,12 +8,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	resp "github.com/jasanya-tech/jasanya-response-backend-golang"
-
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
 )
+
+var NamePaymentExist = errors.New("nama payment sudah tersedia") // create, update
+var PaymentNotExist = errors.New("payment tidak tersedia")       // update
 
 type PaymentUsecaseImpl struct {
 	paymentRepo domain.PaymentRepository
@@ -32,19 +33,18 @@ func NewPaymentUsecaseImpl(
 
 func (p *PaymentUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreatePayment) (*domain.ResponsePayment, error) {
 	if err := p.paymentRepo.OpenConn(ctx); err != nil {
-		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
+		return nil, err
 	}
 	defer p.paymentRepo.CloseConn()
 
 	paymentCheck, err := p.paymentRepo.GetByName(ctx, req.Name)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, resp.HttpErrString(string(resp.S500), resp.S500)
+			return nil, err
 		}
 	}
 	if paymentCheck != nil {
-		msg := resp.RegisterErrMapOfSlices("name", "nama payment sudah tersedia")
-		return nil, resp.HttpErrMapOfSlices(msg, resp.S400)
+		return nil, NamePaymentExist
 	}
 
 	fileExt := filepath.Ext(req.Image.Filename)
@@ -57,12 +57,12 @@ func (p *PaymentUsecaseImpl) Create(ctx context.Context, req *domain.RequestCrea
 	}, func() error {
 		err = p.paymentRepo.Create(ctx, paymentConv)
 		if err != nil {
-			return resp.HttpErrString(string(resp.S500), resp.S500)
+			return err
 		}
 
 		err = p.minioRepo.UploadFile(ctx, req.Image, fileName)
 		if err != nil {
-			return resp.HttpErrString(string(resp.S500), resp.S500)
+			return err
 		}
 
 		return nil
@@ -78,28 +78,27 @@ func (p *PaymentUsecaseImpl) Create(ctx context.Context, req *domain.RequestCrea
 
 func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpdatePayment) (*domain.ResponsePayment, error) {
 	if err := p.paymentRepo.OpenConn(ctx); err != nil {
-		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
+		return nil, err
 	}
 	defer p.paymentRepo.CloseConn()
 
 	payment, err := p.paymentRepo.GetByID(ctx, req.ID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, resp.HttpErrString(string(resp.S500), resp.S500)
+			return nil, err
 		}
-		return nil, resp.HttpErrString("payment tidak tersedia", resp.S404)
+		return nil, PaymentNotExist
 	}
 
 	if payment.Name != req.Name {
 		paymentName, err := p.paymentRepo.GetByName(ctx, req.Name)
 		if err != nil {
 			if !errors.Is(err, sql.ErrNoRows) {
-				return nil, resp.HttpErrString(string(resp.S500), resp.S500)
+				return nil, err
 			}
 		}
 		if paymentName != nil {
-			msg := resp.RegisterErrMapOfSlices("name", "nama payment sudah tersedia")
-			return nil, resp.HttpErrMapOfSlices(msg, resp.S400)
+			return nil, NamePaymentExist
 		}
 	}
 
@@ -118,18 +117,18 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 		ReadOnly:  false,
 	}, func() error {
 		if err = p.paymentRepo.Update(ctx, paymentConv); err != nil {
-			return resp.HttpErrString(string(resp.S500), resp.S500)
+			return err
 		}
 
 		if reqImageCondition {
 			if err = p.minioRepo.UploadFile(ctx, req.Image, fileName); err != nil {
-				return resp.HttpErrString(string(resp.S500), resp.S500)
+				return err
 			}
 
 			imageDelArr := strings.Split(payment.Image, "/")
 			imageDel := fmt.Sprintf("/%s/%s/%s", imageDelArr[2], imageDelArr[3], imageDelArr[4])
 			if err = p.minioRepo.DeleteFile(ctx, imageDel); err != nil {
-				return resp.HttpErrString(string(resp.S500), resp.S500)
+				return err
 			}
 		}
 
@@ -146,13 +145,13 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 
 func (p *PaymentUsecaseImpl) GetAll(ctx context.Context) (*[]domain.ResponsePayment, error) {
 	if err := p.paymentRepo.OpenConn(ctx); err != nil {
-		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
+		return nil, err
 	}
 	defer p.paymentRepo.CloseConn()
 
 	payments, err := p.paymentRepo.GetAll(ctx)
 	if err != nil {
-		return nil, resp.HttpErrString(string(resp.S500), resp.S500)
+		return nil, err
 	}
 
 	var responses []domain.ResponsePayment

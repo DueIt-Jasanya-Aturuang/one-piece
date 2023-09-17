@@ -4,7 +4,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	errResp "github.com/jasanya-tech/jasanya-response-backend-golang"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 )
@@ -13,7 +14,7 @@ func CreateSpendingHistory(req *domain.RequestCreateSpendingHistory) error {
 	err := map[string][]string{}
 
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return errResp.HttpErrString("invalid profile id", errResp.S403)
+		return _error.HttpErrString("invalid profile id", response.CM05)
 	}
 	if _, errParse := uuid.Parse(req.SpendingTypeID); errParse != nil {
 		err["spending_type_id"] = append(err["spending_type_id"], "invalid spending type id")
@@ -68,7 +69,7 @@ func CreateSpendingHistory(req *domain.RequestCreateSpendingHistory) error {
 	}
 
 	if len(err) != 0 {
-		return errResp.HttpErrMapOfSlices(err, errResp.S400)
+		return _error.HttpErrMapOfSlices(err, response.CM06)
 	}
 
 	return nil
@@ -78,13 +79,13 @@ func UpdateSpendingHistory(req *domain.RequestUpdateSpendingHistory) error {
 	err := map[string][]string{}
 
 	if _, errParse := uuid.Parse(req.ProfileID); errParse != nil {
-		return errResp.HttpErrString("invalid profile id", errResp.S403)
+		return _error.HttpErrString("invalid profile id", response.CM05)
 	}
 	if _, errParse := uuid.Parse(req.SpendingTypeID); errParse != nil {
 		err["spending_type_id"] = append(err["spending_type_id"], "invalid spending type id")
 	}
 	if _, errParse := uuid.Parse(req.ID); errParse != nil {
-		return errResp.HttpErrString("spending history tidak ditemukan", errResp.S404)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 	}
 
 	if req.PaymentName == "" && req.PaymentMethodID == "" {
@@ -136,7 +137,7 @@ func UpdateSpendingHistory(req *domain.RequestUpdateSpendingHistory) error {
 	}
 
 	if len(err) != 0 {
-		return errResp.HttpErrMapOfSlices(err, errResp.S400)
+		return _error.HttpErrMapOfSlices(err, response.CM06)
 	}
 
 	return nil

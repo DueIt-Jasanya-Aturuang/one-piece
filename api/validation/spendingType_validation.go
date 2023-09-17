@@ -2,7 +2,8 @@ package validation
 
 import (
 	"github.com/google/uuid"
-	errResp "github.com/jasanya-tech/jasanya-response-backend-golang"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 )
@@ -11,7 +12,7 @@ func CreateSpendingType(req *domain.RequestCreateSpendingType) error {
 	err := map[string][]string{}
 
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return errResp.HttpErrString("invalid profile-id", errResp.S403)
+		return _error.HttpErrString("invalid profile id", response.CM05)
 	}
 
 	if req.Title == "" {
@@ -35,7 +36,7 @@ func CreateSpendingType(req *domain.RequestCreateSpendingType) error {
 	}
 
 	if len(err) != 0 {
-		return errResp.HttpErrMapOfSlices(err, errResp.S400)
+		return _error.HttpErrMapOfSlices(err, response.CM06)
 	}
 
 	return nil
@@ -45,11 +46,11 @@ func UpdateSpendingType(req *domain.RequestUpdateSpendingType) error {
 	err := map[string][]string{}
 
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
-		return errResp.HttpErrString("invalid profile-id", errResp.S403)
+		return _error.HttpErrString("invalid profile id", response.CM05)
 	}
 
 	if _, err := uuid.Parse(req.ID); err != nil {
-		return errResp.HttpErrString("invalid id", errResp.S403)
+		return _error.HttpErrString("invalid id", response.CM05)
 	}
 
 	if req.Title == "" {
@@ -73,7 +74,7 @@ func UpdateSpendingType(req *domain.RequestUpdateSpendingType) error {
 	}
 
 	if len(err) != 0 {
-		return errResp.HttpErrMapOfSlices(err, errResp.S400)
+		return _error.HttpErrMapOfSlices(err, response.CM06)
 	}
 
 	return nil

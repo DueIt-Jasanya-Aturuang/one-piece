@@ -1,14 +1,18 @@
 package rest
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/validation"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
 )
 
 type SpendingHistoryHandlerImpl struct {
@@ -40,6 +44,12 @@ func (h *SpendingHistoryHandlerImpl) Create(w http.ResponseWriter, r *http.Reque
 
 	spendingHistory, err := h.spendingHistoryUsecase.Create(r.Context(), req)
 	if err != nil {
+		if errors.Is(err, _usecase.SpendingHistoryNotFound) {
+			err = _error.HttpErrString(err.Error(), response.CM01)
+		}
+		if errors.Is(err, _usecase.InvalidSpendingTypeID) {
+			err = _error.HttpErrString(err.Error(), response.CM01)
+		}
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
@@ -65,6 +75,12 @@ func (h *SpendingHistoryHandlerImpl) Update(w http.ResponseWriter, r *http.Reque
 
 	spendingHistory, err := h.spendingHistoryUsecase.Update(r.Context(), req)
 	if err != nil {
+		if errors.Is(err, _usecase.SpendingHistoryNotFound) {
+			err = _error.HttpErrString(err.Error(), response.CM01)
+		}
+		if errors.Is(err, _usecase.InvalidSpendingTypeID) {
+			err = _error.HttpErrString(err.Error(), response.CM01)
+		}
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
@@ -78,6 +94,12 @@ func (h *SpendingHistoryHandlerImpl) Delete(w http.ResponseWriter, r *http.Reque
 
 	err := h.spendingHistoryUsecase.Delete(r.Context(), id, profileID)
 	if err != nil {
+		if errors.Is(err, _usecase.SpendingHistoryNotFound) {
+			err = _error.HttpErrString(err.Error(), response.CM01)
+		}
+		if errors.Is(err, _usecase.ProfileIDNotFound) {
+			err = _error.HttpErrString(err.Error(), response.CM01)
+		}
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
@@ -105,6 +127,9 @@ func (h *SpendingHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r 
 
 	spendingHistories, err := h.spendingHistoryUsecase.GetAllByTimeAndProfileID(r.Context(), req)
 	if err != nil {
+		if errors.Is(err, _usecase.InvalidTimestamp) {
+			err = _error.HttpErrString(err.Error(), response.CM06)
+		}
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
@@ -118,6 +143,9 @@ func (h *SpendingHistoryHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, 
 
 	spendingHistory, err := h.spendingHistoryUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
 	if err != nil {
+		if errors.Is(err, _usecase.SpendingHistoryNotFound) {
+			err = _error.HttpErrString(err.Error(), response.CM01)
+		}
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
