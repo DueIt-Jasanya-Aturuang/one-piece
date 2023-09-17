@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	resp "github.com/jasanya-tech/jasanya-response-backend-golang"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
@@ -114,7 +115,7 @@ func TestUsecaseCreatePayment(t *testing.T) {
 		})
 		assert.Error(t, err)
 		assert.Nil(t, payment)
-		var errHTTP *domain.ErrHTTP
+		var errHTTP *resp.HttpError
 		assert.Equal(t, true, errors.As(err, &errHTTP))
 	})
 
@@ -135,9 +136,9 @@ func TestUsecaseCreatePayment(t *testing.T) {
 		})
 		assert.Error(t, err)
 		assert.Nil(t, payment)
-		var errHTTP *domain.ErrHTTP
+		var errHTTP *resp.HttpError
 		assert.Equal(t, true, errors.As(err, &errHTTP))
-		assert.Equal(t, 409, errHTTP.Code)
+		assert.Equal(t, 400, errHTTP.Code)
 	})
 }
 
@@ -270,7 +271,7 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 		})
 		assert.Error(t, err)
 		assert.Nil(t, payment)
-		var errHTTP *domain.ErrHTTP
+		var errHTTP *resp.HttpError
 		assert.Equal(t, true, errors.As(err, &errHTTP))
 		assert.Equal(t, 404, errHTTP.Code)
 	})
@@ -296,9 +297,9 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 		})
 		assert.Error(t, err)
 		assert.Nil(t, payment)
-		var errHTTP *domain.ErrHTTP
+		var errHTTP *resp.HttpError
 		assert.Equal(t, true, errors.As(err, &errHTTP))
-		assert.Equal(t, 409, errHTTP.Code)
+		assert.Equal(t, 400, errHTTP.Code)
 	})
 }
 
@@ -345,7 +346,7 @@ func TestUsecaseGetAllPayment(t *testing.T) {
 		payments, err := paymentUsecase.GetAll(ctx)
 		assert.Error(t, err)
 		assert.Nil(t, payments)
-		var errHTTP *domain.ErrHTTP
+		var errHTTP *resp.HttpError
 		assert.Equal(t, true, errors.As(err, &errHTTP))
 		assert.Equal(t, 500, errHTTP.Code)
 	})

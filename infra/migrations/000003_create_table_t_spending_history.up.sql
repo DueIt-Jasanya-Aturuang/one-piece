@@ -10,7 +10,7 @@ CREATE TABLE t_spending_history
     after_balance              DECIMAL,
     description                TEXT,
     location                   VARCHAR(64),
-    time_spending_history      TIMESTAMP,
+    time_spending_history      DATE,
     show_time_spending_history VARCHAR(64),
     created_at                 DECIMAL     NOT NULL,
     created_by                 VARCHAR(64),

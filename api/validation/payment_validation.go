@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
-func CreatePaymentValidation(req *domain.RequestCreatePayment) error {
+func CreatePayment(req *domain.RequestCreatePayment) error {
 	err := map[string][]string{}
 
 	if req.Image == nil {
@@ -39,12 +41,12 @@ func CreatePaymentValidation(req *domain.RequestCreatePayment) error {
 	}
 
 	if len(err) != 0 {
-		return util.ErrHTTP400(err)
+		return _error.HttpErrMapOfSlices(err, response.CM06)
 	}
 	return nil
 }
 
-func UpdatePaymentValidation(req *domain.RequestUpdatePayment) error {
+func UpdatePayment(req *domain.RequestUpdatePayment) error {
 	err := map[string][]string{}
 
 	if req.Image != nil {
@@ -72,9 +74,9 @@ func UpdatePaymentValidation(req *domain.RequestUpdatePayment) error {
 			err["description"] = append(err["description"], description)
 		}
 	}
-	
+
 	if len(err) != 0 {
-		return util.ErrHTTP400(err)
+		return _error.HttpErrMapOfSlices(err, response.CM06)
 	}
 	return nil
 }

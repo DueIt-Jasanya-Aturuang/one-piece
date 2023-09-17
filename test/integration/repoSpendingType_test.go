@@ -18,6 +18,7 @@ func CreateSpendingType(t *testing.T) {
 		ProfileID:    "profileID1",
 		Title:        "title",
 		MaximumLimit: 15000000,
+		Icon:         "icon",
 		AuditInfo: domain.AuditInfo{
 			CreatedAt: time.Now().Unix(),
 			CreatedBy: "profileID1",
@@ -51,6 +52,7 @@ func UpdateSpendingType(t *testing.T) {
 		ID:           "spendingType1",
 		ProfileID:    "profileID1",
 		Title:        "title",
+		Icon:         "icon",
 		MaximumLimit: 15000000,
 		AuditInfo: domain.AuditInfo{
 			UpdatedAt: time.Now().Unix(),
@@ -175,9 +177,48 @@ func GetAllByProfileIDSpendingType(t *testing.T) {
 	assert.NoError(t, err)
 	defer SpendingTypeRepo.CloseConn()
 
-	spendingTypes, err := SpendingTypeRepo.GetAllByProfileID(context.TODO(), "profileID1")
+	startPeriod := time.Date(time.Now().Year(), time.Now().Month(), 14, 0, 0, 0, 0, time.UTC)
+	endPeriod := startPeriod.AddDate(0, 1, 0)
+
+	req := &domain.RequestGetAllSpendingType{
+		ProfileID: "profileID1",
+		StartTime: startPeriod,
+		EndTime:   endPeriod,
+	}
+	spendingTypes, err := SpendingTypeRepo.GetAllByProfileID(context.TODO(), req)
 	assert.NoError(t, err)
 	assert.NotNil(t, spendingTypes)
 	t.Log(spendingTypes)
 	assert.Equal(t, 4, len(*spendingTypes))
+}
+
+func GetDefaultSpendingType(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	getDefault, err := SpendingTypeRepo.GetDefault(context.TODO())
+	assert.NoError(t, err)
+	assert.NotNil(t, getDefault)
+	assert.Equal(t, 3, len(*getDefault))
+}
+
+func CheckDataSpendingType(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	exist, err := SpendingTypeRepo.CheckData(context.TODO(), "profileID1")
+	assert.NoError(t, err)
+	assert.Equal(t, true, exist)
+}
+
+func CheckByTitleAndProfileIDSpendingType(t *testing.T) {
+	err := SpendingTypeRepo.OpenConn(context.TODO())
+	assert.NoError(t, err)
+	defer SpendingTypeRepo.CloseConn()
+
+	exist, err := SpendingTypeRepo.CheckByTitleAndProfileID(context.TODO(), "profileID1", "title")
+	assert.NoError(t, err)
+	assert.Equal(t, true, exist)
 }

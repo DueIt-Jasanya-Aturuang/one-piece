@@ -4,6 +4,7 @@ CREATE TABLE m_spending_type
     profile_id    VARCHAR(64),
     title         VARCHAR(64),
     maximum_limit DECIMAL,
+    icon VARCHAR(255),
     created_at    DECIMAL     NOT NULL,
     created_by    VARCHAR(64),
     updated_at    DECIMAL     NOT NULL,

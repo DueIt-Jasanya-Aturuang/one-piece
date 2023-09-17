@@ -1,14 +1,17 @@
 package rest
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
+	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/validation"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
 )
 
 type PaymentHandlerImpl struct {
@@ -35,7 +38,7 @@ func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 	_, fileHeader, _ := r.FormFile("image")
 	req.Image = fileHeader
 
-	err = validation.CreatePaymentValidation(req)
+	err = validation.CreatePayment(req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
@@ -43,16 +46,19 @@ func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 
 	payment, err := h.paymentUsecase.Create(r.Context(), req)
 	if err != nil {
+		if errors.Is(err, _usecase.NamePaymentExist) {
+			err = _error.HttpErrMapOfSlices(map[string][]string{
+				"name": {
+					err.Error(),
+				},
+			}, response.CM06)
+		}
+
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: payment,
-		Code: 201,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, payment, "created payment berhasil")
 }
 
 func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +72,7 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		helper.ErrorResponseEncode(w, util.ErrHTTPString("not found", 404))
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
 		return
 	}
 	req.ID = id
@@ -74,7 +80,7 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 	_, fileHeader, _ := r.FormFile("image")
 	req.Image = fileHeader
 
-	err = validation.UpdatePaymentValidation(req)
+	err = validation.UpdatePayment(req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
@@ -82,16 +88,21 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 
 	payment, err := h.paymentUsecase.Update(r.Context(), req)
 	if err != nil {
+		if errors.Is(err, _usecase.NamePaymentExist) {
+			err = _error.HttpErrMapOfSlices(map[string][]string{
+				"name": {
+					err.Error(),
+				},
+			}, response.CM06)
+		} else if errors.Is(err, _usecase.PaymentNotExist) {
+			err = _error.HttpErrString(err.Error(), response.CM01)
+		}
+
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: payment,
-		Code: 200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, payment, "update payment berhasil")
 }
 
 func (h *PaymentHandlerImpl) GetAll(w http.ResponseWriter, r *http.Request) {
@@ -101,10 +112,5 @@ func (h *PaymentHandlerImpl) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := domain.ResponseSuccessHTTP{
-		Data: payments,
-		Code: 200,
-	}
-
-	helper.SuccessResponseEncode(w, resp)
+	helper.SuccessResponseEncode(w, payments, "data payment")
 }

@@ -27,11 +27,12 @@ func main() {
 	minioRepo := _repository.NewMinioImpl(minioConn)
 	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
 	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
+	balanceRepo := _repository.NewBalanceRepositoryImpl(uow)
 
 	// usecase
 	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 	spendingTypeUsecase := _usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
-	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo)
+	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
 
 	// handler
 	paymentHandler := rest.NewPaymentHandlerImpl(paymentUsecase)
@@ -50,14 +51,15 @@ func main() {
 		r.Put("/payment/{id}", paymentHandler.Update)
 
 		r.Get("/spending-type/{profile-id}", spendingTypeHandler.GetAllByProfileID)
+		r.Get("/spending-type/{profile-id}/{id}", spendingTypeHandler.GetByIDAndProfileID)
 		r.Post("/spending-type", spendingTypeHandler.Create)
-		r.Put("/spending-type/{profile-id}/{id}", spendingTypeHandler.Update)
+		r.Put("/spending-type/{id}", spendingTypeHandler.Update)
 		r.Delete("/spending-type/{profile-id}/{id}", spendingTypeHandler.Delete)
 
 		r.Get("/spending-history/{profile-id}", spendingHistoryHandler.GetAllByProfileID)
 		r.Get("/spending-history/{profile-id}/{id}", spendingHistoryHandler.GetByIDAndProfileID)
 		r.Post("/spending-history", spendingHistoryHandler.Create)
-		r.Put("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Update)
+		r.Put("/spending-history/{id}", spendingHistoryHandler.Update)
 		r.Delete("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Delete)
 	})
 

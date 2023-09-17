@@ -7,6 +7,8 @@ import (
 var required = "field ini tidak boleh dikosongkan"
 var minString = "field ini tidak boleh kurang dari %d"
 var maxString = "field ini tidak boleh lebih dari %d"
+var minNumeric = "field ini tidak boleh kurang dari %d"
+var maxNumeric = "field ini tidak boleh lebih dari %d"
 var fileSize = "maximal size harus %d kb atau %d mb"
 var fileContent = "file content harus %s"
 
@@ -42,9 +44,20 @@ func checkContentType(headerContentType string, typeContent string) bool {
 func maxMinString(s string, min, max int) string {
 	switch {
 	case len(s) < min:
-		return fmt.Sprintf(minString, 3)
+		return fmt.Sprintf(minString, min)
 	case len(s) > max:
-		return fmt.Sprintf(maxString, 32)
+		return fmt.Sprintf(maxString, max)
+	}
+
+	return ""
+}
+
+func maxMinNumeric(i int, min, max int) string {
+	switch {
+	case i < min:
+		return fmt.Sprintf(minNumeric, min)
+	case i > max:
+		return fmt.Sprintf(maxNumeric, max)
 	}
 
 	return ""
