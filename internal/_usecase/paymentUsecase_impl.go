@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/rs/zerolog/log"
-
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
+
+var NamePaymentExist = errors.New("nama payment sudah tersedia") // create, update
+var PaymentNotExist = errors.New("payment tidak tersedia")       // update
 
 type PaymentUsecaseImpl struct {
 	paymentRepo domain.PaymentRepository
@@ -31,22 +31,20 @@ func NewPaymentUsecaseImpl(
 	}
 }
 
-func (p *PaymentUsecaseImpl) Create(
-	ctx context.Context, req *domain.RequestCreatePayment,
-) (resp *domain.ResponsePayment, err error) {
-	if err = p.paymentRepo.OpenConn(ctx); err != nil {
-		return nil, util.ErrHTTPString("", 500)
+func (p *PaymentUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreatePayment) (*domain.ResponsePayment, error) {
+	if err := p.paymentRepo.OpenConn(ctx); err != nil {
+		return nil, err
 	}
 	defer p.paymentRepo.CloseConn()
 
 	paymentCheck, err := p.paymentRepo.GetByName(ctx, req.Name)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, util.ErrHTTPString("", 500)
+			return nil, err
 		}
 	}
 	if paymentCheck != nil {
-		return nil, util.ErrHTTPString("nama payment sudah tersedia", 409)
+		return nil, NamePaymentExist
 	}
 
 	fileExt := filepath.Ext(req.Image.Filename)
@@ -71,38 +69,36 @@ func (p *PaymentUsecaseImpl) Create(
 	})
 
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, err
 	}
 
-	resp = converter.PaymentModelToResp(paymentConv)
-	return resp, nil
+	paymentResponse := converter.PaymentModelToResp(paymentConv)
+	return paymentResponse, nil
 }
 
-func (p *PaymentUsecaseImpl) Update(
-	ctx context.Context, req *domain.RequestUpdatePayment,
-) (resp *domain.ResponsePayment, err error) {
-	if err = p.paymentRepo.OpenConn(ctx); err != nil {
-		return nil, util.ErrHTTPString("", 500)
+func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpdatePayment) (*domain.ResponsePayment, error) {
+	if err := p.paymentRepo.OpenConn(ctx); err != nil {
+		return nil, err
 	}
 	defer p.paymentRepo.CloseConn()
 
 	payment, err := p.paymentRepo.GetByID(ctx, req.ID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return nil, util.ErrHTTPString("", 500)
+			return nil, err
 		}
-		return nil, util.ErrHTTPString("payment tidak tersedia", 404)
+		return nil, PaymentNotExist
 	}
+
 	if payment.Name != req.Name {
 		paymentName, err := p.paymentRepo.GetByName(ctx, req.Name)
 		if err != nil {
-			log.Info().Err(err).Msgf("err")
 			if !errors.Is(err, sql.ErrNoRows) {
-				return nil, util.ErrHTTPString("", 500)
+				return nil, err
 			}
 		}
 		if paymentName != nil {
-			return nil, util.ErrHTTPString("nama payment sudah tersedia", 409)
+			return nil, NamePaymentExist
 		}
 	}
 
@@ -143,19 +139,19 @@ func (p *PaymentUsecaseImpl) Update(
 		return nil, err
 	}
 
-	resp = converter.PaymentModelToResp(paymentConv)
-	return resp, nil
+	paymentResponse := converter.PaymentModelToResp(paymentConv)
+	return paymentResponse, nil
 }
 
 func (p *PaymentUsecaseImpl) GetAll(ctx context.Context) (*[]domain.ResponsePayment, error) {
 	if err := p.paymentRepo.OpenConn(ctx); err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, err
 	}
 	defer p.paymentRepo.CloseConn()
 
 	payments, err := p.paymentRepo.GetAll(ctx)
 	if err != nil {
-		return nil, util.ErrHTTPString("", 500)
+		return nil, err
 	}
 
 	var responses []domain.ResponsePayment

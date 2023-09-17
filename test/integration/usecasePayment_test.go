@@ -6,6 +6,7 @@ import (
 	"errors"
 	"testing"
 
+	resp "github.com/jasanya-tech/jasanya-response-backend-golang"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
@@ -66,9 +67,9 @@ func UsecaseCreatePayment409ERROR(t *testing.T) {
 		payment, err := usecasePayment.Create(ctx, req)
 		assert.Error(t, err)
 		assert.Nil(t, payment)
-		var errHTTP *domain.ErrHTTP
+		var errHTTP *resp.HttpError
 		assert.Equal(t, true, errors.As(err, &errHTTP))
-		assert.Equal(t, 409, errHTTP.Code)
+		assert.Equal(t, 400, errHTTP.Code)
 	})
 }
 
@@ -141,9 +142,9 @@ func UsecaseUpdatePaymentERROR(t *testing.T) {
 		payment, err := usecasePayment.Update(ctx, req)
 		assert.Error(t, err)
 		assert.Nil(t, payment)
-		var errHTTP *domain.ErrHTTP
+		var errHTTP *resp.HttpError
 		assert.Equal(t, true, errors.As(err, &errHTTP))
-		assert.Equal(t, 409, errHTTP.Code)
+		assert.Equal(t, 400, errHTTP.Code)
 	})
 
 	t.Run("ERROR_404", func(t *testing.T) {
@@ -157,7 +158,7 @@ func UsecaseUpdatePaymentERROR(t *testing.T) {
 		payment, err := usecasePayment.Update(ctx, req)
 		assert.Error(t, err)
 		assert.Nil(t, payment)
-		var errHTTP *domain.ErrHTTP
+		var errHTTP *resp.HttpError
 		assert.Equal(t, true, errors.As(err, &errHTTP))
 		assert.Equal(t, 404, errHTTP.Code)
 	})

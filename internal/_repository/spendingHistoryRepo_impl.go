@@ -160,7 +160,7 @@ func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
        				mst.title, mpm.name
 				FROM t_spending_history tsh 
 				JOIN m_spending_type mst ON tsh.spending_type_id = mst.id
-				JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
+				LEFT JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
 				WHERE tsh.profile_id = $1 AND tsh.time_spending_history BETWEEN $2 AND $3 AND tsh.deleted_at IS NULL`
 
 	conn, err := s.GetConn()
@@ -227,13 +227,14 @@ func (s *SpendingHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context,
        				mst.title, mpm.name
 				FROM t_spending_history tsh 
 				JOIN m_spending_type mst ON tsh.spending_type_id = mst.id
-				JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
-				WHERE tsh.profile_id = $1 AND id = $2 AND tsh.deleted_at IS NULL`
+				LEFT JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
+				WHERE tsh.profile_id = $1 AND tsh.id = $2 AND tsh.deleted_at IS NULL`
 
 	conn, err := s.GetConn()
 	if err != nil {
 		return nil, err
 	}
+
 	stmt, err := conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContextClose, err)
@@ -268,7 +269,7 @@ func (s *SpendingHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context,
 		&spendingHistory.SpendingTypeTitle,
 		&spendingHistory.PaymentMethodName,
 	); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if !errors.Is(err, sql.ErrNoRows) {
 			log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
 		}
 		return nil, err

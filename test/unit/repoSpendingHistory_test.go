@@ -160,7 +160,7 @@ func TestSpendingHistoryGetAllByTimeAndProfileID(t *testing.T) {
        				mst.title, mpm.name
 				FROM t_spending_history tsh 
 				JOIN m_spending_type mst ON tsh.spending_type_id = mst.id
-				JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
+				LEFT JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
 				WHERE tsh.profile_id = $1 AND tsh.time_spending_history BETWEEN $2 AND $3 AND tsh.deleted_at IS NULL`)
 
 	rows := sqlmock.NewRows([]string{"id", "profile_id", "spending_type_id", "payment_method_id", "payment_name",
@@ -227,8 +227,8 @@ func TestSpendingHistoryGetByIDAndProfileID(t *testing.T) {
        				mst.title, mpm.name
 				FROM t_spending_history tsh 
 				JOIN m_spending_type mst ON tsh.spending_type_id = mst.id
-				JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
-				WHERE tsh.profile_id = $1 AND id = $2 AND tsh.deleted_at IS NULL`)
+				LEFT JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
+				WHERE tsh.profile_id = $1 AND tsh.id = $2 AND tsh.deleted_at IS NULL`)
 
 	rows := sqlmock.NewRows([]string{"id", "profile_id", "spending_type_id", "payment_method_id", "payment_name",
 		"before_balance", "spending_amount", "after_balance", "description", "location", "time_spending_history", "show_time_spending_history",
