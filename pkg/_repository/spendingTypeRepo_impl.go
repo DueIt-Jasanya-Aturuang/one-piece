@@ -363,8 +363,8 @@ func (s *SpendingTypeRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Contex
 	}()
 
 	var spendingTypes []domain.SpendingTypeJoin
+	var spendingType domain.SpendingTypeJoin
 	for rows.Next() {
-		var spendingType domain.SpendingTypeJoin
 		if err = rows.Scan(
 			&spendingType.ID,
 			&spendingType.ProfileID,
@@ -378,6 +378,65 @@ func (s *SpendingTypeRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Contex
 			&spendingType.DeletedAt,
 			&spendingType.DeletedBy,
 			&spendingType.Used,
+		); err != nil {
+			log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
+			return nil, err
+		}
+
+		spendingTypes = append(spendingTypes, spendingType)
+	}
+
+	return &spendingTypes, nil
+}
+
+func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.SpendingType, error) {
+	query := `SELECT mst.id, mst.profile_id, mst.title, mst.maximum_limit, mst.icon, mst.created_at, mst.created_by, 
+       				mst.updated_at, mst.updated_by, mst.deleted_at, mst.deleted_by
+				FROM m_spending_type mst
+				WHERE mst.profile_id = $1 AND mst.deleted_at IS NULL`
+
+	conn, err := s.GetConn()
+	if err != nil {
+		return nil, err
+	}
+
+	stmt, err := conn.PrepareContext(ctx, query)
+	if err != nil {
+		log.Warn().Msgf(util.LogErrPrepareContext, err)
+		return nil, err
+	}
+	defer func() {
+		if errClose := stmt.Close(); errClose != nil {
+			log.Warn().Msgf(util.LogErrPrepareContextClose, err)
+		}
+	}()
+
+	rows, err := stmt.QueryContext(ctx, profileID)
+	if err != nil {
+		log.Warn().Msgf(util.LogErrQueryRows, err)
+		return nil, err
+	}
+	defer func() {
+		if errClose := rows.Close(); errClose != nil {
+			log.Warn().Msgf(util.LogErrQueryRowsClose, err)
+		}
+	}()
+
+	var spendingTypes []domain.SpendingType
+	var spendingType domain.SpendingType
+	for rows.Next() {
+		if err = rows.Scan(
+			&spendingType.ID,
+			&spendingType.ProfileID,
+			&spendingType.Title,
+			&spendingType.MaximumLimit,
+			&spendingType.Icon,
+			&spendingType.CreatedAt,
+			&spendingType.CreatedBy,
+			&spendingType.UpdatedAt,
+			&spendingType.UpdatedBy,
+			&spendingType.DeletedAt,
+			&spendingType.DeletedBy,
 		); err != nil {
 			log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
 			return nil, err

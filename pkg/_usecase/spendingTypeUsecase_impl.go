@@ -130,6 +130,7 @@ func (s *SpendingTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id st
 	if err != nil {
 		return nil, err
 	}
+	defer s.spendingTypeRepo.CloseConn()
 
 	spendingType, err := s.spendingTypeRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
@@ -150,6 +151,7 @@ func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Contex
 	if err != nil {
 		return nil, err
 	}
+	defer s.spendingTypeRepo.CloseConn()
 
 	exist, err := s.spendingTypeRepo.CheckData(ctx, profileID)
 	if err != nil {
@@ -157,22 +159,7 @@ func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Contex
 	}
 
 	if !exist {
-		err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
-			spendingTypes, err := s.spendingTypeRepo.GetDefault(ctx)
-			if err != nil {
-				return err
-			}
-
-			for _, spendingType := range *spendingTypes {
-				spendingType.ProfileID = profileID
-				spendingType.ID = uuid.NewV4().String()
-				err = s.spendingTypeRepo.Create(ctx, &spendingType)
-				if err != nil {
-					return err
-				}
-			}
-			return nil
-		})
+		err = s.createDefaultSpendingType(ctx, profileID)
 		if err != nil {
 			return nil, err
 		}
@@ -194,8 +181,8 @@ func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Contex
 		return nil, err
 	}
 
-	var spendingTypeResponses []domain.ResponseSpendingType
-	var spendingTypeResponse domain.ResponseSpendingType
+	var spendingTypeJoinResponses []domain.ResponseSpendingTypeJoin
+	var spendingTypeJoinResponse domain.ResponseSpendingTypeJoin
 	var budgetAmount int
 
 	for _, spendingType := range *spendingTypes {
@@ -204,14 +191,72 @@ func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Contex
 		formatUsed := helper.FormatRupiah(spendingType.Used)
 		persentaseMaximumLimit := helper.Persentase(spendingType.Used, spendingType.MaximumLimit)
 
-		spendingTypeResponse = converter.SpendingTypeModelJoinToResponse(spendingType, persentaseMaximumLimit, formatMaximumLimit, formatUsed)
-		spendingTypeResponses = append(spendingTypeResponses, spendingTypeResponse)
+		spendingTypeJoinResponse = converter.SpendingTypeModelJoinToResponse(spendingType, persentaseMaximumLimit, formatMaximumLimit, formatUsed)
+		spendingTypeJoinResponses = append(spendingTypeJoinResponses, spendingTypeJoinResponse)
 	}
 
 	respAll := &domain.ResponseAllSpendingType{
-		ResponseSpendingType: &spendingTypeResponses,
+		ResponseSpendingType: &spendingTypeJoinResponses,
 		BudgetAmount:         budgetAmount,
 		FormatBudgetAmount:   helper.FormatRupiah(budgetAmount),
 	}
 	return respAll, nil
+}
+
+func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.ResponseSpendingType, error) {
+	err := s.spendingTypeRepo.OpenConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer s.spendingTypeRepo.CloseConn()
+
+	exist, err := s.spendingTypeRepo.CheckData(ctx, profileID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exist {
+		err = s.createDefaultSpendingType(ctx, profileID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	spendingTypes, err := s.spendingTypeRepo.GetAllByProfileID(ctx, profileID)
+	if err != nil {
+		return nil, err
+	}
+
+	var spendingTypeResponses []domain.ResponseSpendingType
+	var spendingTypeResponse domain.ResponseSpendingType
+
+	for _, spendingType := range *spendingTypes {
+		formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
+
+		spendingTypeResponse = *converter.SpendingTypeModelToResponse(&spendingType, formatMaximumLimit)
+		spendingTypeResponses = append(spendingTypeResponses, spendingTypeResponse)
+	}
+
+	return &spendingTypeResponses, nil
+}
+
+func (s *SpendingTypeUsecaseImpl) createDefaultSpendingType(ctx context.Context, profileID string) error {
+	err := s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+		spendingTypes, err := s.spendingTypeRepo.GetDefault(ctx)
+		if err != nil {
+			return err
+		}
+
+		for _, spendingType := range *spendingTypes {
+			spendingType.ProfileID = profileID
+			spendingType.ID = uuid.NewV4().String()
+			err = s.spendingTypeRepo.Create(ctx, &spendingType)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	return err
 }

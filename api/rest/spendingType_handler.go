@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/validation"
@@ -122,6 +123,7 @@ func (h *SpendingTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *
 	profileID := chi.URLParam(r, "profile-id")
 	id := chi.URLParam(r, "id")
 
+	log.Info().Msgf("%s | %s", profileID, id)
 	_, err := uuid.Parse(profileID)
 	if err != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
@@ -153,7 +155,7 @@ func (h *SpendingTypeHandlerImpl) GetAllByPeriodeAndProfileID(w http.ResponseWri
 		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
 		return
 	}
-	periode := r.URL.Query().Get("periode")
+	periode := chi.URLParam(r, "periode")
 	periodInt, err := strconv.Atoi(periode)
 	if err != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
@@ -161,6 +163,24 @@ func (h *SpendingTypeHandlerImpl) GetAllByPeriodeAndProfileID(w http.ResponseWri
 	}
 
 	spendingTypes, err := h.spendingTypeUsecase.GetAllByPeriodeAndProfileID(r.Context(), profileID, periodInt)
+	if err != nil {
+		helper.ErrorResponseEncode(w, err)
+		return
+	}
+
+	helper.SuccessResponseEncode(w, spendingTypes, "data spending types")
+}
+
+func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
+	profileID := chi.URLParam(r, "profile-id")
+
+	_, err := uuid.Parse(profileID)
+	if err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
+		return
+	}
+
+	spendingTypes, err := h.spendingTypeUsecase.GetAllByProfileID(r.Context(), profileID)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return

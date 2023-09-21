@@ -57,16 +57,25 @@ type ResponseSpendingType struct {
 	MaximumLimit       int    `json:"maximum_limit"`
 	FormatMaximumLimit string `json:"format_maximum_limit"`
 	Icon               string `json:"icon"`
-	Used               int    `json:"used,omiempty"`
-	FormatUsed         string `json:"format_used,omiempty"`
-	PersentaseUsed     string `json:"persentase_used,omitempty"`
+}
+
+type ResponseSpendingTypeJoin struct {
+	ID                 string `json:"id"`
+	ProfileID          string `json:"profile_id"`
+	Title              string `json:"title"`
+	MaximumLimit       int    `json:"maximum_limit"`
+	FormatMaximumLimit string `json:"format_maximum_limit"`
+	Icon               string `json:"icon"`
+	Used               int    `json:"used"`
+	FormatUsed         string `json:"format_used"`
+	PersentaseUsed     string `json:"persentase_used"`
 }
 
 // ResponseAllSpendingType response get all spending type per periode
 type ResponseAllSpendingType struct {
-	ResponseSpendingType *[]ResponseSpendingType `json:"spending_type"`
-	BudgetAmount         int                     `json:"budget_amount"`
-	FormatBudgetAmount   string                  `json:"format_budget_amount"`
+	ResponseSpendingType *[]ResponseSpendingTypeJoin `json:"spending_type"`
+	BudgetAmount         int                         `json:"budget_amount"`
+	FormatBudgetAmount   string                      `json:"format_budget_amount"`
 }
 
 // SpendingTypeRepository spending history repository interface
@@ -80,6 +89,7 @@ type SpendingTypeRepository interface {
 	GetByID(ctx context.Context, id string) (*SpendingType, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)
 	GetAllByTimeAndProfileID(ctx context.Context, req *RequestGetAllSpendingType) (*[]SpendingTypeJoin, error)
+	GetAllByProfileID(ctx context.Context, profileID string) (*[]SpendingType, error)
 	UnitOfWorkRepository
 }
 
@@ -90,4 +100,5 @@ type SpendingTypeUsecase interface {
 	Delete(ctx context.Context, id string, profileID string) error
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseSpendingType, error)
 	GetAllByPeriodeAndProfileID(ctx context.Context, profileID string, periode int) (*ResponseAllSpendingType, error)
+	GetAllByProfileID(ctx context.Context, profileID string) (*[]ResponseSpendingType, error)
 }
