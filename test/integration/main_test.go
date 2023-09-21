@@ -12,7 +12,7 @@ import (
 	"github.com/ory/dockertest/v3"
 	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
 	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/test/integration/setup"
@@ -27,7 +27,7 @@ var SpendingHistoryRepo = _repository2.NewSpendingHistoryRepositoryImpl(Uow)
 var SpendingTypeUsecase = _usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
 
 func TestMain(m *testing.M) {
-	config.LogInit()
+	infra.LogInit()
 	dockerpool := setup.SetupDocker()
 	var resources []*dockertest.Resource
 
@@ -48,8 +48,8 @@ func TestMain(m *testing.M) {
 
 	minioResourece, endpoint := setup.MinioStart(dockerpool)
 	resources = append(resources, minioResourece)
-	config.MinIoEndpoint, config.MinIoID, config.MinIoSecretKey, config.MinIoSSL = endpoint, "MYACCESSKEY", "MYSECRETKEY", false
-	minioConn := config.NewMinioConn()
+	infra.MinIoEndpoint, infra.MinIoID, infra.MinIoSecretKey, infra.MinIoSSL = endpoint, "MYACCESSKEY", "MYSECRETKEY", false
+	minioConn := infra.NewMinioConn()
 	minioClient = minioConn
 
 	code := m.Run()

@@ -8,13 +8,13 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
 )
 
 func createBucket(t *testing.T) {
 	err := minioClient.MakeBucket(context.Background(), "files", minio.MakeBucketOptions{})
-	config.MinIoBucket = "files"
+	infra.MinIoBucket = "files"
 	assert.NoError(t, err)
 }
 

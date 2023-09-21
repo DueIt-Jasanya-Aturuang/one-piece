@@ -9,17 +9,17 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
 )
 
 func main() {
-	config.LogInit()
-	config.EnvInit()
+	infra.LogInit()
+	infra.EnvInit()
 
-	pgConn := config.NewPostgresConn()
-	minioConn := config.NewMinioConn()
+	pgConn := infra.NewPostgresConn()
+	minioConn := infra.NewMinioConn()
 
 	// repository
 	uow := _repository.NewUnitOfWorkRepositoryImpl(pgConn)
@@ -63,10 +63,10 @@ func main() {
 		r.Delete("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Delete)
 	})
 
-	log.Info().Msgf("Server is running on port %s", config.AppAddr)
-	err := http.ListenAndServe(config.AppAddr, r)
+	log.Info().Msgf("Server is running on port %s", infra.AppAddr)
+	err := http.ListenAndServe(infra.AppAddr, r)
 	if err != nil {
-		log.Fatal().Err(err).Msgf("failed listen server on %s", config.AppAddr)
+		log.Fatal().Err(err).Msgf("failed listen server on %s", infra.AppAddr)
 	}
 
 }

@@ -50,6 +50,8 @@ github.com/jasanya-tech/jasanya-response-backend-golang v0.0.0-20230917071625-b9
 github.com/jasanya-tech/jasanya-response-backend-golang v0.0.0-20230917071625-b931b1d38949/go.mod h1:CXZyZxcQ4UDBT3VG3Qf7RbawaQei1dMrbF/P5uO8t5g=
 github.com/jasanya-tech/jasanya-response-backend-golang v0.0.0-20230917112949-86b2c609b719 h1:pMYpLU4XWRFSFDJUsPQ+MTIP6KUAYlzWTiuNWlcernI=
 github.com/jasanya-tech/jasanya-response-backend-golang v0.0.0-20230917112949-86b2c609b719/go.mod h1:2yxOaJz7o7fmOuaP1Mq6pzNSagTlYM10TctUMhaROk8=
+github.com/jasanya-tech/jasanya-response-backend-golang v0.0.0-20230920200656-1b281f294ef9 h1:DiElB0RRiKzcYZWtqcvnMm7TtJCtzQZJnfjBcvEvlvI=
+github.com/jasanya-tech/jasanya-response-backend-golang v0.0.0-20230920200656-1b281f294ef9/go.mod h1:2yxOaJz7o7fmOuaP1Mq6pzNSagTlYM10TctUMhaROk8=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=

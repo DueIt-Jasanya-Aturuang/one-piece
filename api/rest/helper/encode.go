@@ -35,12 +35,12 @@ func ErrorResponseEncode(w http.ResponseWriter, err error) {
 	case errors.As(err, &errPQ):
 		log.Warn().Msgf("pqerror | err : %v", err)
 		if errPQ.Code == "23503" {
-			err = _error.HttpErrString(string(response.CM05), response.CM05)
+			err = _error.HttpErrString(response.CodeCompanyName[response.CM05], response.CM05)
 		} else {
-			err = _error.HttpErrString(string(response.CM99), response.CM99)
+			err = _error.HttpErrString(response.CodeCompanyName[response.CM99], response.CM99)
 		}
 	case errors.Is(err, context.DeadlineExceeded):
-		err = _error.HttpErrString(string(response.CM08), response.CM08)
+		err = _error.HttpErrString(response.CodeCompanyName[response.CM08], response.CM08)
 	}
 
 	ok := errors.As(err, &errHttp)
@@ -59,7 +59,7 @@ func ErrorResponseEncode(w http.ResponseWriter, err error) {
 }
 
 func SuccessResponseEncode(w http.ResponseWriter, data any, message string) {
-	resp := response.Success(data, response.CM00)
+	resp := response.Success(data, response.CM00, message)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(resp.Code)
 

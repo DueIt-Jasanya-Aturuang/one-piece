@@ -1,4 +1,4 @@
-package config
+package infra
 
 import (
 	"log"
@@ -16,7 +16,7 @@ func EnvInit() {
 
 	// app
 	AppAddr = os.Getenv("APPLICATION_ADDR")
-	
+
 	// pg db
 	PgHost = os.Getenv("POSTGRESQL_HOST")
 	PgPort = os.Getenv("POSTGRESQL_PORT")

@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
 )
 
@@ -49,7 +49,7 @@ func (p *PaymentUsecaseImpl) Create(ctx context.Context, req *domain.RequestCrea
 
 	fileExt := filepath.Ext(req.Image.Filename)
 	fileName := p.minioRepo.GenerateFileName(fileExt, "payment-images/public/")
-	paymentConv := converter.CreatePaymentReqToModel(req, fmt.Sprintf("/%s/%s", config.MinIoBucket, fileName))
+	paymentConv := converter.CreatePaymentReqToModel(req, fmt.Sprintf("/%s/%s", infra.MinIoBucket, fileName))
 
 	err = p.paymentRepo.StartTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
@@ -110,7 +110,7 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 		fileName = p.minioRepo.GenerateFileName(fileExt, "payment-images/public/")
 	}
 
-	paymentConv := converter.UpdatePaymentReqToModel(req, fmt.Sprintf("/%s/%s", config.MinIoBucket, fileName))
+	paymentConv := converter.UpdatePaymentReqToModel(req, fmt.Sprintf("/%s/%s", infra.MinIoBucket, fileName))
 
 	err = p.paymentRepo.StartTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
