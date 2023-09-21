@@ -52,7 +52,7 @@ func main() {
 		r.Post("/payment", paymentHandler.Create)
 		r.Put("/payment/{id}", paymentHandler.Update)
 
-		r.Get("/spending-type/{profile-id}", spendingTypeHandler.GetAllByProfileID)
+		r.Get("/spending-type/{profile-id}", spendingTypeHandler.GetAllByPeriodeAndProfileID)
 		r.Get("/spending-type/{profile-id}/{id}", spendingTypeHandler.GetByIDAndProfileID)
 		r.Post("/spending-type", spendingTypeHandler.Create)
 		r.Put("/spending-type/{id}", spendingTypeHandler.Update)

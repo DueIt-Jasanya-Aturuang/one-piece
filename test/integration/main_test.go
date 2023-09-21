@@ -85,7 +85,7 @@ func TestInit(t *testing.T) {
 		t.Run("GetByIDAndProfileID_ERROR-deleted_at-null", GetByIDAndProfileIDSpendingTypeERRORDeletedAtNull)
 		t.Run("GetByIDAndProfileID_ERROR-invalid-id", GetByIDAndProfileIDSpendingTypeERRORInvalidID)
 		t.Run("GetByIDAndProfileID_ERROR-invalid-profile_id", GetByIDAndProfileIDSpendingTypeERRORInvalidProfileID)
-		t.Run("GetAllByProfileID", GetAllByProfileIDSpendingType)
+		t.Run("GetAllByTimeAndProfileID", GetAllByProfileIDSpendingType)
 		t.Run("GetDefault", GetDefaultSpendingType)
 	})
 
@@ -118,7 +118,7 @@ func TestInit(t *testing.T) {
 		t.Run("Delete", DeleteSpendingTypeUsecase)
 		t.Run("GetByIDAndProfileID", GetByIDAndProfileIDSpendingTypeUsecase)
 		t.Run("GetByIDAndProfileID_ERRORNoRow", GetByIDAndProfileIDSpendingTypeUsecaseERRORNoRow)
-		t.Run("GetAllByProfileID", GetAllByProfileIDSpendingTypeUsecase)
+		t.Run("GetAllByTimeAndProfileID", GetAllByProfileIDSpendingTypeUsecase)
 		t.Run("GetAllByProfileID_WithCreateDefaultType", GetAllByProfileIDSpendingTypeUsecaseWithCreateDefaultType)
 	})
 }

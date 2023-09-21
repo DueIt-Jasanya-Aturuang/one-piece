@@ -145,7 +145,7 @@ func (s *SpendingTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id st
 	return spendingTypeResponse, nil
 }
 
-func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string, periode int) (*domain.ResponseAllSpendingType, error) {
+func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Context, profileID string, periode int) (*domain.ResponseAllSpendingType, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
 		return nil, err
@@ -189,7 +189,7 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 		EndTime:   endTime,
 	}
 
-	spendingTypes, err := s.spendingTypeRepo.GetAllByProfileID(ctx, req)
+	spendingTypes, err := s.spendingTypeRepo.GetAllByTimeAndProfileID(ctx, req)
 	if err != nil {
 		return nil, err
 	}

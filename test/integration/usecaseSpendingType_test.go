@@ -91,14 +91,14 @@ func GetByIDAndProfileIDSpendingTypeUsecaseERRORNoRow(t *testing.T) {
 }
 
 func GetAllByProfileIDSpendingTypeUsecase(t *testing.T) {
-	response, err := SpendingTypeUsecase.GetAllByProfileID(context.TODO(), "profileID1", 14)
+	response, err := SpendingTypeUsecase.GetAllByPeriodeAndProfileID(context.TODO(), "profileID1", 14)
 	assert.NoError(t, err)
 	assert.NotNil(t, response)
 	t.Log(response.ResponseSpendingType)
 }
 
 func GetAllByProfileIDSpendingTypeUsecaseWithCreateDefaultType(t *testing.T) {
-	response, err := SpendingTypeUsecase.GetAllByProfileID(context.TODO(), "profileID2", 14)
+	response, err := SpendingTypeUsecase.GetAllByPeriodeAndProfileID(context.TODO(), "profileID2", 14)
 	assert.NoError(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, 3, len(*response.ResponseSpendingType))

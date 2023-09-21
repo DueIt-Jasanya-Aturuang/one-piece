@@ -145,7 +145,7 @@ func (h *SpendingTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *
 	helper.SuccessResponseEncode(w, spendingType, "data spending type")
 }
 
-func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
+func (h *SpendingTypeHandlerImpl) GetAllByPeriodeAndProfileID(w http.ResponseWriter, r *http.Request) {
 	profileID := chi.URLParam(r, "profile-id")
 
 	_, err := uuid.Parse(profileID)
@@ -160,7 +160,7 @@ func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *ht
 		return
 	}
 
-	spendingTypes, err := h.spendingTypeUsecase.GetAllByProfileID(r.Context(), profileID, periodInt)
+	spendingTypes, err := h.spendingTypeUsecase.GetAllByPeriodeAndProfileID(r.Context(), profileID, periodInt)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return

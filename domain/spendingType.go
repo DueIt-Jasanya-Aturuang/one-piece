@@ -79,7 +79,7 @@ type SpendingTypeRepository interface {
 	GetDefault(ctx context.Context) (*[]SpendingType, error)
 	GetByID(ctx context.Context, id string) (*SpendingType, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)
-	GetAllByProfileID(ctx context.Context, req *RequestGetAllSpendingType) (*[]SpendingTypeJoin, error)
+	GetAllByTimeAndProfileID(ctx context.Context, req *RequestGetAllSpendingType) (*[]SpendingTypeJoin, error)
 	UnitOfWorkRepository
 }
 
@@ -89,5 +89,5 @@ type SpendingTypeUsecase interface {
 	Update(ctx context.Context, req *RequestUpdateSpendingType) (*ResponseSpendingType, error)
 	Delete(ctx context.Context, id string, profileID string) error
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseSpendingType, error)
-	GetAllByProfileID(ctx context.Context, profileID string, periode int) (*ResponseAllSpendingType, error)
+	GetAllByPeriodeAndProfileID(ctx context.Context, profileID string, periode int) (*ResponseAllSpendingType, error)
 }
