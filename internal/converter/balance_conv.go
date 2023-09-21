@@ -39,3 +39,16 @@ func UpdateBalanceToModel(id string, profileID string, amount int, amountBalance
 	}
 	return balance
 }
+
+func BalanceModelToResponse(b *domain.Balance) *domain.ResponseBalance {
+	return &domain.ResponseBalance{
+		ID:                        b.ID,
+		ProfileID:                 b.ProfileID,
+		TotalIncomeAmount:         b.TotalIncomeAmount,
+		TotalIncomeAmountFormat:   helper.FormatRupiah(b.TotalIncomeAmount),
+		TotalSpendingAmount:       b.TotalSpendingAmount,
+		TotalSpendingAmountFormat: helper.FormatRupiah(b.TotalSpendingAmount),
+		Balance:                   b.Balance,
+		BalanceFormat:             helper.FormatRupiah(b.Balance),
+	}
+}

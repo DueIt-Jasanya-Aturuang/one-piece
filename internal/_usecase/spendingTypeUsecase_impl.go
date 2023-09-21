@@ -12,9 +12,6 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
 )
 
-var TitleSpendingTypeExist = errors.New("title kategori sudah tersedia") // create, update
-var SpendingTypeNotFound = errors.New("kategori tidak di temukan")       // update, GetByIDAndProfileID
-
 type SpendingTypeUsecaseImpl struct {
 	spendingTypeRepo domain.SpendingTypeRepository
 }

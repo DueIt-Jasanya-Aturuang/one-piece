@@ -11,9 +11,6 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
 )
 
-var SpendingHistoryNotFound = errors.New("spending history tidak ditemukan") // create, update, delete, GetByIDAndProfileID
-var InvalidSpendingTypeID = errors.New("invalid spending history id")        // create, update
-
 type SpendingHistoryUsecaseImpl struct {
 	spendingHistoryRepo domain.SpendingHistoryRepository
 	spendingTypeRepo    domain.SpendingTypeRepository

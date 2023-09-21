@@ -33,11 +33,13 @@ func main() {
 	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 	spendingTypeUsecase := _usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
 	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
+	balanceUsecase := _usecase.NewBalanceUsecaseImpl(balanceRepo)
 
 	// handler
 	paymentHandler := rest.NewPaymentHandlerImpl(paymentUsecase)
 	spendingTypeHandler := rest.NewSpendingTypeHandlerImpl(spendingTypeUsecase)
 	spendingHistoryHandler := rest.NewSpendingHistoryHandlerImpl(spendingHistoryUsecase)
+	balanceHandler := rest.NewBalanceHandlerImpl(balanceUsecase)
 
 	// route
 	r := chi.NewRouter()
@@ -61,6 +63,8 @@ func main() {
 		r.Post("/spending-history", spendingHistoryHandler.Create)
 		r.Put("/spending-history/{id}", spendingHistoryHandler.Update)
 		r.Delete("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Delete)
+
+		r.Get("/balance/{profile-id}", balanceHandler.GetByProfileID)
 	})
 
 	log.Info().Msgf("Server is running on port %s", infra.AppAddr)

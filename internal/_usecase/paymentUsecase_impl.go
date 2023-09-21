@@ -13,9 +13,6 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
 )
 
-var NamePaymentExist = errors.New("nama payment sudah tersedia") // create, update
-var PaymentNotExist = errors.New("payment tidak tersedia")       // update
-
 type PaymentUsecaseImpl struct {
 	paymentRepo domain.PaymentRepository
 	minioRepo   domain.MinioRepo
