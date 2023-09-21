@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/converter"
 )
 
 type BalanceUsecaseImpl struct {

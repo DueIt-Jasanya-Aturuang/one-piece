@@ -12,7 +12,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/validation"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
 )
 
 type SpendingHistoryHandlerImpl struct {

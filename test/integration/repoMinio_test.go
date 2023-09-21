@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
 )
 
 func createBucket(t *testing.T) {

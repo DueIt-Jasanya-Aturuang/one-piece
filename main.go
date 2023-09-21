@@ -10,8 +10,8 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
 )
 
 func main() {

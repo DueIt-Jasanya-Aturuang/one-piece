@@ -6,7 +6,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
 )
 
 func SpendingTypeRequestCreateToModel(req *domain.RequestCreateSpendingType) *domain.SpendingType {

@@ -10,7 +10,7 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/converter"
 )
 
 type PaymentUsecaseImpl struct {

@@ -13,8 +13,8 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
-	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
+	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/test/integration/setup"
 )
 

@@ -8,8 +8,8 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/converter"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
 )
 
 type SpendingTypeUsecaseImpl struct {
