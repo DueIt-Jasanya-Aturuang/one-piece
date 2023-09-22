@@ -38,12 +38,7 @@ func (h *SpendingTypeHandlerImpl) Create(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	profileID := r.Header.Get("Profile-ID")
-	if req.ProfileID != profileID {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile account", response.CM05))
-		return
-	}
-
+	req.ProfileID = r.Header.Get("Profile-ID")
 	err = validation.CreateSpendingType(req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
@@ -75,12 +70,7 @@ func (h *SpendingTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	profileID := r.Header.Get("Profile-ID")
-	if req.ProfileID != profileID {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile account", response.CM05))
-		return
-	}
-
+	req.ProfileID = r.Header.Get("Profile-ID")
 	req.ID = chi.URLParam(r, "id")
 
 	err = validation.UpdateSpendingType(req)
@@ -109,7 +99,7 @@ func (h *SpendingTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *SpendingTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
-	profileID := chi.URLParam(r, "profile-id")
+	profileID := r.Header.Get("Profile-ID")
 	id := chi.URLParam(r, "id")
 
 	_, err := uuid.Parse(profileID)
@@ -133,7 +123,7 @@ func (h *SpendingTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *SpendingTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
-	profileID := chi.URLParam(r, "profile-id")
+	profileID := r.Header.Get("Profile-ID")
 	id := chi.URLParam(r, "id")
 
 	log.Info().Msgf("%s | %s", profileID, id)
@@ -161,7 +151,7 @@ func (h *SpendingTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *
 }
 
 func (h *SpendingTypeHandlerImpl) GetAllByPeriodeAndProfileID(w http.ResponseWriter, r *http.Request) {
-	profileID := chi.URLParam(r, "profile-id")
+	profileID := r.Header.Get("Profile-ID")
 
 	_, err := uuid.Parse(profileID)
 	if err != nil {
@@ -185,7 +175,7 @@ func (h *SpendingTypeHandlerImpl) GetAllByPeriodeAndProfileID(w http.ResponseWri
 }
 
 func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
-	profileID := chi.URLParam(r, "profile-id")
+	profileID := r.Header.Get("Profile-ID")
 
 	_, err := uuid.Parse(profileID)
 	if err != nil {

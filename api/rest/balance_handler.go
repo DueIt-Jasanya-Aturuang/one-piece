@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
@@ -25,7 +24,7 @@ func NewBalanceHandlerImpl(balanceUsecase domain.BalanceUsecase) *BalanceHandler
 }
 
 func (b BalanceHandlerImpl) GetByProfileID(w http.ResponseWriter, r *http.Request) {
-	profileID := chi.URLParam(r, "profile-id")
+	profileID := r.Header.Get("Profile-ID")
 
 	if _, err := uuid.Parse(profileID); err != nil {
 		err := _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)

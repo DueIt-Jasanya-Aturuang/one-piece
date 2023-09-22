@@ -28,7 +28,7 @@ type SpendingTypeJoin struct {
 
 // RequestCreateSpendingType request create spending type
 type RequestCreateSpendingType struct {
-	ProfileID    string `json:"profile_id"`
+	ProfileID    string
 	Title        string `json:"title"`
 	MaximumLimit int    `json:"maximum_limit"`
 	Icon         string `json:"icon"`
@@ -37,7 +37,7 @@ type RequestCreateSpendingType struct {
 // RequestUpdateSpendingType request update spending type
 type RequestUpdateSpendingType struct {
 	ID           string // ID get in url parameter
-	ProfileID    string `json:"profile_id"`
+	ProfileID    string
 	Title        string `json:"title"`
 	MaximumLimit int    `json:"maximum_limit"`
 	Icon         string `json:"icon"`
