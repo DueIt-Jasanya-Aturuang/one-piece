@@ -38,6 +38,12 @@ func (h *SpendingTypeHandlerImpl) Create(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	profileID := r.Header.Get("Profile-ID")
+	if req.ProfileID != profileID {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile account", response.CM05))
+		return
+	}
+
 	err = validation.CreateSpendingType(req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
@@ -68,6 +74,13 @@ func (h *SpendingTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request)
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
+
+	profileID := r.Header.Get("Profile-ID")
+	if req.ProfileID != profileID {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile account", response.CM05))
+		return
+	}
+
 	req.ID = chi.URLParam(r, "id")
 
 	err = validation.UpdateSpendingType(req)

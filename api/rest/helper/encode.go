@@ -61,6 +61,7 @@ func ErrorResponseEncode(w http.ResponseWriter, err error) {
 func SuccessResponseEncode(w http.ResponseWriter, data any, message string) {
 	resp := response.Success(data, response.CM00, message)
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Del("Profile-ID")
 	w.WriteHeader(resp.Code)
 
 	if errEncode := json.NewEncoder(w).Encode(resp); errEncode != nil {

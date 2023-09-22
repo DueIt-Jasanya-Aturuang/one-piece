@@ -36,6 +36,11 @@ func (h *SpendingHistoryHandlerImpl) Create(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	profileID := r.Header.Get("Profile-ID")
+	if req.ProfileID != profileID {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile account", response.CM05))
+		return
+	}
 	err = validation.CreateSpendingHistory(req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
@@ -65,6 +70,13 @@ func (h *SpendingHistoryHandlerImpl) Update(w http.ResponseWriter, r *http.Reque
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
+
+	profileID := r.Header.Get("Profile-ID")
+	if req.ProfileID != profileID {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile account", response.CM05))
+		return
+	}
+
 	req.ID = chi.URLParam(r, "id")
 
 	err = validation.UpdateSpendingHistory(req)

@@ -4,11 +4,12 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	middlewareChi "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/middleware"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
@@ -43,8 +44,8 @@ func main() {
 
 	// route
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
+	r.Use(middlewareChi.Logger)
+	r.Use(middlewareChi.Recoverer)
 	r.MethodNotAllowed(helper.MethodNotAllowed)
 
 	r.Route("/finance", func(r chi.Router) {
@@ -52,20 +53,26 @@ func main() {
 		r.Post("/payment", paymentHandler.Create)
 		r.Put("/payment/{id}", paymentHandler.Update)
 
-		r.Get("/spending-type/{profile-id}/{periode}", spendingTypeHandler.GetAllByPeriodeAndProfileID)
-		r.Get("/spending-type/{profile-id}", spendingTypeHandler.GetAllByProfileID)
 		r.Post("/spending-type", spendingTypeHandler.Create)
 		r.Put("/spending-type/{id}", spendingTypeHandler.Update)
-		r.Delete("/spending-type/{profile-id}/{id}", spendingTypeHandler.Delete)
-		r.Get("/spending-type/detail/{profile-id}/{id}", spendingTypeHandler.GetByIDAndProfileID)
 
-		r.Get("/spending-history/{profile-id}", spendingHistoryHandler.GetAllByProfileID)
-		r.Get("/spending-history/{profile-id}/{id}", spendingHistoryHandler.GetByIDAndProfileID)
 		r.Post("/spending-history", spendingHistoryHandler.Create)
 		r.Put("/spending-history/{id}", spendingHistoryHandler.Update)
-		r.Delete("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Delete)
 
-		r.Get("/balance/{profile-id}", balanceHandler.GetByProfileID)
+		r.Group(func(r chi.Router) {
+			r.Use(middleware.AccountMiddlewareInHeader)
+
+			r.Get("/spending-type/{profile-id}/{periode}", spendingTypeHandler.GetAllByPeriodeAndProfileID)
+			r.Get("/spending-type/{profile-id}", spendingTypeHandler.GetAllByProfileID)
+			r.Delete("/spending-type/{profile-id}/{id}", spendingTypeHandler.Delete)
+			r.Get("/spending-type/detail/{profile-id}/{id}", spendingTypeHandler.GetByIDAndProfileID)
+
+			r.Get("/spending-history/{profile-id}", spendingHistoryHandler.GetAllByProfileID)
+			r.Get("/spending-history/{profile-id}/{id}", spendingHistoryHandler.GetByIDAndProfileID)
+			r.Delete("/spending-history/{profile-id}/{id}", spendingHistoryHandler.Delete)
+
+			r.Get("/balance/{profile-id}", balanceHandler.GetByProfileID)
+		})
 	})
 
 	log.Info().Msgf("Server is running on port %s", infra.AppAddr)
