@@ -7,7 +7,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
 )
 
 func CreatePaymentReqToModel(req *domain.RequestCreatePayment, fileName string) *domain.Payment {

@@ -9,12 +9,10 @@ import (
 	"strings"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/converter"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
 )
-
-var NamePaymentExist = errors.New("nama payment sudah tersedia") // create, update
-var PaymentNotExist = errors.New("payment tidak tersedia")       // update
 
 type PaymentUsecaseImpl struct {
 	paymentRepo domain.PaymentRepository
@@ -49,12 +47,9 @@ func (p *PaymentUsecaseImpl) Create(ctx context.Context, req *domain.RequestCrea
 
 	fileExt := filepath.Ext(req.Image.Filename)
 	fileName := p.minioRepo.GenerateFileName(fileExt, "payment-images/public/")
-	paymentConv := converter.CreatePaymentReqToModel(req, fmt.Sprintf("/%s/%s", config.MinIoBucket, fileName))
+	paymentConv := converter.CreatePaymentReqToModel(req, fmt.Sprintf("/%s/%s", infra.MinIoBucket, fileName))
 
-	err = p.paymentRepo.StartTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelReadCommitted,
-		ReadOnly:  false,
-	}, func() error {
+	err = p.paymentRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		err = p.paymentRepo.Create(ctx, paymentConv)
 		if err != nil {
 			return err
@@ -110,12 +105,9 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 		fileName = p.minioRepo.GenerateFileName(fileExt, "payment-images/public/")
 	}
 
-	paymentConv := converter.UpdatePaymentReqToModel(req, fmt.Sprintf("/%s/%s", config.MinIoBucket, fileName))
+	paymentConv := converter.UpdatePaymentReqToModel(req, fmt.Sprintf("/%s/%s", infra.MinIoBucket, fileName))
 
-	err = p.paymentRepo.StartTx(ctx, &sql.TxOptions{
-		Isolation: sql.LevelReadCommitted,
-		ReadOnly:  false,
-	}, func() error {
+	err = p.paymentRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		if err = p.paymentRepo.Update(ctx, paymentConv); err != nil {
 			return err
 		}

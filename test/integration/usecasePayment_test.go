@@ -10,9 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
 )
 
 func UsecaseCreatePayment(t *testing.T) {

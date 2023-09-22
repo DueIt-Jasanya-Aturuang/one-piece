@@ -12,9 +12,9 @@ import (
 	"github.com/ory/dockertest/v3"
 	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra/config"
-	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
+	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/test/integration/setup"
 )
 
@@ -27,7 +27,7 @@ var SpendingHistoryRepo = _repository2.NewSpendingHistoryRepositoryImpl(Uow)
 var SpendingTypeUsecase = _usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
 
 func TestMain(m *testing.M) {
-	config.LogInit()
+	infra.LogInit()
 	dockerpool := setup.SetupDocker()
 	var resources []*dockertest.Resource
 
@@ -48,8 +48,8 @@ func TestMain(m *testing.M) {
 
 	minioResourece, endpoint := setup.MinioStart(dockerpool)
 	resources = append(resources, minioResourece)
-	config.MinIoEndpoint, config.MinIoID, config.MinIoSecretKey, config.MinIoSSL = endpoint, "MYACCESSKEY", "MYSECRETKEY", false
-	minioConn := config.NewMinioConn()
+	infra.MinIoEndpoint, infra.MinIoID, infra.MinIoSecretKey, infra.MinIoSSL = endpoint, "MYACCESSKEY", "MYSECRETKEY", false
+	minioConn := infra.NewMinioConn()
 	minioClient = minioConn
 
 	code := m.Run()
@@ -85,7 +85,7 @@ func TestInit(t *testing.T) {
 		t.Run("GetByIDAndProfileID_ERROR-deleted_at-null", GetByIDAndProfileIDSpendingTypeERRORDeletedAtNull)
 		t.Run("GetByIDAndProfileID_ERROR-invalid-id", GetByIDAndProfileIDSpendingTypeERRORInvalidID)
 		t.Run("GetByIDAndProfileID_ERROR-invalid-profile_id", GetByIDAndProfileIDSpendingTypeERRORInvalidProfileID)
-		t.Run("GetAllByProfileID", GetAllByProfileIDSpendingType)
+		t.Run("GetAllByTimeAndProfileID", GetAllByProfileIDSpendingType)
 		t.Run("GetDefault", GetDefaultSpendingType)
 	})
 
@@ -118,7 +118,7 @@ func TestInit(t *testing.T) {
 		t.Run("Delete", DeleteSpendingTypeUsecase)
 		t.Run("GetByIDAndProfileID", GetByIDAndProfileIDSpendingTypeUsecase)
 		t.Run("GetByIDAndProfileID_ERRORNoRow", GetByIDAndProfileIDSpendingTypeUsecaseERRORNoRow)
-		t.Run("GetAllByProfileID", GetAllByProfileIDSpendingTypeUsecase)
+		t.Run("GetAllByTimeAndProfileID", GetAllByProfileIDSpendingTypeUsecase)
 		t.Run("GetAllByProfileID_WithCreateDefaultType", GetAllByProfileIDSpendingTypeUsecaseWithCreateDefaultType)
 	})
 }

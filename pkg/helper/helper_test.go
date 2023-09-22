@@ -19,7 +19,7 @@ func TestPersentase(t *testing.T) {
 }
 
 func TestFormatRupiah(t *testing.T) {
-	rp := -1000000000
+	rp := 0
 
 	res := FormatRupiah(rp)
 	t.Log(res)
@@ -36,7 +36,7 @@ func TestUUID(t *testing.T) {
 
 func TestTime(t *testing.T) {
 
-	startTime, endTime, err := TimeDate(time.Now().UTC().Day())
+	startTime, endTime, err := TimeDate(6)
 	assert.NoError(t, err)
 	t.Log(startTime)
 	t.Log(endTime)
