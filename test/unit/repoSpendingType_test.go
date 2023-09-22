@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
 )
 
 func TestRepoSpendingTypeCreate(t *testing.T) {
@@ -256,7 +256,7 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
 		}
 		err := spendingTypeRepo.OpenConn(context.TODO())
 		assert.NoError(t, err)
-		spendingType, err := spendingTypeRepo.GetAllByProfileID(context.TODO(), req)
+		spendingType, err := spendingTypeRepo.GetAllByTimeAndProfileID(context.TODO(), req)
 		assert.NoError(t, err)
 		assert.NotNil(t, spendingType)
 		assert.Equal(t, 3, len(*spendingType))
@@ -277,7 +277,7 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
 		}
 		err := spendingTypeRepo.OpenConn(context.TODO())
 		assert.NoError(t, err)
-		spendingType, err := spendingTypeRepo.GetAllByProfileID(context.TODO(), req)
+		spendingType, err := spendingTypeRepo.GetAllByTimeAndProfileID(context.TODO(), req)
 		assert.NoError(t, err)
 		assert.NotNil(t, spendingType)
 		assert.Equal(t, 0, len(*spendingType))

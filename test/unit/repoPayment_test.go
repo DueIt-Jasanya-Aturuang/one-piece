@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_repository"
+	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
 )
 
 func TestRepoCreatePayment(t *testing.T) {

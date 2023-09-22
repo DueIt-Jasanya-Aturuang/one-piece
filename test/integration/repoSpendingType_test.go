@@ -185,7 +185,7 @@ func GetAllByProfileIDSpendingType(t *testing.T) {
 		StartTime: startPeriod,
 		EndTime:   endPeriod,
 	}
-	spendingTypes, err := SpendingTypeRepo.GetAllByProfileID(context.TODO(), req)
+	spendingTypes, err := SpendingTypeRepo.GetAllByTimeAndProfileID(context.TODO(), req)
 	assert.NoError(t, err)
 	assert.NotNil(t, spendingTypes)
 	t.Log(spendingTypes)

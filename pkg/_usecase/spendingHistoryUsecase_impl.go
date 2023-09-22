@@ -7,12 +7,9 @@ import (
 	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/converter"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/converter"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
 )
-
-var SpendingHistoryNotFound = errors.New("spending history tidak ditemukan") // create, update, delete, GetByIDAndProfileID
-var InvalidSpendingTypeID = errors.New("invalid spending history id")        // create, update
 
 type SpendingHistoryUsecaseImpl struct {
 	spendingHistoryRepo domain.SpendingHistoryRepository

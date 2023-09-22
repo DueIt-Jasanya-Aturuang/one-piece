@@ -12,7 +12,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/validation"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/internal/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
 )
 
 type SpendingHistoryHandlerImpl struct {
@@ -35,6 +35,7 @@ func (h *SpendingHistoryHandlerImpl) Create(w http.ResponseWriter, r *http.Reque
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
+	req.ProfileID = r.Header.Get("Profile-ID")
 
 	err = validation.CreateSpendingHistory(req)
 	if err != nil {
@@ -65,6 +66,8 @@ func (h *SpendingHistoryHandlerImpl) Update(w http.ResponseWriter, r *http.Reque
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
+
+	req.ProfileID = r.Header.Get("Profile-ID")
 	req.ID = chi.URLParam(r, "id")
 
 	err = validation.UpdateSpendingHistory(req)
@@ -89,7 +92,7 @@ func (h *SpendingHistoryHandlerImpl) Update(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *SpendingHistoryHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
-	profileID := chi.URLParam(r, "profile-id")
+	profileID := r.Header.Get("Profile-ID")
 	id := chi.URLParam(r, "id")
 
 	err := h.spendingHistoryUsecase.Delete(r.Context(), id, profileID)
@@ -119,7 +122,7 @@ func (h *SpendingHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r 
 	endTime, _ = time.Parse("2006-01-02", end)
 
 	req := &domain.RequestGetFilteredDataSpendingHistory{
-		ProfileID: chi.URLParam(r, "profile-id"),
+		ProfileID: r.Header.Get("Profile-ID"),
 		StartTime: startTime,
 		EndTime:   endTime,
 		Type:      typeQuery,
@@ -139,7 +142,7 @@ func (h *SpendingHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r 
 
 func (h *SpendingHistoryHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	profileID := chi.URLParam(r, "profile-id")
+	profileID := r.Header.Get("Profile-ID")
 
 	spendingHistory, err := h.spendingHistoryUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
 	if err != nil {

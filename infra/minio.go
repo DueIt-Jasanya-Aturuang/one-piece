@@ -1,4 +1,4 @@
-package config
+package infra
 
 import (
 	"github.com/minio/minio-go/v7"

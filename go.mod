@@ -1,6 +1,8 @@
 module github.com/DueIt-Jasanya-Aturuang/one-piece
 
-go 1.20
+go 1.21
+
+toolchain go1.21.1
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
@@ -32,7 +34,7 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
-	github.com/jasanya-tech/jasanya-response-backend-golang v0.0.0-20230917112949-86b2c609b719 // indirect
+	github.com/jasanya-tech/jasanya-response-backend-golang v0.0.0-20230920200656-1b281f294ef9 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect

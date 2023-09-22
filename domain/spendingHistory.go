@@ -44,7 +44,7 @@ type SpendingHistoryJoin struct {
 
 // RequestCreateSpendingHistory request create spending history
 type RequestCreateSpendingHistory struct {
-	ProfileID               string `json:"profile_id"`
+	ProfileID               string
 	SpendingTypeID          string `json:"spending_type_id"`
 	PaymentMethodID         string `json:"payment_method_id"`
 	PaymentName             string `json:"payment_name"`
@@ -58,7 +58,7 @@ type RequestCreateSpendingHistory struct {
 // RequestUpdateSpendingHistory request update spending history
 type RequestUpdateSpendingHistory struct {
 	ID                      string
-	ProfileID               string `json:"profile_id"`
+	ProfileID               string
 	SpendingTypeID          string `json:"spending_type_id"`
 	PaymentMethodID         string `json:"payment_method_id"`
 	PaymentName             string `json:"payment_name"`
