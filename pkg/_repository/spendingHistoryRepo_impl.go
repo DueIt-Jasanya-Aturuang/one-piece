@@ -26,7 +26,7 @@ func NewSpendingHistoryRepositoryImpl(
 
 func (s *SpendingHistoryRepositoryImpl) Create(ctx context.Context, spendingHistory *domain.SpendingHistory) error {
 	query := `INSERT INTO t_spending_history (id, profile_id, spending_type_id, payment_method_id, payment_name, 
-                        before_balance, spending_amount, after_balance, description, location, time_spending_history, show_time_spending_history, 
+                        before_balance, spending_amount, after_balance, description, time_spending_history, show_time_spending_history, 
                         created_at, created_by, updated_at)
 				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`
 
@@ -57,7 +57,6 @@ func (s *SpendingHistoryRepositoryImpl) Create(ctx context.Context, spendingHist
 		spendingHistory.SpendingAmount,
 		spendingHistory.AfterBalance,
 		spendingHistory.Description,
-		spendingHistory.Location,
 		spendingHistory.TimeSpendingHistory,
 		spendingHistory.ShowTimeSpendingHistory,
 		spendingHistory.CreatedAt,
@@ -73,9 +72,9 @@ func (s *SpendingHistoryRepositoryImpl) Create(ctx context.Context, spendingHist
 
 func (s *SpendingHistoryRepositoryImpl) Update(ctx context.Context, spendingHistory *domain.SpendingHistory) error {
 	query := `UPDATE t_spending_history SET spending_type_id = $1, payment_method_id = $2, payment_name = $3, before_balance = $4, 
-                              spending_amount = $5, after_balance = $6, description = $7, location = $8, time_spending_history = $9, 
-                              show_time_spending_history = $10, updated_at = $11, updated_by = $12 
-                          WHERE id = $13 AND profile_id = $14 AND deleted_at IS NULL`
+                              spending_amount = $5, after_balance = $6, description = $7, time_spending_history = $8, 
+                              show_time_spending_history = $9, updated_at = $10, updated_by = $11
+                          WHERE id = $12 AND profile_id = $13 AND deleted_at IS NULL`
 
 	tx, err := s.GetTx()
 	if err != nil {
@@ -102,7 +101,6 @@ func (s *SpendingHistoryRepositoryImpl) Update(ctx context.Context, spendingHist
 		spendingHistory.SpendingAmount,
 		spendingHistory.AfterBalance,
 		spendingHistory.Description,
-		spendingHistory.Location,
 		spendingHistory.TimeSpendingHistory,
 		spendingHistory.ShowTimeSpendingHistory,
 		spendingHistory.UpdatedAt,
@@ -155,7 +153,7 @@ func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
 	ctx context.Context, req *domain.RequestGetFilteredDataSpendingHistory,
 ) (*[]domain.SpendingHistoryJoin, error) {
 	query := `SELECT tsh.id, tsh.profile_id, tsh.spending_type_id, tsh.payment_method_id, tsh.payment_name, tsh.before_balance, 
-       				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.location, tsh.time_spending_history, tsh.show_time_spending_history, 
+       				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.time_spending_history, tsh.show_time_spending_history, 
        				tsh.created_at, tsh.created_by, tsh.updated_at, tsh.updated_by, tsh.deleted_at, tsh.deleted_by,
        				mst.title, mpm.name
 				FROM t_spending_history tsh 
@@ -198,7 +196,6 @@ func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
 			&spendingHistory.SpendingAmount,
 			&spendingHistory.AfterBalance,
 			&spendingHistory.Description,
-			&spendingHistory.Location,
 			&spendingHistory.TimeSpendingHistory,
 			&spendingHistory.ShowTimeSpendingHistory,
 			&spendingHistory.CreatedAt,
@@ -222,7 +219,7 @@ func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
 
 func (s *SpendingHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.SpendingHistoryJoin, error) {
 	query := `SELECT tsh.id, tsh.profile_id, tsh.spending_type_id, tsh.payment_method_id, tsh.payment_name, tsh.before_balance, 
-       				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.location, tsh.time_spending_history, tsh.show_time_spending_history, 
+       				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.time_spending_history, tsh.show_time_spending_history, 
        				tsh.created_at, tsh.created_by, tsh.updated_at, tsh.updated_by, tsh.deleted_at, tsh.deleted_by,
        				mst.title, mpm.name
 				FROM t_spending_history tsh 
@@ -257,7 +254,6 @@ func (s *SpendingHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context,
 		&spendingHistory.SpendingAmount,
 		&spendingHistory.AfterBalance,
 		&spendingHistory.Description,
-		&spendingHistory.Location,
 		&spendingHistory.TimeSpendingHistory,
 		&spendingHistory.ShowTimeSpendingHistory,
 		&spendingHistory.CreatedAt,
