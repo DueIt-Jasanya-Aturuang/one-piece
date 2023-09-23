@@ -1,1 +1,0 @@
-DROP TABLE IF EXISTS m_income_type;

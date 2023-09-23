@@ -22,7 +22,6 @@ func CreateSpendingHistoryToModel(req *domain.RequestCreateSpendingHistory, bala
 		SpendingAmount:          req.SpendingAmount,
 		AfterBalance:            balance - req.SpendingAmount,
 		Description:             req.Description,
-		Location:                req.Location,
 		TimeSpendingHistory:     timeSpendingHistory.UTC(),
 		ShowTimeSpendingHistory: req.ShowTimeSpendingHistory,
 		AuditInfo: domain.AuditInfo{
@@ -46,7 +45,6 @@ func UpdateSpendingHistoryToModel(req *domain.RequestUpdateSpendingHistory, bala
 		SpendingAmount:          req.SpendingAmount,
 		AfterBalance:            balance - req.SpendingAmount,
 		Description:             req.Description,
-		Location:                req.Location,
 		TimeSpendingHistory:     timeSpendingHistory.UTC(),
 		ShowTimeSpendingHistory: req.ShowTimeSpendingHistory,
 		AuditInfo: domain.AuditInfo{
@@ -71,7 +69,6 @@ func SpendingHistoryJoinModelToResponse(spendingHistory *domain.SpendingHistoryJ
 		FormatSpendingAmount:    helper.FormatRupiah(spendingHistory.SpendingAmount),
 		AfterBalance:            spendingHistory.AfterBalance,
 		Description:             spendingHistory.Description,
-		Location:                spendingHistory.Description,
 		TimeSpendingHistory:     spendingHistory.TimeSpendingHistory.UTC(),
 		ShowTimeSpendingHistory: spendingHistory.ShowTimeSpendingHistory,
 	}
@@ -93,7 +90,6 @@ func GetAllSpendingHistoryJoinModelToResponse(spendingHistory domain.SpendingHis
 		FormatSpendingAmount:    helper.FormatRupiah(spendingHistory.SpendingAmount),
 		AfterBalance:            spendingHistory.AfterBalance,
 		Description:             spendingHistory.Description,
-		Location:                spendingHistory.Description,
 		TimeSpendingHistory:     spendingHistory.TimeSpendingHistory.UTC(),
 		ShowTimeSpendingHistory: spendingHistory.ShowTimeSpendingHistory,
 	}

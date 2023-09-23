@@ -53,11 +53,6 @@ func CreateSpendingHistory(req *domain.RequestCreateSpendingHistory) error {
 		err["description"] = append(err["description"], description)
 	}
 
-	location := maxMinString(req.Location, 3, 32)
-	if location != "" {
-		err["location"] = append(err["location"], location)
-	}
-
 	_, errParse := time.Parse("2006-01-02", req.TimeSpendingHistory)
 	if errParse != nil {
 		err["time_spending_history"] = append(err["time_spending_history"], "invalid date")
@@ -119,11 +114,6 @@ func UpdateSpendingHistory(req *domain.RequestUpdateSpendingHistory) error {
 	description := maxMinString(req.Description, 3, 55)
 	if description != "" {
 		err["description"] = append(err["description"], description)
-	}
-
-	location := maxMinString(req.Location, 3, 32)
-	if location != "" {
-		err["location"] = append(err["location"], location)
 	}
 
 	_, errParse := time.Parse("2006-01-02", req.TimeSpendingHistory)
