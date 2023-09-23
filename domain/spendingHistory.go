@@ -17,7 +17,6 @@ type SpendingHistory struct {
 	SpendingAmount          int
 	AfterBalance            int
 	Description             string
-	Location                string
 	TimeSpendingHistory     time.Time
 	ShowTimeSpendingHistory string
 	AuditInfo
@@ -36,7 +35,6 @@ type SpendingHistoryJoin struct {
 	SpendingAmount          int
 	AfterBalance            int
 	Description             string
-	Location                string
 	TimeSpendingHistory     time.Time
 	ShowTimeSpendingHistory string
 	AuditInfo
@@ -50,7 +48,6 @@ type RequestCreateSpendingHistory struct {
 	PaymentName             string `json:"payment_name"`
 	SpendingAmount          int    `json:"spending_amount"`
 	Description             string `json:"description"`
-	Location                string `json:"location"`
 	TimeSpendingHistory     string `json:"time_spending_history"`
 	ShowTimeSpendingHistory string `json:"show_time_spending_history"`
 }
@@ -64,7 +61,6 @@ type RequestUpdateSpendingHistory struct {
 	PaymentName             string `json:"payment_name"`
 	SpendingAmount          int    `json:"spending_amount"`
 	Description             string `json:"description"`
-	Location                string `json:"location"`
 	TimeSpendingHistory     string `json:"time_spending_history"`
 	ShowTimeSpendingHistory string `json:"show_time_spending_history"`
 }
@@ -98,7 +94,6 @@ type ResponseSpendingHistory struct {
 	FormatSpendingAmount    string    `json:"format_spending_amount"`
 	AfterBalance            int       `json:"after_balance"`
 	Description             string    `json:"description"`
-	Location                string    `json:"location"`
 	TimeSpendingHistory     time.Time `json:"time_spending_history"`
 	ShowTimeSpendingHistory string    `json:"show_time_spending_history"`
 }
