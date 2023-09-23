@@ -9,6 +9,7 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/middleware"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
@@ -48,6 +49,7 @@ func main() {
 	r.MethodNotAllowed(helper.MethodNotAllowed)
 
 	r.Route("/finance", func(r chi.Router) {
+		r.Use(middleware.SetAuthorization)
 		r.Get("/payment", paymentHandler.GetAll)
 		r.Post("/payment", paymentHandler.Create)
 		r.Put("/payment/{id}", paymentHandler.Update)
