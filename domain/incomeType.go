@@ -2,39 +2,57 @@ package domain
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
 type IncomeType struct {
-	ID string
+	ID          string
+	ProfileID   string
+	Name        string
+	Description sql.NullString
+	Icon        string
+	IncomeType  string
+	FixedIncome sql.NullBool
+	Periode     sql.NullString
+	Amount      sql.NullInt64
 	AuditInfo
 }
 
 type RequestCreateIncomeType struct {
-	Name string
+	ProfileID   string
+	Name        string         `json:"name"`
+	Description sql.NullString `json:"description"`
+	Icon        string         `json:"icon"`
 }
 
 type RequestUpdateIncomeType struct {
-	ID string
+	ID          string
+	ProfileID   string
+	Name        string         `json:"name"`
+	Description sql.NullString `json:"description"`
+	Icon        string         `json:"icon"`
 }
 
 type RequestGetAllIncomeType struct {
 	ProfileID string
 	StartTime time.Time
 	EndTime   time.Time
-	Type      string
 }
 
 type ResponseIncomeType struct {
-	ID string
+	ID          string         `json:"id"`
+	ProfileID   string         `json:"profile_id"`
+	Name        string         `json:"name"`
+	Description sql.NullString `json:"description"`
+	Icon        string         `json:"icon"`
 }
 
 type IncomeTypeRepository interface {
 	Create(ctx context.Context, income *IncomeType) error
 	Update(ctx context.Context, income *IncomeType) error
 	Delete(ctx context.Context, id string, profileID string) error
-	CheckByTitleAndProfileID(ctx context.Context, profileID string, title string) (bool, error)
-	GetByID(ctx context.Context, id string) (*IncomeType, error)
+	CheckByNameAndProfileID(ctx context.Context, profileID string, name string) (bool, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*IncomeType, error)
 	GetAllByProfileID(ctx context.Context, profileID string) (*[]IncomeType, error)
 	UnitOfWorkRepository
