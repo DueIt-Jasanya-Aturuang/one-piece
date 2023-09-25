@@ -29,18 +29,21 @@ func main() {
 	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
 	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
 	balanceRepo := _repository.NewBalanceRepositoryImpl(uow)
+	incomeTypeRepo := _repository.NewIncomeTypeRepositoryImpl(uow)
 
 	// usecase
 	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 	spendingTypeUsecase := _usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
 	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
 	balanceUsecase := _usecase.NewBalanceUsecaseImpl(balanceRepo)
+	incomeTypeUsecase := _usecase.NewIncomeTypeUsecaseImpl(incomeTypeRepo)
 
 	// handler
 	paymentHandler := rest.NewPaymentHandlerImpl(paymentUsecase)
 	spendingTypeHandler := rest.NewSpendingTypeHandlerImpl(spendingTypeUsecase)
 	spendingHistoryHandler := rest.NewSpendingHistoryHandlerImpl(spendingHistoryUsecase)
 	balanceHandler := rest.NewBalanceHandlerImpl(balanceUsecase)
+	incomeTypeHandler := rest.NewIncomeTypeHandlerImpl(incomeTypeUsecase)
 
 	// route
 	r := chi.NewRouter()
@@ -66,6 +69,8 @@ func main() {
 		r.Post("/spending-history", spendingHistoryHandler.Create)
 		r.Put("/spending-history/{id}", spendingHistoryHandler.Update)
 		r.Delete("/spending-history/{id}", spendingHistoryHandler.Delete)
+
+		r.Post("/income-type", incomeTypeHandler.Create)
 
 		r.Get("/balance", balanceHandler.GetByProfileID)
 	})
