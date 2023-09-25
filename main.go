@@ -57,8 +57,8 @@ func main() {
 		r.Post("/payment", paymentHandler.Create)
 		r.Put("/payment/{id}", paymentHandler.Update)
 
-		r.Get("/spending-type/{periode}", spendingTypeHandler.GetAllByPeriodeAndProfileID)
 		r.Get("/spending-type", spendingTypeHandler.GetAllByProfileID)
+		r.Get("/spending-type/{periode}", spendingTypeHandler.GetAllByPeriodeAndProfileID)
 		r.Get("/spending-type/detail/{id}", spendingTypeHandler.GetByIDAndProfileID)
 		r.Post("/spending-type", spendingTypeHandler.Create)
 		r.Put("/spending-type/{id}", spendingTypeHandler.Update)
@@ -70,6 +70,8 @@ func main() {
 		r.Put("/spending-history/{id}", spendingHistoryHandler.Update)
 		r.Delete("/spending-history/{id}", spendingHistoryHandler.Delete)
 
+		r.Get("/income-type", incomeTypeHandler.GetAllByProfileID)
+		r.Get("/income-type/detail/{id}", incomeTypeHandler.GetByIDAndProfileID)
 		r.Post("/income-type", incomeTypeHandler.Create)
 		r.Put("/income-type/{id}", incomeTypeHandler.Update)
 		r.Delete("/income-type/{id}", incomeTypeHandler.Delete)

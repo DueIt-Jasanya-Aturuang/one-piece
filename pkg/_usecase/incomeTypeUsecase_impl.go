@@ -115,11 +115,41 @@ func (i *IncomeTypeUsecaseImpl) Delete(ctx context.Context, id string, profileID
 }
 
 func (i *IncomeTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseIncomeType, error) {
-	// TODO implement me
-	panic("implement me")
+	if err := i.incomeTypeRepo.OpenConn(ctx); err != nil {
+		return nil, err
+	}
+	defer i.incomeTypeRepo.CloseConn()
+
+	incomeType, err := i.incomeTypeRepo.GetByIDAndProfileID(ctx, id, profileID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, IncomeTypeIsNotExist
+		}
+		return nil, err
+	}
+
+	resp := converter.IncomeTypeModelToResp(incomeType)
+
+	return resp, nil
 }
 
 func (i *IncomeTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.ResponseIncomeType, error) {
-	// TODO implement me
-	panic("implement me")
+	if err := i.incomeTypeRepo.OpenConn(ctx); err != nil {
+		return nil, err
+	}
+	defer i.incomeTypeRepo.CloseConn()
+
+	incomeTypes, err := i.incomeTypeRepo.GetAllByProfileID(ctx, profileID)
+	if err != nil {
+		return nil, err
+	}
+
+	var resps []domain.ResponseIncomeType
+
+	for _, incomeType := range *incomeTypes {
+		resp := converter.IncomeTypeModelToResp(&incomeType)
+		resps = append(resps, *resp)
+	}
+
+	return &resps, nil
 }
