@@ -72,6 +72,7 @@ func main() {
 
 		r.Post("/income-type", incomeTypeHandler.Create)
 		r.Put("/income-type/{id}", incomeTypeHandler.Update)
+		r.Delete("/income-type/{id}", incomeTypeHandler.Delete)
 
 		r.Get("/balance", balanceHandler.GetByProfileID)
 	})

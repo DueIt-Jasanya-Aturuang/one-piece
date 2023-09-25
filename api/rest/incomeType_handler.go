@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
@@ -91,4 +92,26 @@ func (i *IncomeTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helper.SuccessResponseEncode(w, incomeType, "update pemasukan kategori sukses")
+}
+
+func (i *IncomeTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	profileID := r.Header.Get("Profile-ID")
+
+	if _, err := uuid.Parse(id); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
+		return
+	}
+	if _, err := uuid.Parse(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+		return
+	}
+
+	err := i.incomeTypeUsecase.Delete(r.Context(), id, profileID)
+	if err != nil {
+		helper.ErrorResponseEncode(w, err)
+		return
+	}
+
+	helper.SuccessResponseEncode(w, nil, "deleted pemasukan kategori sukses")
 }

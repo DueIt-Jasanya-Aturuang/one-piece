@@ -97,8 +97,21 @@ func (i *IncomeTypeUsecaseImpl) Update(ctx context.Context, req *domain.RequestU
 }
 
 func (i *IncomeTypeUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
-	// TODO implement me
-	panic("implement me")
+	if err := i.incomeTypeRepo.OpenConn(ctx); err != nil {
+		return err
+	}
+	defer i.incomeTypeRepo.CloseConn()
+
+	err := i.incomeTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+		err := i.incomeTypeRepo.Delete(ctx, id, profileID)
+		if err != nil {
+			return nil
+		}
+
+		return nil
+	})
+
+	return err
 }
 
 func (i *IncomeTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseIncomeType, error) {
