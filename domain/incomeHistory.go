@@ -20,8 +20,9 @@ type RequestCreateIncomeHistory struct {
 }
 
 type RequestUpdateIncomeHistory struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ProfileID string
+	ID        string `json:"id"`
+	Name      string `json:"name"`
 }
 
 type RequestGetFilteredDataIncomeHistory struct {

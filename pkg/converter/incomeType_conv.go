@@ -29,6 +29,24 @@ func RequestCreateIncomeTypeToModel(i *domain.RequestCreateIncomeType) *domain.I
 	}
 }
 
+func RequestUpdateIncomeTypeToModel(i *domain.RequestUpdateIncomeType) *domain.IncomeType {
+	return &domain.IncomeType{
+		ID:          i.ID,
+		ProfileID:   i.ProfileID,
+		Name:        i.Name,
+		Description: helper.NewNullString(i.Description),
+		Icon:        i.Icon,
+		IncomeType:  "lainnya",
+		FixedIncome: helper.NewNullBool(false),
+		Periode:     helper.NewNullString(""),
+		Amount:      helper.NewNullInt64(0),
+		AuditInfo: domain.AuditInfo{
+			UpdatedAt: time.Now().Unix(),
+			UpdatedBy: helper.NewNullString(i.ProfileID),
+		},
+	}
+}
+
 func IncomeTypeModelToResp(i *domain.IncomeType) *domain.ResponseIncomeType {
 	return &domain.ResponseIncomeType{
 		ID:          i.ID,

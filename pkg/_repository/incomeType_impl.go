@@ -95,8 +95,8 @@ func (i *IncomeTypeRepositoryImpl) Update(ctx context.Context, income *domain.In
 		income.FixedIncome,
 		income.Periode,
 		income.Amount,
-		income.UpdatedBy,
 		income.UpdatedAt,
+		income.UpdatedBy,
 		income.ID,
 		income.ProfileID,
 	); err != nil {

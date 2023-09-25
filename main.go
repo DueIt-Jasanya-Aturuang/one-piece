@@ -71,6 +71,7 @@ func main() {
 		r.Delete("/spending-history/{id}", spendingHistoryHandler.Delete)
 
 		r.Post("/income-type", incomeTypeHandler.Create)
+		r.Put("/income-type/{id}", incomeTypeHandler.Update)
 
 		r.Get("/balance", balanceHandler.GetByProfileID)
 	})

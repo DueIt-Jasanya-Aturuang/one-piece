@@ -60,7 +60,7 @@ type IncomeTypeRepository interface {
 
 type IncomeTypeUsecase interface {
 	Create(ctx context.Context, req *RequestCreateIncomeType) (*ResponseIncomeType, error)
-	Update(ctx context.Context, req *RequestUpdateIncomeHistory) (*ResponseIncomeType, error)
+	Update(ctx context.Context, req *RequestUpdateIncomeType) (*ResponseIncomeType, error)
 	Delete(ctx context.Context, id string, profileID string) error
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseIncomeType, error)
 	GetAllByProfileID(ctx context.Context, profileID string) (*[]ResponseIncomeType, error)
