@@ -188,49 +188,6 @@ func (s *SpendingTypeRepositoryImpl) CheckByTitleAndProfileID(ctx context.Contex
 	return exist, nil
 }
 
-func (s *SpendingTypeRepositoryImpl) GetByID(ctx context.Context, id string) (*domain.SpendingType, error) {
-	query := `SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
-				FROM m_spending_type WHERE id = $1 AND deleted_at IS NULL`
-
-	conn, err := s.GetConn()
-	if err != nil {
-		return nil, err
-	}
-
-	stmt, err := conn.PrepareContext(ctx, query)
-	if err != nil {
-		log.Warn().Msgf(util.LogErrPrepareContext, err)
-		return nil, err
-	}
-	defer func() {
-		if errClose := stmt.Close(); errClose != nil {
-			log.Warn().Msgf(util.LogErrPrepareContextClose, err)
-		}
-	}()
-
-	var spendingType domain.SpendingType
-	if err = stmt.QueryRowContext(ctx, id).Scan(
-		&spendingType.ID,
-		&spendingType.ProfileID,
-		&spendingType.Title,
-		&spendingType.MaximumLimit,
-		&spendingType.Icon,
-		&spendingType.CreatedAt,
-		&spendingType.CreatedBy,
-		&spendingType.UpdatedAt,
-		&spendingType.UpdatedBy,
-		&spendingType.DeletedAt,
-		&spendingType.DeletedBy,
-	); err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
-		}
-		return nil, err
-	}
-
-	return &spendingType, nil
-}
-
 func (s *SpendingTypeRepositoryImpl) GetDefault(ctx context.Context) (*[]domain.SpendingType, error) {
 	query := `SELECT id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_default_spending_type WHERE active = true AND deleted_at IS NULL`

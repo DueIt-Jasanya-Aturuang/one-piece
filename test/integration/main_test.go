@@ -77,7 +77,7 @@ func TestInit(t *testing.T) {
 		t.Run("Update", UpdateSpendingType)
 		t.Run("Delete", DeleteSpendingType)
 		t.Run("CheckData", CheckDataSpendingType)
-		t.Run("CheckByTitleAndProfileID", CheckByTitleAndProfileIDSpendingType)
+		t.Run("CheckByNameAndProfileID", CheckByTitleAndProfileIDSpendingType)
 		t.Run("GetByID", GetByIDSpendingType)
 		t.Run("GetByID_ERROR-deleted_at-null", GetByIDSpendingTypeERRORDeletedAtNull)
 		t.Run("GetByID_ERROR-invalid-id", GetByIDSpendingTypeERRORInvalidID)

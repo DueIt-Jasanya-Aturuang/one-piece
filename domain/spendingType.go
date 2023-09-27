@@ -86,7 +86,6 @@ type SpendingTypeRepository interface {
 	CheckData(ctx context.Context, profileID string) (bool, error)
 	CheckByTitleAndProfileID(ctx context.Context, profileID string, title string) (bool, error)
 	GetDefault(ctx context.Context) (*[]SpendingType, error)
-	GetByID(ctx context.Context, id string) (*SpendingType, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)
 	GetAllByTimeAndProfileID(ctx context.Context, req *RequestGetAllSpendingType) (*[]SpendingTypeJoin, error)
 	GetAllByProfileID(ctx context.Context, profileID string) (*[]SpendingType, error)

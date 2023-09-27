@@ -35,7 +35,7 @@ func ErrorResponseEncode(w http.ResponseWriter, err error) {
 	case errors.As(err, &errPQ):
 		log.Warn().Msgf("pqerror | err : %v", err)
 		if errPQ.Code == "23503" {
-			err = _error.HttpErrString(response.CodeCompanyName[response.CM05], response.CM05)
+			err = _error.HttpErrString("invalid profile id", response.CM05)
 		} else {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM99], response.CM99)
 		}
