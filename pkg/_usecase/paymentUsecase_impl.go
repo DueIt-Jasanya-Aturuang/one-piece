@@ -102,6 +102,7 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 
 	fileName := payment.Image
 	reqImageCondition := req.Image != nil && req.Image.Size > 0
+	reqDeleteImageCondition := !strings.Contains(fileName, "default")
 
 	if reqImageCondition {
 		fileExt := filepath.Ext(req.Image.Filename)
@@ -120,11 +121,14 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 				return err
 			}
 
-			imageDelArr := strings.Split(payment.Image, "/")
-			imageDel := fmt.Sprintf("/%s/%s/%s", imageDelArr[2], imageDelArr[3], imageDelArr[4])
-			if err = p.minioRepo.DeleteFile(ctx, imageDel); err != nil {
-				return err
+			if reqDeleteImageCondition {
+				imageDelArr := strings.Split(payment.Image, "/")
+				imageDel := fmt.Sprintf("/%s/%s/%s", imageDelArr[2], imageDelArr[3], imageDelArr[4])
+				if err = p.minioRepo.DeleteFile(ctx, imageDel); err != nil {
+					return err
+				}
 			}
+
 		}
 
 		return nil
@@ -185,6 +189,7 @@ func (p *PaymentUsecaseImpl) Delete(ctx context.Context, id string, profileID st
 		}
 		return err
 	}
+	reqDeleteImageCondition := !strings.Contains(payment.Image, "default")
 
 	err = p.paymentRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		if err = p.paymentRepo.Delete(ctx, id, profileID); err != nil {
@@ -198,10 +203,12 @@ func (p *PaymentUsecaseImpl) Delete(ctx context.Context, id string, profileID st
 		return err
 	}
 
-	imageDelArr := strings.Split(payment.Image, "/")
-	imageDel := fmt.Sprintf("/%s/%s/%s", imageDelArr[2], imageDelArr[3], imageDelArr[4])
-	if err = p.minioRepo.DeleteFile(ctx, imageDel); err != nil {
-		return err
+	if reqDeleteImageCondition {
+		imageDelArr := strings.Split(payment.Image, "/")
+		imageDel := fmt.Sprintf("/%s/%s/%s", imageDelArr[2], imageDelArr[3], imageDelArr[4])
+		if err = p.minioRepo.DeleteFile(ctx, imageDel); err != nil {
+			return err
+		}
 	}
 
 	return nil
