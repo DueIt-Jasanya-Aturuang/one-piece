@@ -289,7 +289,7 @@ func (s *SpendingHistoryUsecaseImpl) validatePaymentAndSpendingTypeID(ctx contex
 	}
 
 	if req.PaymentMethodID != "" {
-		_, err = s.paymentRepo.GetByID(ctx, req.PaymentMethodID)
+		_, err = s.paymentRepo.GetByIDAndProfileID(ctx, req.PaymentMethodID, req.ProfileID)
 		if err != nil {
 			if !errors.Is(err, sql.ErrNoRows) {
 				return err

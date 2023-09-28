@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
@@ -36,6 +37,9 @@ func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, fileHeader, _ := r.FormFile("image")
+	profileID := r.Header.Get("Profile-ID")
+
+	req.ProfileID = profileID
 	req.Image = fileHeader
 
 	err = validation.CreatePayment(req)
@@ -75,6 +79,9 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
 		return
 	}
+	profileID := r.Header.Get("Profile-ID")
+
+	req.ProfileID = profileID
 	req.ID = id
 
 	_, fileHeader, _ := r.FormFile("image")
@@ -106,11 +113,44 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PaymentHandlerImpl) GetAll(w http.ResponseWriter, r *http.Request) {
-	payments, err := h.paymentUsecase.GetAll(r.Context())
+	profileID := r.Header.Get("Profile-ID")
+
+	if _, err := uuid.Parse(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+		return
+	}
+
+	payments, err := h.paymentUsecase.GetAllByProfileID(r.Context(), profileID)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
 	helper.SuccessResponseEncode(w, payments, "data payment")
+}
+
+func (h *PaymentHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	profileID := r.Header.Get("Profile-ID")
+
+	if _, err := uuid.Parse(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+		return
+	}
+	if _, err := uuid.Parse(id); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid id", response.CM05))
+		return
+	}
+
+	err := h.paymentUsecase.Delete(r.Context(), id, profileID)
+	if err != nil {
+		if errors.Is(err, _usecase.PaymentNotExist) {
+			helper.SuccessResponseEncode(w, nil, "deleted payment successfully")
+			return
+		}
+		helper.ErrorResponseEncode(w, err)
+		return
+	}
+
+	helper.SuccessResponseEncode(w, nil, "deleted payment successfully")
 }

@@ -53,9 +53,11 @@ func main() {
 
 	r.Route("/finance", func(r chi.Router) {
 		r.Use(middleware.SetAuthorization)
+
 		r.Get("/payment", paymentHandler.GetAll)
 		r.Post("/payment", paymentHandler.Create)
 		r.Put("/payment/{id}", paymentHandler.Update)
+		r.Delete("/payment/{id}", paymentHandler.Delete)
 
 		r.Get("/spending-type", spendingTypeHandler.GetAllByProfileID)
 		r.Get("/spending-type/{periode}", spendingTypeHandler.GetAllByPeriodeAndProfileID)

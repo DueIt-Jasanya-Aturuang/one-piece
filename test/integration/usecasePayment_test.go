@@ -171,7 +171,7 @@ func UsecaseGetAllPayment(t *testing.T) {
 	ctx := context.TODO()
 	usecasePayment := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 
-	payments, err := usecasePayment.GetAll(ctx)
+	payments, err := usecasePayment.GetAllByProfileID(ctx)
 	assert.NoError(t, err)
 	assert.NotNil(t, payments)
 	t.Log(payments)

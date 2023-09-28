@@ -9,6 +9,7 @@ import (
 // Payment entity payment
 type Payment struct {
 	ID          string
+	ProfileID   string
 	Name        string
 	Description sql.NullString
 	Image       string
@@ -20,6 +21,7 @@ type RequestCreatePayment struct {
 	Name        string                `form:"name"`
 	Description string                `form:"description"`
 	Image       *multipart.FileHeader `form:"image"`
+	ProfileID   string
 }
 
 // RequestUpdatePayment update payment request
@@ -27,12 +29,14 @@ type RequestUpdatePayment struct {
 	Name        string                `form:"name"`
 	Description string                `form:"description"`
 	Image       *multipart.FileHeader `form:"image"`
+	ProfileID   string
 	ID          string
 }
 
 // ResponsePayment response payment
 type ResponsePayment struct {
 	ID          string  `json:"id"`
+	ProfileID   string  `json:"profile_id"`
 	Name        string  `json:"name"`
 	Description *string `json:"description"`
 	Image       string  `json:"image"`
@@ -44,9 +48,12 @@ type ResponsePayment struct {
 type PaymentRepository interface {
 	Create(ctx context.Context, payment *Payment) error
 	Update(ctx context.Context, payment *Payment) error
-	GetAll(ctx context.Context) (*[]Payment, error)
-	GetByID(ctx context.Context, id string) (*Payment, error)
-	GetByName(ctx context.Context, name string) (*Payment, error)
+	Delete(ctx context.Context, id string, profileID string) error
+	CheckData(ctx context.Context, profileID string) (bool, error)
+	GetAllByProfileID(ctx context.Context, profileID string) (*[]Payment, error)
+	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*Payment, error)
+	GetByNameAndProfileID(ctx context.Context, name string, profileID string) (*Payment, error)
+	GetDefault(ctx context.Context) (*[]Payment, error)
 	UnitOfWorkRepository
 }
 
@@ -56,5 +63,6 @@ type PaymentRepository interface {
 type PaymentUsecase interface {
 	Create(ctx context.Context, req *RequestCreatePayment) (*ResponsePayment, error)
 	Update(ctx context.Context, req *RequestUpdatePayment) (*ResponsePayment, error)
-	GetAll(ctx context.Context) (*[]ResponsePayment, error)
+	GetAllByProfileID(ctx context.Context, profileID string) (*[]ResponsePayment, error)
+	Delete(ctx context.Context, id string, profileID string) error
 }

@@ -14,6 +14,7 @@ func CreatePaymentReqToModel(req *domain.RequestCreatePayment, fileName string) 
 	id := uuid.NewV4().String()
 	payment := &domain.Payment{
 		ID:          id,
+		ProfileID:   req.ProfileID,
 		Name:        req.Name,
 		Description: helper.NewNullString(req.Description),
 		Image:       fileName,
@@ -33,6 +34,7 @@ func CreatePaymentReqToModel(req *domain.RequestCreatePayment, fileName string) 
 func PaymentModelToResp(payment *domain.Payment) *domain.ResponsePayment {
 	resp := &domain.ResponsePayment{
 		ID:          payment.ID,
+		ProfileID:   payment.ProfileID,
 		Name:        payment.Name,
 		Description: helper.GetNullString(payment.Description),
 		Image:       payment.Image,
@@ -44,6 +46,7 @@ func PaymentModelToResp(payment *domain.Payment) *domain.ResponsePayment {
 func PaymentGetAllPaymentModelToResp(payment domain.Payment) domain.ResponsePayment {
 	resp := domain.ResponsePayment{
 		ID:          payment.ID,
+		ProfileID:   payment.ProfileID,
 		Name:        payment.Name,
 		Description: helper.GetNullString(payment.Description),
 		Image:       payment.Image,
@@ -55,6 +58,7 @@ func PaymentGetAllPaymentModelToResp(payment domain.Payment) domain.ResponsePaym
 func UpdatePaymentReqToModel(req *domain.RequestUpdatePayment, fileName string) *domain.Payment {
 	payment := &domain.Payment{
 		ID:          req.ID,
+		ProfileID:   req.ProfileID,
 		Name:        req.Name,
 		Description: helper.NewNullString(req.Description),
 		Image:       fileName,
