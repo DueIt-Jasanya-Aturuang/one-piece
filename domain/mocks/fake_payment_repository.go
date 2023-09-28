@@ -225,7 +225,7 @@ func (fake *FakePaymentRepository) GetAll(arg1 context.Context) (*[]domain.Payme
 	}{arg1})
 	stub := fake.GetAllStub
 	fakeReturns := fake.getAllReturns
-	fake.recordInvocation("GetAll", []interface{}{arg1})
+	fake.recordInvocation("GetAllByProfileID", []interface{}{arg1})
 	fake.getAllMutex.Unlock()
 	if stub != nil {
 		return stub(arg1)
@@ -290,7 +290,7 @@ func (fake *FakePaymentRepository) GetByID(arg1 context.Context, arg2 string) (*
 	}{arg1, arg2})
 	stub := fake.GetByIDStub
 	fakeReturns := fake.getByIDReturns
-	fake.recordInvocation("GetByID", []interface{}{arg1, arg2})
+	fake.recordInvocation("GetByIDAndProfileID", []interface{}{arg1, arg2})
 	fake.getByIDMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
@@ -355,7 +355,7 @@ func (fake *FakePaymentRepository) GetByName(arg1 context.Context, arg2 string) 
 	}{arg1, arg2})
 	stub := fake.GetByNameStub
 	fakeReturns := fake.getByNameReturns
-	fake.recordInvocation("GetByName", []interface{}{arg1, arg2})
+	fake.recordInvocation("GetByNameAndProfileID", []interface{}{arg1, arg2})
 	fake.getByNameMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)

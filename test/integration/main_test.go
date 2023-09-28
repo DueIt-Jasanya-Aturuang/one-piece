@@ -65,10 +65,10 @@ func TestMain(m *testing.M) {
 func TestInit(t *testing.T) {
 	t.Run("PAYMENT_REPO", func(t *testing.T) {
 		t.Run("Create", CreatePayment)
-		t.Run("GetByID", GetPaymentById)
+		t.Run("GetByIDAndProfileID", GetPaymentById)
 		t.Run("GetPaymentById_ERROR", GetPaymentByIdERROR)
 		t.Run("Update", UpdatePayment)
-		t.Run("GetByName", GetPaymentByName)
+		t.Run("GetByNameAndProfileID", GetPaymentByName)
 		t.Run("GetPaymentByName_ERROR", GetPaymentByNameERROR)
 	})
 
@@ -78,7 +78,7 @@ func TestInit(t *testing.T) {
 		t.Run("Delete", DeleteSpendingType)
 		t.Run("CheckData", CheckDataSpendingType)
 		t.Run("CheckByNameAndProfileID", CheckByTitleAndProfileIDSpendingType)
-		t.Run("GetByID", GetByIDSpendingType)
+		t.Run("GetByIDAndProfileID", GetByIDSpendingType)
 		t.Run("GetByID_ERROR-deleted_at-null", GetByIDSpendingTypeERRORDeletedAtNull)
 		t.Run("GetByID_ERROR-invalid-id", GetByIDSpendingTypeERRORInvalidID)
 		t.Run("GetByIDAndProfileID", GetByIDAndProfileIDSpendingType)
@@ -107,7 +107,7 @@ func TestInit(t *testing.T) {
 		t.Run("CreatePayment409ERROR", UsecaseCreatePayment409ERROR)
 		t.Run("Update", UsecaseUpdatePayment)
 		t.Run("UpdatePaymentERROR", UsecaseUpdatePaymentERROR)
-		t.Run("GetAll", UsecaseGetAllPayment)
+		t.Run("GetAllByProfileID", UsecaseGetAllPayment)
 	})
 
 	t.Run("SPENDINGTYPE_USECASE", func(t *testing.T) {

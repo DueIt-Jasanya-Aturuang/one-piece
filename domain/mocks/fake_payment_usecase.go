@@ -127,7 +127,7 @@ func (fake *FakePaymentUsecase) GetAll(arg1 context.Context) (*[]domain.Response
 	}{arg1})
 	stub := fake.GetAllStub
 	fakeReturns := fake.getAllReturns
-	fake.recordInvocation("GetAll", []interface{}{arg1})
+	fake.recordInvocation("GetAllByProfileID", []interface{}{arg1})
 	fake.getAllMutex.Unlock()
 	if stub != nil {
 		return stub(arg1)

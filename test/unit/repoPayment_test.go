@@ -223,7 +223,7 @@ func TestRepoGetPaymentById(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentRes, err := paymentRepo.GetByID(context.TODO(), payment.ID)
+		paymentRes, err := paymentRepo.GetByIDAndProfileID(context.TODO(), payment.ID)
 		assert.NoError(t, err)
 		assert.NotNil(t, paymentRes)
 
@@ -241,7 +241,7 @@ func TestRepoGetPaymentById(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentResp, err := paymentRepo.GetByID(context.TODO(), "nil")
+		paymentResp, err := paymentRepo.GetByIDAndProfileID(context.TODO(), "nil")
 		assert.Error(t, err)
 		assert.Nil(t, paymentResp)
 		assert.Equal(t, sql.ErrNoRows, err)
@@ -291,7 +291,7 @@ func TestRepoGetPaymentByName(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentRes, err := paymentRepo.GetByName(context.TODO(), payment.Name)
+		paymentRes, err := paymentRepo.GetByNameAndProfileID(context.TODO(), payment.Name)
 		assert.NoError(t, err)
 		assert.NotNil(t, paymentRes)
 
@@ -309,7 +309,7 @@ func TestRepoGetPaymentByName(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentResp, err := paymentRepo.GetByName(context.TODO(), "nil")
+		paymentResp, err := paymentRepo.GetByNameAndProfileID(context.TODO(), "nil")
 		assert.Error(t, err)
 		assert.Nil(t, paymentResp)
 		assert.Equal(t, sql.ErrNoRows, err)
@@ -374,7 +374,7 @@ func TestRepoGetAllPayment(t *testing.T) {
 		assert.NoError(t, err)
 		defer paymentRepo.CloseConn()
 
-		paymentRes, err := paymentRepo.GetAll(context.TODO())
+		paymentRes, err := paymentRepo.GetAllByProfileID(context.TODO())
 		assert.NoError(t, err)
 		assert.NotNil(t, paymentRes)
 		assert.Equal(t, 2, len(*paymentRes))

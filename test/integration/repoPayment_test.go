@@ -51,7 +51,7 @@ func GetPaymentById(t *testing.T) {
 	assert.NoError(t, err)
 	defer PaymentRepo.CloseConn()
 
-	payment, err := PaymentRepo.GetByID(ctx, "payment1")
+	payment, err := PaymentRepo.GetByIDAndProfileID(ctx, "payment1")
 	assert.NoError(t, err)
 	assert.NotNil(t, payment)
 	assert.Equal(t, "bca", payment.Name)
@@ -63,7 +63,7 @@ func GetPaymentByIdERROR(t *testing.T) {
 	assert.NoError(t, err)
 	defer PaymentRepo.CloseConn()
 
-	payment, err := PaymentRepo.GetByID(ctx, "payment1nill")
+	payment, err := PaymentRepo.GetByIDAndProfileID(ctx, "payment1nill")
 	assert.Error(t, err)
 	assert.Nil(t, payment)
 	assert.Equal(t, sql.ErrNoRows, err)
@@ -110,7 +110,7 @@ func GetPaymentByName(t *testing.T) {
 	assert.NoError(t, err)
 	defer PaymentRepo.CloseConn()
 
-	payment, err := PaymentRepo.GetByName(ctx, "bca")
+	payment, err := PaymentRepo.GetByNameAndProfileID(ctx, "bca")
 	assert.NoError(t, err)
 	assert.NotNil(t, payment)
 	assert.Equal(t, false, payment.Description.Valid)
@@ -122,7 +122,7 @@ func GetPaymentByNameERROR(t *testing.T) {
 	assert.NoError(t, err)
 	defer PaymentRepo.CloseConn()
 
-	payment, err := PaymentRepo.GetByName(ctx, "namepaymentnil")
+	payment, err := PaymentRepo.GetByNameAndProfileID(ctx, "namepaymentnil")
 	assert.Error(t, err)
 	assert.Nil(t, payment)
 	assert.Equal(t, sql.ErrNoRows, err)

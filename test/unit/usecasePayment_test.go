@@ -327,7 +327,7 @@ func TestUsecaseGetAllPayment(t *testing.T) {
 		paymentRepo.GetAll(ctx)
 		paymentRepo.GetAllReturns(data, nil)
 
-		payments, err := paymentUsecase.GetAll(ctx)
+		payments, err := paymentUsecase.GetAllByProfileID(ctx)
 		assert.NoError(t, err)
 		assert.NotNil(t, payments)
 		assert.Equal(t, 2, len(*payments))
@@ -343,7 +343,7 @@ func TestUsecaseGetAllPayment(t *testing.T) {
 		paymentRepo.GetAll(ctx)
 		paymentRepo.GetAllReturns(nil, errors.New("error db"))
 
-		payments, err := paymentUsecase.GetAll(ctx)
+		payments, err := paymentUsecase.GetAllByProfileID(ctx)
 		assert.Error(t, err)
 		assert.Nil(t, payments)
 		var errHTTP *resp.HttpError

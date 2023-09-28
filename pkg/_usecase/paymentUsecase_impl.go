@@ -8,6 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/rs/zerolog/log"
+	uuid "github.com/satori/go.uuid"
+
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/converter"
@@ -35,7 +38,7 @@ func (p *PaymentUsecaseImpl) Create(ctx context.Context, req *domain.RequestCrea
 	}
 	defer p.paymentRepo.CloseConn()
 
-	paymentCheck, err := p.paymentRepo.GetByName(ctx, req.Name)
+	paymentCheck, err := p.paymentRepo.GetByNameAndProfileID(ctx, req.Name, req.ProfileID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return nil, err
@@ -77,7 +80,7 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 	}
 	defer p.paymentRepo.CloseConn()
 
-	payment, err := p.paymentRepo.GetByID(ctx, req.ID)
+	payment, err := p.paymentRepo.GetByIDAndProfileID(ctx, req.ID, req.ProfileID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return nil, err
@@ -86,7 +89,7 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 	}
 
 	if payment.Name != req.Name {
-		paymentName, err := p.paymentRepo.GetByName(ctx, req.Name)
+		paymentName, err := p.paymentRepo.GetByNameAndProfileID(ctx, req.Name, req.ProfileID)
 		if err != nil {
 			if !errors.Is(err, sql.ErrNoRows) {
 				return nil, err
@@ -135,13 +138,25 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 	return paymentResponse, nil
 }
 
-func (p *PaymentUsecaseImpl) GetAll(ctx context.Context) (*[]domain.ResponsePayment, error) {
+func (p *PaymentUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.ResponsePayment, error) {
 	if err := p.paymentRepo.OpenConn(ctx); err != nil {
 		return nil, err
 	}
 	defer p.paymentRepo.CloseConn()
 
-	payments, err := p.paymentRepo.GetAll(ctx)
+	exist, err := p.paymentRepo.CheckData(ctx, profileID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exist {
+		err = p.createDefaultPayment(ctx, profileID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	payments, err := p.paymentRepo.GetAllByProfileID(ctx, profileID)
 	if err != nil {
 		return nil, err
 	}
@@ -154,4 +169,61 @@ func (p *PaymentUsecaseImpl) GetAll(ctx context.Context) (*[]domain.ResponsePaym
 	}
 
 	return &responses, nil
+}
+
+func (p *PaymentUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
+	if err := p.paymentRepo.OpenConn(ctx); err != nil {
+		return err
+	}
+	defer p.paymentRepo.CloseConn()
+
+	payment, err := p.paymentRepo.GetByIDAndProfileID(ctx, id, profileID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			log.Info().Msgf("payment tidak tersedia saat delete | id : %s", id)
+			return PaymentNotExist
+		}
+		return err
+	}
+
+	err = p.paymentRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+		if err = p.paymentRepo.Delete(ctx, id, profileID); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	imageDelArr := strings.Split(payment.Image, "/")
+	imageDel := fmt.Sprintf("/%s/%s/%s", imageDelArr[2], imageDelArr[3], imageDelArr[4])
+	if err = p.minioRepo.DeleteFile(ctx, imageDel); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *PaymentUsecaseImpl) createDefaultPayment(ctx context.Context, profileID string) error {
+	err := p.paymentRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+		payments, err := p.paymentRepo.GetDefault(ctx)
+		if err != nil {
+			return err
+		}
+
+		for _, payment := range *payments {
+			payment.ProfileID = profileID
+			payment.ID = uuid.NewV4().String()
+			err = p.paymentRepo.Create(ctx, &payment)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	return err
 }
