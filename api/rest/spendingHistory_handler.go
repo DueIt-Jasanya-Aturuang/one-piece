@@ -49,7 +49,18 @@ func (h *SpendingHistoryHandlerImpl) Create(w http.ResponseWriter, r *http.Reque
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
 		if errors.Is(err, _usecase.InvalidSpendingTypeID) {
-			err = _error.HttpErrString(err.Error(), response.CM01)
+			err = _error.HttpErrMapOfSlices(map[string][]string{
+				"spending_type_id": {
+					err.Error(),
+				},
+			}, response.CM06)
+		}
+		if errors.Is(err, _usecase.InvalidPaymentMethodID) {
+			err = _error.HttpErrMapOfSlices(map[string][]string{
+				"payment_method_id": {
+					err.Error(),
+				},
+			}, response.CM06)
 		}
 		helper.ErrorResponseEncode(w, err)
 		return
@@ -82,7 +93,18 @@ func (h *SpendingHistoryHandlerImpl) Update(w http.ResponseWriter, r *http.Reque
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
 		if errors.Is(err, _usecase.InvalidSpendingTypeID) {
-			err = _error.HttpErrString(err.Error(), response.CM01)
+			err = _error.HttpErrMapOfSlices(map[string][]string{
+				"spending_type_id": {
+					err.Error(),
+				},
+			}, response.CM06)
+		}
+		if errors.Is(err, _usecase.InvalidPaymentMethodID) {
+			err = _error.HttpErrMapOfSlices(map[string][]string{
+				"payment_method_id": {
+					err.Error(),
+				},
+			}, response.CM06)
 		}
 		helper.ErrorResponseEncode(w, err)
 		return
