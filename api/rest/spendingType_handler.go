@@ -165,6 +165,11 @@ func (h *SpendingTypeHandlerImpl) GetAllByPeriodeAndProfileID(w http.ResponseWri
 		return
 	}
 
+	if periodInt > 29 || periodInt < 1 {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
+		return
+	}
+
 	spendingTypes, err := h.spendingTypeUsecase.GetAllByPeriodeAndProfileID(r.Context(), profileID, periodInt)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
