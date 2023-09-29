@@ -186,6 +186,7 @@ func (p *PaymentRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id stri
 
 	if err = stmt.QueryRowContext(ctx, id, profileID).Scan(
 		&payment.ID,
+		&payment.ProfileID,
 		&payment.Name,
 		&payment.Description,
 		&payment.Image,
