@@ -28,7 +28,7 @@ func (s *SpendingHistoryRepositoryImpl) Create(ctx context.Context, spendingHist
 	query := `INSERT INTO t_spending_history (id, profile_id, spending_type_id, payment_method_id, payment_name, 
                         before_balance, spending_amount, after_balance, description, time_spending_history, show_time_spending_history, 
                         created_at, created_by, updated_at)
-				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`
 
 	tx, err := s.GetTx()
 	if err != nil {
