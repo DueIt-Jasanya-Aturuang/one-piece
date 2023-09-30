@@ -98,12 +98,18 @@ type ResponseSpendingHistory struct {
 	ShowTimeSpendingHistory string    `json:"show_time_spending_history"`
 }
 
+type GetSpendingHistoryByTimeAndProfileID struct {
+	ProfileID string
+	StartTime time.Time
+	EndTime   time.Time
+}
+
 // SpendingHistoryRepository spending history repository interface
 type SpendingHistoryRepository interface {
 	Create(ctx context.Context, spendingHistory *SpendingHistory) error
 	Update(ctx context.Context, spendingHistory *SpendingHistory) error
 	Delete(ctx context.Context, id string, profileID string) error
-	GetAllByTimeAndProfileID(ctx context.Context, req *RequestGetFilteredDataSpendingHistory) (*[]SpendingHistoryJoin, error)
+	GetAllByTimeAndProfileID(ctx context.Context, req *GetSpendingHistoryByTimeAndProfileID) (*[]SpendingHistoryJoin, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingHistoryJoin, error)
 	UnitOfWorkRepository
 }

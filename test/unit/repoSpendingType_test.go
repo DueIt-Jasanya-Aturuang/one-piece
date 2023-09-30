@@ -249,7 +249,7 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs("test", startPeriod, endPeriod).WillReturnRows(rows)
 
-		req := &domain.RequestGetAllSpendingType{
+		req := &domain.GetAllSpendingTypeByTime{
 			ProfileID: "test",
 			StartTime: startPeriod,
 			EndTime:   endPeriod,
@@ -270,7 +270,7 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
 		mocksql.ExpectPrepare(query)
 		mocksql.ExpectQuery(query).WithArgs("test", startPeriod, endPeriod).WillReturnRows(rows)
 
-		req := &domain.RequestGetAllSpendingType{
+		req := &domain.GetAllSpendingTypeByTime{
 			ProfileID: "test",
 			StartTime: startPeriod,
 			EndTime:   endPeriod,

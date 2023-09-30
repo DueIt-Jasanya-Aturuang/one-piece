@@ -241,10 +241,12 @@ func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Contex
 			return nil, InvalidTimestamp
 		}
 	}
-	req.StartTime = startTime
-	req.EndTime = endTime
 
-	spendingHistories, err := s.spendingHistoryRepo.GetAllByTimeAndProfileID(ctx, req)
+	spendingHistories, err := s.spendingHistoryRepo.GetAllByTimeAndProfileID(ctx, &domain.GetSpendingHistoryByTimeAndProfileID{
+		ProfileID: req.ProfileID,
+		StartTime: startTime,
+		EndTime:   endTime,
+	})
 	if err != nil {
 		return nil, err
 	}

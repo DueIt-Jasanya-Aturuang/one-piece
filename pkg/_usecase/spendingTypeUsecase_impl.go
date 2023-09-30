@@ -170,7 +170,7 @@ func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Contex
 		return nil, err
 	}
 
-	req := &domain.RequestGetAllSpendingType{
+	req := &domain.GetAllSpendingTypeByTime{
 		ProfileID: profileID,
 		StartTime: startTime,
 		EndTime:   endTime,

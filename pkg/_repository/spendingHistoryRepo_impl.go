@@ -150,7 +150,7 @@ func (s *SpendingHistoryRepositoryImpl) Delete(ctx context.Context, id string, p
 }
 
 func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
-	ctx context.Context, req *domain.RequestGetFilteredDataSpendingHistory,
+	ctx context.Context, req *domain.GetSpendingHistoryByTimeAndProfileID,
 ) (*[]domain.SpendingHistoryJoin, error) {
 	query := `SELECT tsh.id, tsh.profile_id, tsh.spending_type_id, tsh.payment_method_id, tsh.payment_name, tsh.before_balance, 
        				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.time_spending_history, tsh.show_time_spending_history, 

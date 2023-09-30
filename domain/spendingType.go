@@ -43,12 +43,6 @@ type RequestUpdateSpendingType struct {
 	Icon         string `json:"icon"`
 }
 
-type RequestGetAllSpendingType struct {
-	ProfileID string
-	StartTime time.Time
-	EndTime   time.Time
-}
-
 // ResponseSpendingType response spending type
 type ResponseSpendingType struct {
 	ID                 string `json:"id"`
@@ -78,6 +72,12 @@ type ResponseAllSpendingType struct {
 	FormatBudgetAmount   string                      `json:"format_budget_amount"`
 }
 
+type GetAllSpendingTypeByTime struct {
+	ProfileID string
+	StartTime time.Time
+	EndTime   time.Time
+}
+
 // SpendingTypeRepository spending history repository interface
 type SpendingTypeRepository interface {
 	Create(ctx context.Context, spendingType *SpendingType) error
@@ -87,7 +87,7 @@ type SpendingTypeRepository interface {
 	CheckByTitleAndProfileID(ctx context.Context, profileID string, title string) (bool, error)
 	GetDefault(ctx context.Context) (*[]SpendingType, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)
-	GetAllByTimeAndProfileID(ctx context.Context, req *RequestGetAllSpendingType) (*[]SpendingTypeJoin, error)
+	GetAllByTimeAndProfileID(ctx context.Context, req *GetAllSpendingTypeByTime) (*[]SpendingTypeJoin, error)
 	GetAllByProfileID(ctx context.Context, profileID string) (*[]SpendingType, error)
 	UnitOfWorkRepository
 }
