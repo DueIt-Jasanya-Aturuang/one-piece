@@ -181,6 +181,11 @@ func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
 		log.Warn().Msgf(util.LogErrQueryRows, err)
 		return nil, err
 	}
+	defer func() {
+		if errClose := rows.Close(); errClose != nil {
+			log.Warn().Msgf(util.LogErrQueryRowsClose, err)
+		}
+	}()
 
 	var spendingHistories []domain.SpendingHistoryJoin
 	var spendingHistory domain.SpendingHistoryJoin

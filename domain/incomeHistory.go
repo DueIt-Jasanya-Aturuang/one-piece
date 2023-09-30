@@ -97,7 +97,7 @@ type IncomeHistoryRepository interface {
 	Update(ctx context.Context, income *IncomeHistory) error
 	Delete(ctx context.Context, id string, profileID string) error
 	GetAllByTimeAndProfileID(ctx context.Context, req *GetIncomeHistoryByTimeAndProfileID) (*[]IncomeHistoryJoin, error)
-	GetTotalIncomeByPeriode(ctx context.Context, req *GetIncomeHistoryByTimeAndProfileID) (*[]IncomeHistoryJoin, error)
+	GetTotalIncomeByPeriode(ctx context.Context, req *GetIncomeHistoryByTimeAndProfileID) (int, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*IncomeHistoryJoin, error)
 	UnitOfWorkRepository
 }
