@@ -16,7 +16,7 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain/mocks"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
 )
 
 func newFileHeader() *multipart.FileHeader {
@@ -53,7 +53,7 @@ func TestUsecaseCreatePayment(t *testing.T) {
 	paymentRepo := &mocks.FakePaymentRepository{}
 	minioRepo := &mocks.FakeMinioRepo{}
 
-	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	paymentUsecase := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 
 	t.Run("SUCCESS", func(t *testing.T) {
 		ctx := context.TODO()
@@ -146,7 +146,7 @@ func TestUsecaseUpdatePayment(t *testing.T) {
 	paymentRepo := &mocks.FakePaymentRepository{}
 	minioRepo := &mocks.FakeMinioRepo{}
 
-	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	paymentUsecase := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 
 	t.Run("SUCCESS_sama-name-req", func(t *testing.T) {
 		ctx := context.TODO()
@@ -307,7 +307,7 @@ func TestUsecaseGetAllPayment(t *testing.T) {
 	paymentRepo := &mocks.FakePaymentRepository{}
 	minioRepo := &mocks.FakeMinioRepo{}
 
-	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	paymentUsecase := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 
 	t.Run("SUCCESS", func(t *testing.T) {
 		ctx := context.TODO()

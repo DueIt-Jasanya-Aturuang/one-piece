@@ -13,18 +13,18 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
-	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/test/integration/setup"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
 )
 
 var DB *sql.DB
 var minioClient *minio.Client
-var Uow = _repository2.NewUnitOfWorkRepositoryImpl(DB)
-var PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
-var SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
-var SpendingHistoryRepo = _repository2.NewSpendingHistoryRepositoryImpl(Uow)
-var SpendingTypeUsecase = _usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
+var Uow = repository.NewUnitOfWorkRepositoryImpl(DB)
+var PaymentRepo = repository.NewPaymentRepositoryImpl(Uow)
+var SpendingTypeRepo = repository.NewSpendingTypeRepositoryImpl(Uow)
+var SpendingHistoryRepo = repository.NewSpendingHistoryRepositoryImpl(Uow)
+var SpendingTypeUsecase = usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
 
 func TestMain(m *testing.M) {
 	infra.LogInit()
@@ -34,11 +34,11 @@ func TestMain(m *testing.M) {
 	pgResource, dbPg, _ := setup.Postgres(dockerpool)
 	resources = append(resources, pgResource)
 	DB = dbPg
-	Uow = _repository2.NewUnitOfWorkRepositoryImpl(DB)
-	PaymentRepo = _repository2.NewPaymentRepositoryImpl(Uow)
-	SpendingTypeRepo = _repository2.NewSpendingTypeRepositoryImpl(Uow)
-	SpendingHistoryRepo = _repository2.NewSpendingHistoryRepositoryImpl(Uow)
-	SpendingTypeUsecase = _usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
+	Uow = repository.NewUnitOfWorkRepositoryImpl(DB)
+	PaymentRepo = repository.NewPaymentRepositoryImpl(Uow)
+	SpendingTypeRepo = repository.NewSpendingTypeRepositoryImpl(Uow)
+	SpendingHistoryRepo = repository.NewSpendingHistoryRepositoryImpl(Uow)
+	SpendingTypeUsecase = usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
 
 	if DB == nil {
 		panic("db nil")

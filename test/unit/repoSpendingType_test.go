@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
+	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
 )
 
 func TestRepoSpendingTypeCreate(t *testing.T) {
@@ -19,8 +19,8 @@ func TestRepoSpendingTypeCreate(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingTypeRepo := _repository2.NewSpendingTypeRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`INSERT INTO m_spending_type (id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at) 
 				VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`)
@@ -63,8 +63,8 @@ func TestRepoSpendingTypeUpdate(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingTypeRepo := _repository2.NewSpendingTypeRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`UPDATE m_spending_type SET title = $1, maximum_limit = $2, icon = $3, updated_at = $4, updated_by = $5 
                     WHERE id = $6 AND profile_id = $7 AND deleted_at IS NULL`)
@@ -107,8 +107,8 @@ func TestRepoSpendingTypeDelete(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingTypeRepo := _repository2.NewSpendingTypeRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`UPDATE m_spending_type SET deleted_by = $1, deleted_at = $2 WHERE id = $3 AND profile_id = $4`)
 
@@ -139,8 +139,8 @@ func TestRepoSpendingTypeGetByID(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingTypeRepo := _repository2.NewSpendingTypeRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_spending_type WHERE id = $1 AND deleted_at IS NULL`)
@@ -183,8 +183,8 @@ func TestRepoSpendingTypeGetByIDAndProfileID(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingTypeRepo := _repository2.NewSpendingTypeRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_spending_type WHERE id = $1 AND profile_id = $2 AND deleted_at IS NULL`)
@@ -227,8 +227,8 @@ func TestRepoSpendingTypeGetAllByProfileID(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingTypeRepo := _repository2.NewSpendingTypeRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`SELECT mst.id, mst.profile_id, mst.title, mst.maximum_limit, mst.icon, mst.created_at, mst.created_by, 
        				mst.updated_at, mst.updated_by, mst.deleted_at, mst.deleted_by, 

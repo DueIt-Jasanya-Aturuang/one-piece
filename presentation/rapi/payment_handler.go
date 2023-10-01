@@ -1,4 +1,4 @@
-package rest
+package rapi
 
 import (
 	"errors"
@@ -9,10 +9,10 @@ import (
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/validation"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/validation"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
 )
 
 type PaymentHandlerImpl struct {
@@ -50,7 +50,7 @@ func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 
 	payment, err := h.paymentUsecase.Create(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, _usecase.NamePaymentExist) {
+		if errors.Is(err, usecase.NamePaymentExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"name": {
 					err.Error(),
@@ -95,13 +95,13 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 
 	payment, err := h.paymentUsecase.Update(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, _usecase.NamePaymentExist) {
+		if errors.Is(err, usecase.NamePaymentExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"name": {
 					err.Error(),
 				},
 			}, response.CM06)
-		} else if errors.Is(err, _usecase.PaymentNotExist) {
+		} else if errors.Is(err, usecase.PaymentNotExist) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
 
@@ -144,7 +144,7 @@ func (h *PaymentHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
 
 	err := h.paymentUsecase.Delete(r.Context(), id, profileID)
 	if err != nil {
-		if errors.Is(err, _usecase.PaymentNotExist) {
+		if errors.Is(err, usecase.PaymentNotExist) {
 			helper.SuccessResponseEncode(w, nil, "deleted payment successfully")
 			return
 		}

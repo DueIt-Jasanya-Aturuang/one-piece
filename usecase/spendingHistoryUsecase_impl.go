@@ -1,4 +1,4 @@
-package _usecase
+package usecase
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/converter"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
+	converter2 "github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/converter"
+	helper2 "github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/helper"
 )
 
 type SpendingHistoryUsecaseImpl struct {
@@ -57,16 +57,16 @@ func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Req
 
 	var id string
 
-	err = s.spendingHistoryRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+	err = s.spendingHistoryRepo.StartTx(ctx, helper2.LevelReadCommitted(), func() error {
 		if balance == nil {
-			balance = converter.CreateBalanceToModel(req.ProfileID)
+			balance = converter2.CreateBalanceToModel(req.ProfileID)
 			err = s.balanceRepo.Create(ctx, balance)
 			if err != nil {
 				return err
 			}
 		}
 
-		spendingHistory := converter.CreateSpendingHistoryToModel(req, balance.Balance)
+		spendingHistory := converter2.CreateSpendingHistoryToModel(req, balance.Balance)
 		err = s.spendingHistoryRepo.Create(ctx, spendingHistory)
 		if err != nil {
 			return err
@@ -75,7 +75,7 @@ func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Req
 
 		amountSpending := balance.TotalSpendingAmount + req.SpendingAmount
 		amountBalance := balance.Balance - req.SpendingAmount
-		balance = converter.UpdateBalanceToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
+		balance = converter2.UpdateBalanceToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
 		err = s.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
 			return err
@@ -96,7 +96,7 @@ func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Req
 		return nil, SpendingHistoryNotFound
 	}
 
-	resp := converter.SpendingHistoryJoinModelToResponse(spendingHistoryJoin)
+	resp := converter2.SpendingHistoryJoinModelToResponse(spendingHistoryJoin)
 
 	return resp, nil
 }
@@ -132,9 +132,9 @@ func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Req
 		return nil, SpendingHistoryNotFound
 	}
 
-	err = s.spendingHistoryRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+	err = s.spendingHistoryRepo.StartTx(ctx, helper2.LevelReadCommitted(), func() error {
 		if balance == nil {
-			balance = converter.CreateBalanceToModel(req.ProfileID)
+			balance = converter2.CreateBalanceToModel(req.ProfileID)
 			err = s.balanceRepo.Create(ctx, balance)
 			if err != nil {
 				return err
@@ -144,14 +144,14 @@ func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Req
 		beforeBalance := balance.Balance + spendingHistoryJoin.SpendingAmount
 		amountSpending := balance.TotalSpendingAmount + req.SpendingAmount - spendingHistoryJoin.SpendingAmount
 		amountBalance := balance.Balance - req.SpendingAmount + spendingHistoryJoin.SpendingAmount
-		balance = converter.UpdateBalanceToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
+		balance = converter2.UpdateBalanceToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
 
 		err = s.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
 			return err
 		}
 
-		spendingHistory := converter.UpdateSpendingHistoryToModel(req, beforeBalance)
+		spendingHistory := converter2.UpdateSpendingHistoryToModel(req, beforeBalance)
 		err = s.spendingHistoryRepo.Update(ctx, spendingHistory)
 		if err != nil {
 			return err
@@ -172,7 +172,7 @@ func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Req
 		return nil, SpendingHistoryNotFound
 	}
 
-	resp := converter.SpendingHistoryJoinModelToResponse(spendingHistoryJoin)
+	resp := converter2.SpendingHistoryJoinModelToResponse(spendingHistoryJoin)
 
 	return resp, nil
 }
@@ -200,10 +200,10 @@ func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, prof
 		return err
 	}
 
-	err = s.spendingHistoryRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+	err = s.spendingHistoryRepo.StartTx(ctx, helper2.LevelReadCommitted(), func() error {
 		spendingAmount := balance.TotalSpendingAmount - spendingHistoryJoin.SpendingAmount
 		balanceAmount := balance.Balance + spendingHistoryJoin.SpendingAmount
-		balance = converter.UpdateBalanceToModel(balance.ID, profileID, spendingAmount, balanceAmount)
+		balance = converter2.UpdateBalanceToModel(balance.ID, profileID, spendingAmount, balanceAmount)
 
 		err = s.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
@@ -225,7 +225,7 @@ func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, prof
 	return nil
 }
 
-func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.RequestGetFilteredDataSpendingHistory) (*[]domain.ResponseSpendingHistory, error) {
+func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetFilteredDataSpendingHistory) (*[]domain.ResponseSpendingHistory, error) {
 	err := s.spendingHistoryRepo.OpenConn(ctx)
 	if err != nil {
 		return nil, err
@@ -234,9 +234,9 @@ func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Contex
 
 	var startTime, endTime time.Time
 	if req.Type != "" {
-		startTime, endTime, _ = helper.TimeDateByTypeFilter(req.Type)
+		startTime, endTime, _ = helper2.TimeDateByTypeFilter(req.Type)
 	} else {
-		startTime, endTime, err = helper.FormatDate(req.StartTime, req.EndTime)
+		startTime, endTime, err = helper2.FormatDate(req.StartTime, req.EndTime)
 		if err != nil {
 			return nil, InvalidTimestamp
 		}
@@ -254,7 +254,7 @@ func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Contex
 	var spendingHistoryJoinResponses []domain.ResponseSpendingHistory
 
 	for _, spendingHistory := range *spendingHistories {
-		spendingHistoryJoinResponse := converter.GetAllSpendingHistoryJoinModelToResponse(spendingHistory)
+		spendingHistoryJoinResponse := converter2.GetAllSpendingHistoryJoinModelToResponse(spendingHistory)
 		spendingHistoryJoinResponses = append(spendingHistoryJoinResponses, spendingHistoryJoinResponse)
 	}
 
@@ -276,7 +276,7 @@ func (s *SpendingHistoryUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id
 		return nil, err
 	}
 
-	spendingHistoryJoinResponse := converter.SpendingHistoryJoinModelToResponse(spendingHistory)
+	spendingHistoryJoinResponse := converter2.SpendingHistoryJoinModelToResponse(spendingHistory)
 
 	return spendingHistoryJoinResponse, nil
 }

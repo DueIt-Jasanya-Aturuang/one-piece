@@ -5,6 +5,36 @@ import (
 	"time"
 )
 
+// SpendingTypeRepository spending history repository interface
+type SpendingTypeRepository interface {
+	Create(ctx context.Context, spendingType *SpendingType) error
+	Update(ctx context.Context, spendingType *SpendingType) error
+	Delete(ctx context.Context, id string, profileID string) error
+	CheckData(ctx context.Context, profileID string) (bool, error)
+	CheckByTitleAndProfileID(ctx context.Context, profileID string, title string) (bool, error)
+	GetDefault(ctx context.Context) (*[]SpendingType, error)
+	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)
+	GetAllByTimeAndProfileID(ctx context.Context, req *GetAllSpendingTypeByTime) (*[]SpendingTypeJoin, error)
+	GetAllByProfileID(ctx context.Context, profileID string) (*[]SpendingType, error)
+	UnitOfWorkRepository
+}
+
+// SpendingTypeUsecase spending history usecase interface
+type SpendingTypeUsecase interface {
+	Create(ctx context.Context, req *RequestCreateSpendingType) (*ResponseSpendingType, error)
+	Update(ctx context.Context, req *RequestUpdateSpendingType) (*ResponseSpendingType, error)
+	Delete(ctx context.Context, id string, profileID string) error
+	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseSpendingType, error)
+	GetAllByPeriodeAndProfileID(ctx context.Context, profileID string, periode int) (*ResponseAllSpendingType, error)
+	GetAllByProfileID(ctx context.Context, profileID string) (*[]ResponseSpendingType, error)
+}
+
+type GetAllSpendingTypeByTime struct {
+	ProfileID string
+	StartTime time.Time
+	EndTime   time.Time
+}
+
 // SpendingType spending type entity
 type SpendingType struct {
 	ID           string
@@ -70,34 +100,4 @@ type ResponseAllSpendingType struct {
 	ResponseSpendingType *[]ResponseSpendingTypeJoin `json:"spending_type"`
 	BudgetAmount         int                         `json:"budget_amount"`
 	FormatBudgetAmount   string                      `json:"format_budget_amount"`
-}
-
-type GetAllSpendingTypeByTime struct {
-	ProfileID string
-	StartTime time.Time
-	EndTime   time.Time
-}
-
-// SpendingTypeRepository spending history repository interface
-type SpendingTypeRepository interface {
-	Create(ctx context.Context, spendingType *SpendingType) error
-	Update(ctx context.Context, spendingType *SpendingType) error
-	Delete(ctx context.Context, id string, profileID string) error
-	CheckData(ctx context.Context, profileID string) (bool, error)
-	CheckByTitleAndProfileID(ctx context.Context, profileID string, title string) (bool, error)
-	GetDefault(ctx context.Context) (*[]SpendingType, error)
-	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)
-	GetAllByTimeAndProfileID(ctx context.Context, req *GetAllSpendingTypeByTime) (*[]SpendingTypeJoin, error)
-	GetAllByProfileID(ctx context.Context, profileID string) (*[]SpendingType, error)
-	UnitOfWorkRepository
-}
-
-// SpendingTypeUsecase spending history usecase interface
-type SpendingTypeUsecase interface {
-	Create(ctx context.Context, req *RequestCreateSpendingType) (*ResponseSpendingType, error)
-	Update(ctx context.Context, req *RequestUpdateSpendingType) (*ResponseSpendingType, error)
-	Delete(ctx context.Context, id string, profileID string) error
-	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseSpendingType, error)
-	GetAllByPeriodeAndProfileID(ctx context.Context, profileID string, periode int) (*ResponseAllSpendingType, error)
-	GetAllByProfileID(ctx context.Context, profileID string) (*[]ResponseSpendingType, error)
 }

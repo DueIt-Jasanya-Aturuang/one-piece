@@ -7,12 +7,12 @@ import (
 	middlewareChi "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/middleware"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/middleware"
+	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
+	usecase2 "github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
 )
 
 func main() {
@@ -23,27 +23,27 @@ func main() {
 	minioConn := infra.NewMinioConn()
 
 	// repository
-	uow := _repository.NewUnitOfWorkRepositoryImpl(pgConn)
-	paymentRepo := _repository.NewPaymentRepositoryImpl(uow)
-	minioRepo := _repository.NewMinioImpl(minioConn)
-	spendingTypeRepo := _repository.NewSpendingTypeRepositoryImpl(uow)
-	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
-	balanceRepo := _repository.NewBalanceRepositoryImpl(uow)
-	incomeTypeRepo := _repository.NewIncomeTypeRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(pgConn)
+	paymentRepo := _repository2.NewPaymentRepositoryImpl(uow)
+	minioRepo := _repository2.NewMinioImpl(minioConn)
+	spendingTypeRepo := _repository2.NewSpendingTypeRepositoryImpl(uow)
+	spendingHistoryRepo := _repository2.NewSpendingHistoryRepositoryImpl(uow)
+	balanceRepo := _repository2.NewBalanceRepositoryImpl(uow)
+	incomeTypeRepo := _repository2.NewIncomeTypeRepositoryImpl(uow)
 
 	// usecase
-	paymentUsecase := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
-	spendingTypeUsecase := _usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
-	spendingHistoryUsecase := _usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
-	balanceUsecase := _usecase.NewBalanceUsecaseImpl(balanceRepo)
-	incomeTypeUsecase := _usecase.NewIncomeTypeUsecaseImpl(incomeTypeRepo)
+	paymentUsecase := usecase2.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	spendingTypeUsecase := usecase2.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
+	spendingHistoryUsecase := usecase2.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
+	balanceUsecase := usecase2.NewBalanceUsecaseImpl(balanceRepo)
+	incomeTypeUsecase := usecase2.NewIncomeTypeUsecaseImpl(incomeTypeRepo)
 
 	// handler
-	paymentHandler := rest.NewPaymentHandlerImpl(paymentUsecase)
-	spendingTypeHandler := rest.NewSpendingTypeHandlerImpl(spendingTypeUsecase)
-	spendingHistoryHandler := rest.NewSpendingHistoryHandlerImpl(spendingHistoryUsecase)
-	balanceHandler := rest.NewBalanceHandlerImpl(balanceUsecase)
-	incomeTypeHandler := rest.NewIncomeTypeHandlerImpl(incomeTypeUsecase)
+	paymentHandler := rapi.NewPaymentHandlerImpl(paymentUsecase)
+	spendingTypeHandler := rapi.NewSpendingTypeHandlerImpl(spendingTypeUsecase)
+	spendingHistoryHandler := rapi.NewSpendingHistoryHandlerImpl(spendingHistoryUsecase)
+	balanceHandler := rapi.NewBalanceHandlerImpl(balanceUsecase)
+	incomeTypeHandler := rapi.NewIncomeTypeHandlerImpl(incomeTypeUsecase)
 
 	// route
 	r := chi.NewRouter()

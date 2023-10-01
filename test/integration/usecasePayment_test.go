@@ -10,17 +10,17 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
+	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/helper"
 )
 
 func UsecaseCreatePayment(t *testing.T) {
-	uow := _repository.NewUnitOfWorkRepositoryImpl(DB)
-	paymentRepo := _repository.NewPaymentRepositoryImpl(uow)
-	minioRepo := _repository.NewMinioImpl(minioClient)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(DB)
+	paymentRepo := _repository2.NewPaymentRepositoryImpl(uow)
+	minioRepo := _repository2.NewMinioImpl(minioClient)
 	ctx := context.TODO()
-	usecasePayment := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	usecasePayment := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 
 	t.Run("SUCCESS", func(t *testing.T) {
 		req := &domain.RequestCreatePayment{
@@ -51,11 +51,11 @@ func UsecaseCreatePayment(t *testing.T) {
 }
 
 func UsecaseCreatePayment409ERROR(t *testing.T) {
-	uow := _repository.NewUnitOfWorkRepositoryImpl(DB)
-	paymentRepo := _repository.NewPaymentRepositoryImpl(uow)
-	minioRepo := _repository.NewMinioImpl(minioClient)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(DB)
+	paymentRepo := _repository2.NewPaymentRepositoryImpl(uow)
+	minioRepo := _repository2.NewMinioImpl(minioClient)
 	ctx := context.TODO()
-	usecasePayment := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	usecasePayment := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 
 	t.Run("ERROR", func(t *testing.T) {
 		req := &domain.RequestCreatePayment{
@@ -74,11 +74,11 @@ func UsecaseCreatePayment409ERROR(t *testing.T) {
 }
 
 func UsecaseUpdatePayment(t *testing.T) {
-	uow := _repository.NewUnitOfWorkRepositoryImpl(DB)
-	paymentRepo := _repository.NewPaymentRepositoryImpl(uow)
-	minioRepo := _repository.NewMinioImpl(minioClient)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(DB)
+	paymentRepo := _repository2.NewPaymentRepositoryImpl(uow)
+	minioRepo := _repository2.NewMinioImpl(minioClient)
 	ctx := context.TODO()
-	usecasePayment := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	usecasePayment := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 
 	t.Run("SUCCESS", func(t *testing.T) {
 		req := &domain.RequestUpdatePayment{
@@ -125,11 +125,11 @@ func UsecaseUpdatePayment(t *testing.T) {
 }
 
 func UsecaseUpdatePaymentERROR(t *testing.T) {
-	uow := _repository.NewUnitOfWorkRepositoryImpl(DB)
-	paymentRepo := _repository.NewPaymentRepositoryImpl(uow)
-	minioRepo := _repository.NewMinioImpl(minioClient)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(DB)
+	paymentRepo := _repository2.NewPaymentRepositoryImpl(uow)
+	minioRepo := _repository2.NewMinioImpl(minioClient)
 	ctx := context.TODO()
-	usecasePayment := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	usecasePayment := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 
 	t.Run("ERROR_409", func(t *testing.T) {
 		req := &domain.RequestUpdatePayment{
@@ -165,11 +165,11 @@ func UsecaseUpdatePaymentERROR(t *testing.T) {
 }
 
 func UsecaseGetAllPayment(t *testing.T) {
-	uow := _repository.NewUnitOfWorkRepositoryImpl(DB)
-	paymentRepo := _repository.NewPaymentRepositoryImpl(uow)
-	minioRepo := _repository.NewMinioImpl(minioClient)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(DB)
+	paymentRepo := _repository2.NewPaymentRepositoryImpl(uow)
+	minioRepo := _repository2.NewMinioImpl(minioClient)
 	ctx := context.TODO()
-	usecasePayment := _usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	usecasePayment := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
 
 	payments, err := usecasePayment.GetAllByProfileID(ctx)
 	assert.NoError(t, err)

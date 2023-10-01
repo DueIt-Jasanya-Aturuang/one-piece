@@ -12,7 +12,7 @@ COPY go.mod go.sum ./
 # Download Go module dependencies
 RUN go mod download
 
-# Copy the rest of the application code to the container
+# Copy the rapi of the application code to the container
 COPY . .
 
 # Build the Go application

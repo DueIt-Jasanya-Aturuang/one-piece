@@ -6,6 +6,39 @@ import (
 	"time"
 )
 
+// SpendingHistoryRepository spending history repository interface
+type SpendingHistoryRepository interface {
+	Create(ctx context.Context, spendingHistory *SpendingHistory) error
+	Update(ctx context.Context, spendingHistory *SpendingHistory) error
+	Delete(ctx context.Context, id string, profileID string) error
+	GetAllByTimeAndProfileID(ctx context.Context, req *GetSpendingHistoryByTimeAndProfileID) (*[]SpendingHistoryJoin, error)
+	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingHistoryJoin, error)
+	UnitOfWorkRepository
+}
+
+// SpendingHistoryUsecase spending history usecase interface
+type SpendingHistoryUsecase interface {
+	Create(ctx context.Context, req *RequestCreateSpendingHistory) (*ResponseSpendingHistory, error)
+	Update(ctx context.Context, req *RequestUpdateSpendingHistory) (*ResponseSpendingHistory, error)
+	Delete(ctx context.Context, id string, profileID string) error
+	GetAllByTimeAndProfileID(ctx context.Context, req *GetFilteredDataSpendingHistory) (*[]ResponseSpendingHistory, error)
+	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseSpendingHistory, error)
+}
+
+type GetSpendingHistoryByTimeAndProfileID struct {
+	ProfileID string
+	StartTime time.Time
+	EndTime   time.Time
+}
+
+// GetFilteredDataSpendingHistory request get filtered data spending history
+type GetFilteredDataSpendingHistory struct {
+	ProfileID string
+	StartTime time.Time
+	EndTime   time.Time
+	Type      string
+}
+
 // SpendingHistory spending history entity
 type SpendingHistory struct {
 	ID                      string
@@ -65,14 +98,6 @@ type RequestUpdateSpendingHistory struct {
 	ShowTimeSpendingHistory string `json:"show_time_spending_history"`
 }
 
-// RequestGetFilteredDataSpendingHistory request get filtered data spending history
-type RequestGetFilteredDataSpendingHistory struct {
-	ProfileID string
-	StartTime time.Time
-	EndTime   time.Time
-	Type      string
-}
-
 // RequestValidatePaymentAndSpendingTypeID untuk validasi
 type RequestValidatePaymentAndSpendingTypeID struct {
 	ProfileID       string
@@ -96,29 +121,4 @@ type ResponseSpendingHistory struct {
 	Description             string    `json:"description"`
 	TimeSpendingHistory     time.Time `json:"time_spending_history"`
 	ShowTimeSpendingHistory string    `json:"show_time_spending_history"`
-}
-
-type GetSpendingHistoryByTimeAndProfileID struct {
-	ProfileID string
-	StartTime time.Time
-	EndTime   time.Time
-}
-
-// SpendingHistoryRepository spending history repository interface
-type SpendingHistoryRepository interface {
-	Create(ctx context.Context, spendingHistory *SpendingHistory) error
-	Update(ctx context.Context, spendingHistory *SpendingHistory) error
-	Delete(ctx context.Context, id string, profileID string) error
-	GetAllByTimeAndProfileID(ctx context.Context, req *GetSpendingHistoryByTimeAndProfileID) (*[]SpendingHistoryJoin, error)
-	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingHistoryJoin, error)
-	UnitOfWorkRepository
-}
-
-// SpendingHistoryUsecase spending history usecase interface
-type SpendingHistoryUsecase interface {
-	Create(ctx context.Context, req *RequestCreateSpendingHistory) (*ResponseSpendingHistory, error)
-	Update(ctx context.Context, req *RequestUpdateSpendingHistory) (*ResponseSpendingHistory, error)
-	Delete(ctx context.Context, id string, profileID string) error
-	GetAllByTimeAndProfileID(ctx context.Context, req *RequestGetFilteredDataSpendingHistory) (*[]ResponseSpendingHistory, error)
-	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseSpendingHistory, error)
 }

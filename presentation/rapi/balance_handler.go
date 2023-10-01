@@ -1,4 +1,4 @@
-package rest
+package rapi
 
 import (
 	"errors"
@@ -8,9 +8,9 @@ import (
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/api/rest/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
 )
 
 type BalanceHandlerImpl struct {
@@ -34,7 +34,7 @@ func (b BalanceHandlerImpl) GetByProfileID(w http.ResponseWriter, r *http.Reques
 
 	resp, err := b.balanceUsecase.GetByProfileID(r.Context(), profileID)
 	if err != nil {
-		if errors.Is(err, _usecase.BalanceNotExist) {
+		if errors.Is(err, usecase.BalanceNotExist) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 		}
 

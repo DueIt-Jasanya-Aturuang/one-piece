@@ -3,50 +3,7 @@ package domain
 import (
 	"context"
 	"database/sql"
-	"time"
 )
-
-type IncomeType struct {
-	ID          string
-	ProfileID   string
-	Name        string
-	Description sql.NullString
-	Icon        string
-	IncomeType  string
-	FixedIncome sql.NullBool
-	Periode     sql.NullString
-	Amount      sql.NullInt64
-	AuditInfo
-}
-
-type RequestCreateIncomeType struct {
-	ProfileID   string
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Icon        string `json:"icon"`
-}
-
-type RequestUpdateIncomeType struct {
-	ID          string
-	ProfileID   string
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Icon        string `json:"icon"`
-}
-
-type RequestGetAllIncomeType struct {
-	ProfileID string
-	StartTime time.Time
-	EndTime   time.Time
-}
-
-type ResponseIncomeType struct {
-	ID          string  `json:"id"`
-	ProfileID   string  `json:"profile_id"`
-	Name        string  `json:"name"`
-	Description *string `json:"description"`
-	Icon        string  `json:"icon"`
-}
 
 type IncomeTypeRepository interface {
 	Create(ctx context.Context, income *IncomeType) error
@@ -64,4 +21,43 @@ type IncomeTypeUsecase interface {
 	Delete(ctx context.Context, id string, profileID string) error
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseIncomeType, error)
 	GetAllByProfileID(ctx context.Context, profileID string) (*[]ResponseIncomeType, error)
+}
+
+// IncomeType MODEL
+type IncomeType struct {
+	ID          string
+	ProfileID   string
+	Name        string
+	Description sql.NullString
+	Icon        string
+	IncomeType  string
+	FixedIncome sql.NullBool
+	Periode     sql.NullString
+	Amount      sql.NullInt64
+	AuditInfo
+}
+
+// RequestCreateIncomeType REQUEST create schema for api
+type RequestCreateIncomeType struct {
+	ProfileID   string
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Icon        string `json:"icon"`
+}
+
+type RequestUpdateIncomeType struct {
+	ID          string
+	ProfileID   string
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Icon        string `json:"icon"`
+}
+
+// ResponseIncomeType response
+type ResponseIncomeType struct {
+	ID          string  `json:"id"`
+	ProfileID   string  `json:"profile_id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	Icon        string  `json:"icon"`
 }

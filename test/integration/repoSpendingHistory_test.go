@@ -124,7 +124,7 @@ func GetAllByTimeAndProfileIDSpendingHistory(t *testing.T) {
 
 		startTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().UTC().Day(), 0, 0, 0, 0, time.UTC)
 		endTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().UTC().Day(), 23, 59, 59, 0, time.UTC)
-		spendingHistories, err := SpendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.RequestGetFilteredDataSpendingHistory{
+		spendingHistories, err := SpendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.GetFilteredDataSpendingHistory{
 			ProfileID: "profileID1",
 			StartTime: startTime,
 			EndTime:   endTime,
@@ -144,7 +144,7 @@ func GetAllByTimeAndProfileIDSpendingHistory(t *testing.T) {
 		endTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().UTC().Day(), 23, 59, 59, 0, time.UTC)
 		startTime = startTime.Add(-24 * time.Hour)
 		endTime = endTime.Add(-24 * time.Hour)
-		spendingHistories, err := SpendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.RequestGetFilteredDataSpendingHistory{
+		spendingHistories, err := SpendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.GetFilteredDataSpendingHistory{
 			ProfileID: "profileID1",
 			StartTime: startTime,
 			EndTime:   endTime,

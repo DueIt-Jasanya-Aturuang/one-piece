@@ -6,7 +6,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
+	helper2 "github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/helper"
 )
 
 func CreateBalanceToModel(profileID string) *domain.Balance {
@@ -34,7 +34,7 @@ func UpdateBalanceToModel(id string, profileID string, amount int, amountBalance
 		Balance:             amountBalance,
 		AuditInfo: domain.AuditInfo{
 			UpdatedAt: time.Now().Unix(),
-			UpdatedBy: helper.NewNullString(profileID),
+			UpdatedBy: helper2.NewNullString(profileID),
 		},
 	}
 	return balance
@@ -45,10 +45,10 @@ func BalanceModelToResponse(b *domain.Balance) *domain.ResponseBalance {
 		ID:                        b.ID,
 		ProfileID:                 b.ProfileID,
 		TotalIncomeAmount:         b.TotalIncomeAmount,
-		TotalIncomeAmountFormat:   helper.FormatRupiah(b.TotalIncomeAmount),
+		TotalIncomeAmountFormat:   helper2.FormatRupiah(b.TotalIncomeAmount),
 		TotalSpendingAmount:       b.TotalSpendingAmount,
-		TotalSpendingAmountFormat: helper.FormatRupiah(b.TotalSpendingAmount),
+		TotalSpendingAmountFormat: helper2.FormatRupiah(b.TotalSpendingAmount),
 		Balance:                   b.Balance,
-		BalanceFormat:             helper.FormatRupiah(b.Balance),
+		BalanceFormat:             helper2.FormatRupiah(b.Balance),
 	}
 }

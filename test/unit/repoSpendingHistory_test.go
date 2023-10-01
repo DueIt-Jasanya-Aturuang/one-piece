@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/_repository"
+	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
 )
 
 func TestSpendingHistoryCreate(t *testing.T) {
@@ -19,8 +19,8 @@ func TestSpendingHistoryCreate(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingHistoryRepo := _repository2.NewSpendingHistoryRepositoryImpl(uow)
 	spendingHistory := &domain.SpendingHistory{
 		ID:                      "test",
 		ProfileID:               "test",
@@ -70,8 +70,8 @@ func TestSpendingHistoryUpdate(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingHistoryRepo := _repository2.NewSpendingHistoryRepositoryImpl(uow)
 	spendingHistory := &domain.SpendingHistory{
 		ID:                      "test",
 		ProfileID:               "test",
@@ -120,8 +120,8 @@ func TestSpendingHistoryDelete(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingHistoryRepo := _repository2.NewSpendingHistoryRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`UPDATE t_spending_history SET deleted_at = $1, deleted_by = $2
                               WHERE id = $3 AND profile_id = $4`)
@@ -151,8 +151,8 @@ func TestSpendingHistoryGetAllByTimeAndProfileID(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingHistoryRepo := _repository2.NewSpendingHistoryRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`SELECT tsh.id, tsh.profile_id, tsh.spending_type_id, tsh.payment_method_id, tsh.payment_name, tsh.before_balance, 
        				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.location, tsh.time_spending_history, tsh.show_time_spending_history, 
@@ -179,7 +179,7 @@ func TestSpendingHistoryGetAllByTimeAndProfileID(t *testing.T) {
 		err = spendingHistoryRepo.OpenConn(context.TODO())
 		defer spendingHistoryRepo.CloseConn()
 
-		spendingHistories, err := spendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.RequestGetFilteredDataSpendingHistory{
+		spendingHistories, err := spendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.GetFilteredDataSpendingHistory{
 			ProfileID: "profileID",
 			StartTime: start,
 			EndTime:   end,
@@ -200,7 +200,7 @@ func TestSpendingHistoryGetAllByTimeAndProfileID(t *testing.T) {
 		err = spendingHistoryRepo.OpenConn(context.TODO())
 		defer spendingHistoryRepo.CloseConn()
 
-		spendingHistories, err := spendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.RequestGetFilteredDataSpendingHistory{
+		spendingHistories, err := spendingHistoryRepo.GetAllByTimeAndProfileID(context.TODO(), &domain.GetFilteredDataSpendingHistory{
 			ProfileID: "profileID",
 			StartTime: start,
 			EndTime:   end,
@@ -218,8 +218,8 @@ func TestSpendingHistoryGetByIDAndProfileID(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := _repository.NewUnitOfWorkRepositoryImpl(db)
-	spendingHistoryRepo := _repository.NewSpendingHistoryRepositoryImpl(uow)
+	uow := _repository2.NewUnitOfWorkRepositoryImpl(db)
+	spendingHistoryRepo := _repository2.NewSpendingHistoryRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`SELECT tsh.id, tsh.profile_id, tsh.spending_type_id, tsh.payment_method_id, tsh.payment_name, tsh.before_balance, 
        				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.location, tsh.time_spending_history, tsh.show_time_spending_history, 

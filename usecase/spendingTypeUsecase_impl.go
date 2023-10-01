@@ -1,4 +1,4 @@
-package _usecase
+package usecase
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/converter"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/converter"
+	helper2 "github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/helper"
 )
 
 type SpendingTypeUsecaseImpl struct {
@@ -40,7 +40,7 @@ func (s *SpendingTypeUsecaseImpl) Create(ctx context.Context, req *domain.Reques
 	}
 
 	spendingType := converter.SpendingTypeRequestCreateToModel(req)
-	err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+	err = s.spendingTypeRepo.StartTx(ctx, helper2.LevelReadCommitted(), func() error {
 		err = s.spendingTypeRepo.Create(ctx, spendingType)
 		if err != nil {
 			return err
@@ -52,7 +52,7 @@ func (s *SpendingTypeUsecaseImpl) Create(ctx context.Context, req *domain.Reques
 		return nil, err
 	}
 
-	formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
+	formatMaximumLimit := helper2.FormatRupiah(spendingType.MaximumLimit)
 	spendingTypeResponse := converter.SpendingTypeModelToResponse(spendingType, formatMaximumLimit)
 
 	return spendingTypeResponse, nil
@@ -84,7 +84,7 @@ func (s *SpendingTypeUsecaseImpl) Update(ctx context.Context, req *domain.Reques
 	}
 
 	spendingType = converter.SpendingTypeRequestUpdateToModel(req)
-	err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+	err = s.spendingTypeRepo.StartTx(ctx, helper2.LevelReadCommitted(), func() error {
 		err = s.spendingTypeRepo.Update(ctx, spendingType)
 		if err != nil {
 			return err
@@ -96,7 +96,7 @@ func (s *SpendingTypeUsecaseImpl) Update(ctx context.Context, req *domain.Reques
 		return nil, err
 	}
 
-	formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
+	formatMaximumLimit := helper2.FormatRupiah(spendingType.MaximumLimit)
 	spendingTypeResponse := converter.SpendingTypeModelToResponse(spendingType, formatMaximumLimit)
 
 	return spendingTypeResponse, nil
@@ -109,7 +109,7 @@ func (s *SpendingTypeUsecaseImpl) Delete(ctx context.Context, id string, profile
 	}
 	defer s.spendingTypeRepo.CloseConn()
 
-	err = s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+	err = s.spendingTypeRepo.StartTx(ctx, helper2.LevelReadCommitted(), func() error {
 		err = s.spendingTypeRepo.Delete(ctx, id, profileID)
 		if err != nil {
 			return err
@@ -140,7 +140,7 @@ func (s *SpendingTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id st
 		return nil, err
 	}
 
-	formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
+	formatMaximumLimit := helper2.FormatRupiah(spendingType.MaximumLimit)
 	spendingTypeResponse := converter.SpendingTypeModelToResponse(spendingType, formatMaximumLimit)
 
 	return spendingTypeResponse, nil
@@ -165,7 +165,7 @@ func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Contex
 		}
 	}
 
-	startTime, endTime, err := helper.TimeDate(periode)
+	startTime, endTime, err := helper2.TimeDate(periode)
 	if err != nil {
 		return nil, err
 	}
@@ -187,9 +187,9 @@ func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Contex
 
 	for _, spendingType := range *spendingTypes {
 		budgetAmount += spendingType.Used
-		formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
-		formatUsed := helper.FormatRupiah(spendingType.Used)
-		persentaseMaximumLimit := helper.Persentase(spendingType.Used, spendingType.MaximumLimit)
+		formatMaximumLimit := helper2.FormatRupiah(spendingType.MaximumLimit)
+		formatUsed := helper2.FormatRupiah(spendingType.Used)
+		persentaseMaximumLimit := helper2.Persentase(spendingType.Used, spendingType.MaximumLimit)
 
 		spendingTypeJoinResponse = converter.SpendingTypeModelJoinToResponse(spendingType, persentaseMaximumLimit, formatMaximumLimit, formatUsed)
 		spendingTypeJoinResponses = append(spendingTypeJoinResponses, spendingTypeJoinResponse)
@@ -198,7 +198,7 @@ func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Contex
 	respAll := &domain.ResponseAllSpendingType{
 		ResponseSpendingType: &spendingTypeJoinResponses,
 		BudgetAmount:         budgetAmount,
-		FormatBudgetAmount:   helper.FormatRupiah(budgetAmount),
+		FormatBudgetAmount:   helper2.FormatRupiah(budgetAmount),
 	}
 	return respAll, nil
 }
@@ -231,7 +231,7 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 	var spendingTypeResponse domain.ResponseSpendingType
 
 	for _, spendingType := range *spendingTypes {
-		formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
+		formatMaximumLimit := helper2.FormatRupiah(spendingType.MaximumLimit)
 
 		spendingTypeResponse = *converter.SpendingTypeModelToResponse(&spendingType, formatMaximumLimit)
 		spendingTypeResponses = append(spendingTypeResponses, spendingTypeResponse)
@@ -241,7 +241,7 @@ func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profile
 }
 
 func (s *SpendingTypeUsecaseImpl) createDefaultSpendingType(ctx context.Context, profileID string) error {
-	err := s.spendingTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
+	err := s.spendingTypeRepo.StartTx(ctx, helper2.LevelReadCommitted(), func() error {
 		spendingTypes, err := s.spendingTypeRepo.GetDefault(ctx)
 		if err != nil {
 			return err

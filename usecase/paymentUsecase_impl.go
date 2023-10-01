@@ -1,4 +1,4 @@
-package _usecase
+package usecase
 
 import (
 	"context"
@@ -13,8 +13,8 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/converter"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/converter"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/helper"
 )
 
 type PaymentUsecaseImpl struct {

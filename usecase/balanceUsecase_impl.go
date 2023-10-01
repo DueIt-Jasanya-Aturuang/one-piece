@@ -1,4 +1,4 @@
-package _usecase
+package usecase
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/pkg/converter"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/converter"
 )
 
 type BalanceUsecaseImpl struct {
