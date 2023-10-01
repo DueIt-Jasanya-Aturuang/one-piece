@@ -73,9 +73,9 @@ func (i *IncomeHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Reque
 		}
 		id = incomeHistory.ID
 
-		amountSpending := balance.TotalIncomeAmount + req.IncomeAmount
+		amountIncome := balance.TotalIncomeAmount + req.IncomeAmount
 		amountBalance := balance.Balance + req.IncomeAmount
-		balance = converter.UpdateBalanceIncomeToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
+		balance = converter.UpdateBalanceToModel(balance.ID, req.ProfileID, balance.TotalSpendingAmount, amountIncome, amountBalance)
 		err = i.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
 			return err
@@ -147,9 +147,9 @@ func (i *IncomeHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Reque
 			return err
 		}
 
-		amountSpending := balance.TotalIncomeAmount + req.IncomeAmount
+		amountIncome := balance.TotalIncomeAmount + req.IncomeAmount - incomeHistory.IncomeAmount
 		amountBalance := balance.Balance + req.IncomeAmount
-		balance = converter.UpdateBalanceIncomeToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
+		balance = converter.UpdateBalanceToModel(balance.ID, req.ProfileID, balance.TotalSpendingAmount, amountIncome, amountBalance)
 		err = i.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
 			return err
@@ -201,7 +201,7 @@ func (i *IncomeHistoryUsecaseImpl) Delete(ctx context.Context, id string, profil
 	err = i.incomeHistoryRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		incomeAmount := balance.TotalIncomeAmount - incomeHistoryJoin.IncomeAmount
 		balanceAmount := balance.Balance - incomeHistoryJoin.IncomeAmount
-		balance = converter.UpdateBalanceIncomeToModel(balance.ID, profileID, incomeAmount, balanceAmount)
+		balance = converter.UpdateBalanceToModel(balance.ID, profileID, balance.TotalSpendingAmount, incomeAmount, balanceAmount)
 
 		err = i.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
