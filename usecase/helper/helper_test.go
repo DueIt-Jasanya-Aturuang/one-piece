@@ -19,7 +19,7 @@ func TestPersentase(t *testing.T) {
 }
 
 func TestFormatRupiah(t *testing.T) {
-	rp := 0
+	rp := 2000000000000
 
 	res := FormatRupiah(rp)
 	t.Log(res)

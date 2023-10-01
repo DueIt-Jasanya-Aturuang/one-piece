@@ -26,12 +26,26 @@ func CreateBalanceToModel(profileID string) *domain.Balance {
 	return balance
 }
 
-func UpdateBalanceToModel(id string, profileID string, amount int, amountBalance int) *domain.Balance {
+func UpdateBalanceSpendingToModel(id string, profileID string, amount int, amountBalance int) *domain.Balance {
 	balance := &domain.Balance{
 		ID:                  id,
 		ProfileID:           profileID,
 		TotalSpendingAmount: amount,
 		Balance:             amountBalance,
+		AuditInfo: domain.AuditInfo{
+			UpdatedAt: time.Now().Unix(),
+			UpdatedBy: helper2.NewNullString(profileID),
+		},
+	}
+	return balance
+}
+
+func UpdateBalanceIncomeToModel(id string, profileID string, amount int, amountBalance int) *domain.Balance {
+	balance := &domain.Balance{
+		ID:                id,
+		ProfileID:         profileID,
+		TotalIncomeAmount: amount,
+		Balance:           amountBalance,
 		AuditInfo: domain.AuditInfo{
 			UpdatedAt: time.Now().Unix(),
 			UpdatedBy: helper2.NewNullString(profileID),

@@ -12,8 +12,10 @@ func FormatRupiah(num int) string {
 
 	if string(numStr[0]) == "-" {
 		for i, char := range numStr {
-			if (len(numStr)-i)%3 == 0 && i != 1 {
-				formatted += "."
+			if string(numStr[i]) != "-" {
+				if (len(numStr)-i)%3 == 0 && i != 1 {
+					formatted += "."
+				}
 			}
 
 			formatted += string(char)

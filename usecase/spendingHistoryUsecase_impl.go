@@ -75,7 +75,7 @@ func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Req
 
 		amountSpending := balance.TotalSpendingAmount + req.SpendingAmount
 		amountBalance := balance.Balance - req.SpendingAmount
-		balance = converter.UpdateBalanceToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
+		balance = converter.UpdateBalanceSpendingToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
 		err = s.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
 			return err
@@ -144,7 +144,7 @@ func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Req
 		beforeBalance := balance.Balance + spendingHistoryJoin.SpendingAmount
 		amountSpending := balance.TotalSpendingAmount + req.SpendingAmount - spendingHistoryJoin.SpendingAmount
 		amountBalance := balance.Balance - req.SpendingAmount + spendingHistoryJoin.SpendingAmount
-		balance = converter.UpdateBalanceToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
+		balance = converter.UpdateBalanceSpendingToModel(balance.ID, req.ProfileID, amountSpending, amountBalance)
 
 		err = s.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
@@ -203,7 +203,7 @@ func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, prof
 	err = s.spendingHistoryRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		spendingAmount := balance.TotalSpendingAmount - spendingHistoryJoin.SpendingAmount
 		balanceAmount := balance.Balance + spendingHistoryJoin.SpendingAmount
-		balance = converter.UpdateBalanceToModel(balance.ID, profileID, spendingAmount, balanceAmount)
+		balance = converter.UpdateBalanceSpendingToModel(balance.ID, profileID, spendingAmount, balanceAmount)
 
 		err = s.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
