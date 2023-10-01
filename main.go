@@ -11,8 +11,8 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/middleware"
-	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
-	usecase2 "github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
 )
 
 func main() {
@@ -23,20 +23,22 @@ func main() {
 	minioConn := infra.NewMinioConn()
 
 	// repository
-	uow := _repository2.NewUnitOfWorkRepositoryImpl(pgConn)
-	paymentRepo := _repository2.NewPaymentRepositoryImpl(uow)
-	minioRepo := _repository2.NewMinioImpl(minioConn)
-	spendingTypeRepo := _repository2.NewSpendingTypeRepositoryImpl(uow)
-	spendingHistoryRepo := _repository2.NewSpendingHistoryRepositoryImpl(uow)
-	balanceRepo := _repository2.NewBalanceRepositoryImpl(uow)
-	incomeTypeRepo := _repository2.NewIncomeTypeRepositoryImpl(uow)
+	uow := repository.NewUnitOfWorkRepositoryImpl(pgConn)
+	paymentRepo := repository.NewPaymentRepositoryImpl(uow)
+	minioRepo := repository.NewMinioImpl(minioConn)
+	spendingTypeRepo := repository.NewSpendingTypeRepositoryImpl(uow)
+	spendingHistoryRepo := repository.NewSpendingHistoryRepositoryImpl(uow)
+	balanceRepo := repository.NewBalanceRepositoryImpl(uow)
+	incomeTypeRepo := repository.NewIncomeTypeRepositoryImpl(uow)
+	incomeHistoryRepo := repository.NewIncomeHistoryRepositoryImpl(uow)
 
 	// usecase
-	paymentUsecase := usecase2.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
-	spendingTypeUsecase := usecase2.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
-	spendingHistoryUsecase := usecase2.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
-	balanceUsecase := usecase2.NewBalanceUsecaseImpl(balanceRepo)
-	incomeTypeUsecase := usecase2.NewIncomeTypeUsecaseImpl(incomeTypeRepo)
+	paymentUsecase := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	spendingTypeUsecase := usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
+	spendingHistoryUsecase := usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
+	balanceUsecase := usecase.NewBalanceUsecaseImpl(balanceRepo)
+	incomeTypeUsecase := usecase.NewIncomeTypeUsecaseImpl(incomeTypeRepo)
+	incomeHistoryUsecase := usecase.NewIncomeHistoryUsecaseImpl(incomeTypeRepo, incomeHistoryRepo, paymentRepo, balanceRepo)
 
 	// handler
 	paymentHandler := rapi.NewPaymentHandlerImpl(paymentUsecase)
@@ -44,6 +46,7 @@ func main() {
 	spendingHistoryHandler := rapi.NewSpendingHistoryHandlerImpl(spendingHistoryUsecase)
 	balanceHandler := rapi.NewBalanceHandlerImpl(balanceUsecase)
 	incomeTypeHandler := rapi.NewIncomeTypeHandlerImpl(incomeTypeUsecase)
+	incomeHistoryHandler := rapi.NewIncomeHistoryHandlerImpl(incomeHistoryUsecase)
 
 	// route
 	r := chi.NewRouter()
@@ -77,6 +80,12 @@ func main() {
 		r.Post("/income-type", incomeTypeHandler.Create)
 		r.Put("/income-type/{id}", incomeTypeHandler.Update)
 		r.Delete("/income-type/{id}", incomeTypeHandler.Delete)
+
+		r.Get("/income-history", incomeHistoryHandler.GetAllByProfileID)
+		r.Get("/income-history/{id}", incomeHistoryHandler.GetByIDAndProfileID)
+		r.Post("/income-history", incomeHistoryHandler.Create)
+		r.Put("/income-history/{id}", incomeHistoryHandler.Update)
+		r.Delete("/income-history/{id}", incomeHistoryHandler.Delete)
 
 		r.Get("/balance", balanceHandler.GetByProfileID)
 	})
