@@ -288,12 +288,14 @@ func (i *IncomeHistoryUsecaseImpl) validateIncomeTypeAndPaymend(ctx context.Cont
 		return InvalidIncomeTypeID
 	}
 
-	_, err = i.paymentRepo.GetByIDAndProfileID(ctx, req.PaymentMethodID, req.ProfileID)
-	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			return err
+	if req.PaymentMethodID != "" {
+		_, err = i.paymentRepo.GetByIDAndProfileID(ctx, req.PaymentMethodID, req.ProfileID)
+		if err != nil {
+			if !errors.Is(err, sql.ErrNoRows) {
+				return err
+			}
+			return InvalidPaymentMethodID
 		}
-		return InvalidPaymentMethodID
 	}
 
 	return nil

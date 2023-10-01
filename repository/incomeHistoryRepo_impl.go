@@ -250,7 +250,7 @@ func (i *IncomeHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context, i
 				FROM t_income_history tih
 				JOIN m_income_type mit ON tih.income_type_id = mit.id
 				LEFT JOIN m_payment_methods mpm ON tih.payment_method_id = mpm.id
-				WHERE tih.profile_id=$1 AND tih.profile_id=$2 AND tih.deleted_at IS NULL`
+				WHERE tih.id=$1 AND tih.profile_id=$2 AND tih.deleted_at IS NULL`
 
 	conn, err := i.GetConn()
 	if err != nil {
