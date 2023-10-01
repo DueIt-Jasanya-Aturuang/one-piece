@@ -143,7 +143,7 @@ func (i *IncomeHistoryRepositoryImpl) Delete(ctx context.Context, id string, pro
 func (i *IncomeHistoryRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetIncomeHistoryByTimeAndProfileID) (*[]domain.IncomeHistoryJoin, error) {
 	query := `SELECT tih.id, tih.profile_id, tih.income_type_id, tih.payment_method_id, tih.payment_name, tih.income_amount, tih.description, 
        					tih.time_income_history, tih.show_time_income_history, tih.created_at, tih.created_by, tih.updated_at, tih.updated_by, 
-       					tih.deleted_at, tih.deleted_by, mit.title, mpm.name
+       					tih.deleted_at, tih.deleted_by, mit.name, mpm.name
 				FROM t_income_history tih
 				JOIN m_income_type mit ON tih.income_type_id = mit.id
 				LEFT JOIN m_payment_methods mpm ON tih.payment_method_id = mpm.id
@@ -246,7 +246,7 @@ func (i *IncomeHistoryRepositoryImpl) GetTotalIncomeByPeriode(ctx context.Contex
 func (i *IncomeHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.IncomeHistoryJoin, error) {
 	query := `SELECT tih.id, tih.profile_id, tih.income_type_id, tih.payment_method_id, tih.payment_name, tih.income_amount, tih.description, 
        					tih.time_income_history, tih.show_time_income_history, tih.created_at, tih.created_by, tih.updated_at, tih.updated_by, 
-       					tih.deleted_at, tih.deleted_by, mit.title, mpm.name
+       					tih.deleted_at, tih.deleted_by, mit.name, mpm.name
 				FROM t_income_history tih
 				JOIN m_income_type mit ON tih.income_type_id = mit.id
 				LEFT JOIN m_payment_methods mpm ON tih.payment_method_id = mpm.id
