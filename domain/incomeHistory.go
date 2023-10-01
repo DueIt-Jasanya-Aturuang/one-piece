@@ -34,7 +34,7 @@ type GetFilteredDataIncomeHistory struct {
 
 type ValidatePaymentAndIncomeTypeID struct {
 	ProfileID       string
-	SpendingTypeID  string
+	IncomeTypeID    string
 	PaymentMethodID string
 }
 
