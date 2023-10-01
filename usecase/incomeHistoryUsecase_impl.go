@@ -199,9 +199,9 @@ func (i *IncomeHistoryUsecaseImpl) Delete(ctx context.Context, id string, profil
 	}
 
 	err = i.incomeHistoryRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
-		spendingAmount := balance.TotalIncomeAmount - incomeHistoryJoin.IncomeAmount
+		incomeAmount := balance.TotalIncomeAmount - incomeHistoryJoin.IncomeAmount
 		balanceAmount := balance.Balance - incomeHistoryJoin.IncomeAmount
-		balance = converter.UpdateBalanceToModel(balance.ID, profileID, spendingAmount, balanceAmount)
+		balance = converter.UpdateBalanceToModel(balance.ID, profileID, incomeAmount, balanceAmount)
 
 		err = i.balanceRepo.UpdateByProfileID(ctx, balance)
 		if err != nil {
@@ -269,7 +269,7 @@ func (i *IncomeHistoryUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id s
 	incomeHistory, err := i.incomeHistoryRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, SpendingHistoryNotFound
+			return nil, IncomeHistoryNotFound
 		}
 		return nil, err
 	}
