@@ -16,6 +16,7 @@ func EnvInit() {
 
 	// app
 	AppAddr = os.Getenv("APPLICATION_ADDR")
+	AppApiKeyFinance = os.Getenv("APPLICATION_KEY_FINANCE")
 
 	// pg db
 	PgHost = os.Getenv("POSTGRESQL_HOST")
@@ -39,7 +40,8 @@ func EnvInit() {
 }
 
 var (
-	AppAddr string
+	AppAddr          string
+	AppApiKeyFinance string
 )
 var (
 	PgHost   string

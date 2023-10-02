@@ -52,6 +52,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middlewareChi.Logger)
 	r.Use(middlewareChi.Recoverer)
+	r.Use(middleware.CheckApiKey)
 	r.MethodNotAllowed(helper.MethodNotAllowed)
 
 	r.Route("/finance", func(r chi.Router) {
