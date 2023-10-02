@@ -32,3 +32,8 @@ const (
 	LogErrDecode = "failed decode data | err : %v"
 	LogErrEncode = "failed encode | data : %v | err : %v"
 )
+
+const (
+	LogErrMarshal   = "failed marshal | data %v | err : %v"
+	LogErrUnmarshal = "failed unmarshal | data : %v | err : %v"
+)

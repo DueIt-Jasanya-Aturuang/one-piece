@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/oklog/ulid/v2"
 	"github.com/rs/zerolog/log"
-	uuid "github.com/satori/go.uuid"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
@@ -142,37 +142,39 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 	return paymentResponse, nil
 }
 
-func (p *PaymentUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.ResponsePayment, error) {
+func (p *PaymentUsecaseImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaymentPaginate) (*[]domain.ResponsePayment, string, error) {
 	if err := p.paymentRepo.OpenConn(ctx); err != nil {
-		return nil, err
+		return nil, "0", err
 	}
 	defer p.paymentRepo.CloseConn()
 
-	exist, err := p.paymentRepo.CheckData(ctx, profileID)
+	exist, err := p.paymentRepo.CheckData(ctx, req.ProfileID)
 	if err != nil {
-		return nil, err
+		return nil, "0", err
 	}
 
 	if !exist {
-		err = p.createDefaultPayment(ctx, profileID)
+		err = p.createDefaultPayment(ctx, req.ProfileID)
 		if err != nil {
-			return nil, err
+			return nil, "0", err
 		}
 	}
 
-	payments, err := p.paymentRepo.GetAllByProfileID(ctx, profileID)
+	payments, err := p.paymentRepo.GetAllByProfileID(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, "0", err
 	}
 
 	var responses []domain.ResponsePayment
-
+	var cursor string
 	for _, payment := range *payments {
 		paymentConv := converter.PaymentGetAllPaymentModelToResp(payment)
 		responses = append(responses, paymentConv)
+
+		cursor = paymentConv.ID
 	}
 
-	return &responses, nil
+	return &responses, cursor, nil
 }
 
 func (p *PaymentUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
@@ -223,7 +225,7 @@ func (p *PaymentUsecaseImpl) createDefaultPayment(ctx context.Context, profileID
 
 		for _, payment := range *payments {
 			payment.ProfileID = profileID
-			payment.ID = uuid.NewV4().String()
+			payment.ID = ulid.Make().String()
 			err = p.paymentRepo.Create(ctx, &payment)
 			if err != nil {
 				return err

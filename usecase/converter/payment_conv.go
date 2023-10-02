@@ -4,16 +4,16 @@ import (
 	"database/sql"
 	"time"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/helper"
 )
 
 func CreatePaymentReqToModel(req *domain.RequestCreatePayment, fileName string) *domain.Payment {
-	id := uuid.NewV4().String()
+	id := ulid.Make()
 	payment := &domain.Payment{
-		ID:          id,
+		ID:          id.String(),
 		ProfileID:   req.ProfileID,
 		Name:        req.Name,
 		Description: helper.NewNullString(req.Description),

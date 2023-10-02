@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 )
@@ -54,10 +55,14 @@ func CreatePayment(req *domain.RequestCreatePayment) error {
 func UpdatePayment(req *domain.RequestUpdatePayment) error {
 	err := map[string][]string{}
 
+	if _, err := ulid.Parse(req.ID); err != nil {
+		return _error.HttpErrString("invalid id", response.CM05)
+	}
+
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
 		return _error.HttpErrString("invalid profile id", response.CM05)
 	}
-	
+
 	if req.Image != nil {
 		if req.Image != nil && req.Image.Size > 0 {
 			if req.Image.Size > 2097152 {

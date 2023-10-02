@@ -1,10 +1,12 @@
 package helper
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
@@ -73,4 +75,13 @@ func TestTimeDateByTypeFilter(t *testing.T) {
 		assert.NoError(t, err)
 		t.Logf("start : %v | end : %v", startTime, endTime)
 	})
+}
+
+func TestUlid(t *testing.T) {
+	ulid1 := ulid.Make()
+	time.Sleep(1 * time.Millisecond)
+	ulid2 := ulid.Make()
+	fmt.Println(ulid1.Time())
+	fmt.Println(ulid1.String())
+	fmt.Println(ulid2.Time())
 }

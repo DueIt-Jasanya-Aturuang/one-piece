@@ -251,10 +251,14 @@ func (p *PaymentRepositoryImpl) GetByNameAndProfileID(ctx context.Context, name 
 	return &payment, nil
 }
 
-func (p *PaymentRepositoryImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.Payment, error) {
+func (p *PaymentRepositoryImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaymentPaginate) (*[]domain.Payment, error) {
 	query := `SELECT id, profile_id, name, description, image, created_at, created_by, 
-       				updated_at, updated_by, deleted_at, deleted_by 
-			 FROM m_payment_methods WHERE profile_id = $1 AND deleted_at IS NULL`
+       			updated_at, updated_by, deleted_at, deleted_by
+          FROM m_payment_methods WHERE profile_id = $1 AND deleted_at IS NULL `
+	if req.ID != "" {
+		query += `AND id ` + req.Operation + ` $2 `
+	}
+	query += `ORDER BY id ` + req.Order + ` LIMIT 5`
 
 	conn, err := p.GetConn()
 	if err != nil {
@@ -272,7 +276,13 @@ func (p *PaymentRepositoryImpl) GetAllByProfileID(ctx context.Context, profileID
 		}
 	}()
 
-	rows, err := stmt.QueryContext(ctx, profileID)
+	var rows *sql.Rows
+	if req.ID != "" {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID, req.ID)
+	} else {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID)
+	}
+
 	if err != nil {
 		log.Warn().Msgf(util.LogErrQueryRows, err)
 		return nil, err

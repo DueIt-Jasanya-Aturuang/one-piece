@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
@@ -75,12 +76,7 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := chi.URLParam(r, "id")
-	if id == "" {
-		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
-		return
-	}
 	profileID := r.Header.Get("Profile-ID")
-
 	req.ProfileID = profileID
 	req.ID = id
 
@@ -114,19 +110,32 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 
 func (h *PaymentHandlerImpl) GetAll(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
-
+	cursor := r.URL.Query().Get("cursor")
+	order := r.URL.Query().Get("order")
 	if _, err := uuid.Parse(profileID); err != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
 		return
 	}
 
-	payments, err := h.paymentUsecase.GetAllByProfileID(r.Context(), profileID)
+	order, operation := helper.GetOrder(order)
+
+	req := &domain.RequestGetAllPaymentPaginate{
+		ProfileID: profileID,
+		ID:        cursor,
+		Operation: operation,
+		Order:     order,
+	}
+	payments, cursorResp, err := h.paymentUsecase.GetAllByProfileID(r.Context(), req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	helper.SuccessResponseEncode(w, payments, "data payment")
+	resp := map[string]any{
+		"payments": payments,
+		"cursor":   cursorResp,
+	}
+	helper.SuccessResponseEncode(w, resp, "data payment")
 }
 
 func (h *PaymentHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
@@ -137,7 +146,7 @@ func (h *PaymentHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
 		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
 		return
 	}
-	if _, err := uuid.Parse(id); err != nil {
+	if _, err := ulid.Parse(id); err != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid id", response.CM05))
 		return
 	}
