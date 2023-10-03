@@ -146,8 +146,9 @@ func (h *PaymentHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
 		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
 		return
 	}
+
 	if _, err := ulid.Parse(id); err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid id", response.CM05))
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
 		return
 	}
 

@@ -33,7 +33,7 @@ func CreateSpendingHistory(req *domain.RequestCreateSpendingHistory) error {
 	}
 
 	if req.PaymentMethodID != "" {
-		if _, errParse := uuid.Parse(req.PaymentMethodID); errParse != nil {
+		if _, errParse := ulid.Parse(req.PaymentMethodID); errParse != nil {
 			err["payment_method_id"] = append(err["payment_method_id"], "invalid payment method id")
 		}
 	}
@@ -96,7 +96,7 @@ func UpdateSpendingHistory(req *domain.RequestUpdateSpendingHistory) error {
 	}
 
 	if req.PaymentMethodID != "" {
-		if _, errParse := uuid.Parse(req.PaymentMethodID); errParse != nil {
+		if _, errParse := ulid.Parse(req.PaymentMethodID); errParse != nil {
 			err["payment_method_id"] = append(err["payment_method_id"], "invalid payment method id")
 		}
 	}

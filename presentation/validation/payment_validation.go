@@ -56,7 +56,7 @@ func UpdatePayment(req *domain.RequestUpdatePayment) error {
 	err := map[string][]string{}
 
 	if _, err := ulid.Parse(req.ID); err != nil {
-		return _error.HttpErrString("invalid id", response.CM05)
+		return _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 	}
 
 	if _, err := uuid.Parse(req.ProfileID); err != nil {

@@ -111,7 +111,7 @@ func (h *SpendingTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request)
 	}
 	_, err = ulid.Parse(id)
 	if err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
 		return
 	}
 

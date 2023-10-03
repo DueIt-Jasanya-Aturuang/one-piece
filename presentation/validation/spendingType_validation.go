@@ -51,7 +51,7 @@ func UpdateSpendingType(req *domain.RequestUpdateSpendingType) error {
 	}
 
 	if _, err := ulid.Parse(req.ID); err != nil {
-		return _error.HttpErrString("invalid id", response.CM05)
+		return _error.HttpErrString("not found", response.CM01)
 	}
 
 	if req.Title == "" {
