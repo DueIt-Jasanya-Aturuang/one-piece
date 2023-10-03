@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
@@ -98,7 +99,7 @@ func (i *IncomeTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	profileID := r.Header.Get("Profile-ID")
 
-	if _, err := uuid.Parse(id); err != nil {
+	if _, err := ulid.Parse(id); err != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
 		return
 	}
@@ -120,7 +121,7 @@ func (i *IncomeTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *ht
 	id := chi.URLParam(r, "id")
 	profileID := r.Header.Get("Profile-ID")
 
-	if _, err := uuid.Parse(id); err != nil {
+	if _, err := ulid.Parse(id); err != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
 		return
 	}
@@ -149,11 +150,27 @@ func (i *IncomeTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *http
 		return
 	}
 
-	resps, err := i.incomeTypeUsecase.GetAllByProfileID(r.Context(), profileID)
+	cursor := r.URL.Query().Get("cursor")
+	order := r.URL.Query().Get("order")
+	order, operation := helper.GetOrder(order)
+
+	req := &domain.RequestGetAllPaginate{
+		ProfileID: profileID,
+		ID:        cursor,
+		Operation: operation,
+		Order:     order,
+	}
+
+	incomeTypes, cursorResp, err := i.incomeTypeUsecase.GetAllByProfileID(r.Context(), req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	helper.SuccessResponseEncode(w, resps, "data pemasukan kategori")
+	resp := map[string]any{
+		"cursor":      cursorResp,
+		"income_type": incomeTypes,
+	}
+
+	helper.SuccessResponseEncode(w, resp, "data pemasukan kategori")
 }

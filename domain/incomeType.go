@@ -11,7 +11,7 @@ type IncomeTypeRepository interface {
 	Delete(ctx context.Context, id string, profileID string) error
 	CheckByNameAndProfileID(ctx context.Context, profileID string, name string) (bool, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*IncomeType, error)
-	GetAllByProfileID(ctx context.Context, profileID string) (*[]IncomeType, error)
+	GetAllByProfileID(ctx context.Context, req *RequestGetAllPaginate) (*[]IncomeType, error)
 	UnitOfWorkRepository
 }
 
@@ -20,7 +20,7 @@ type IncomeTypeUsecase interface {
 	Update(ctx context.Context, req *RequestUpdateIncomeType) (*ResponseIncomeType, error)
 	Delete(ctx context.Context, id string, profileID string) error
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseIncomeType, error)
-	GetAllByProfileID(ctx context.Context, profileID string) (*[]ResponseIncomeType, error)
+	GetAllByProfileID(ctx context.Context, req *RequestGetAllPaginate) (*[]ResponseIncomeType, string, error)
 }
 
 // IncomeType MODEL

@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 )
@@ -41,7 +42,7 @@ func UpdateIncomeType(req *domain.RequestUpdateIncomeType) error {
 		return _error.HttpErrString("invalid profile id", response.CM05)
 	}
 
-	if _, err := uuid.Parse(req.ID); err != nil {
+	if _, err := ulid.Parse(req.ID); err != nil {
 		return _error.HttpErrString("not found", response.CM01)
 	}
 

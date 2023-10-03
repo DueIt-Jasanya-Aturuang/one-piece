@@ -3,14 +3,14 @@ package converter
 import (
 	"time"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/helper"
 )
 
 func RequestCreateIncomeTypeToModel(i *domain.RequestCreateIncomeType) *domain.IncomeType {
-	id := uuid.NewV4().String()
+	id := ulid.Make().String()
 	return &domain.IncomeType{
 		ID:          id,
 		ProfileID:   i.ProfileID,

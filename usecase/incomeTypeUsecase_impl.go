@@ -133,23 +133,26 @@ func (i *IncomeTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id stri
 	return resp, nil
 }
 
-func (i *IncomeTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.ResponseIncomeType, error) {
+func (i *IncomeTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaginate) (*[]domain.ResponseIncomeType, string, error) {
 	if err := i.incomeTypeRepo.OpenConn(ctx); err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer i.incomeTypeRepo.CloseConn()
 
-	incomeTypes, err := i.incomeTypeRepo.GetAllByProfileID(ctx, profileID)
+	incomeTypes, err := i.incomeTypeRepo.GetAllByProfileID(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	var resps []domain.ResponseIncomeType
+	var cursor string
 
 	for _, incomeType := range *incomeTypes {
 		resp := converter.IncomeTypeModelToResp(&incomeType)
 		resps = append(resps, *resp)
+
+		cursor = incomeType.ID
 	}
 
-	return &resps, nil
+	return &resps, cursor, nil
 }

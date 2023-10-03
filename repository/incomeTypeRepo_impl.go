@@ -216,10 +216,14 @@ func (i *IncomeTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id s
 	return &incomeType, nil
 }
 
-func (i *IncomeTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.IncomeType, error) {
+func (i *IncomeTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaginate) (*[]domain.IncomeType, error) {
 	query := `SELECT id, profile_id, name, description, icon, income_type, fixed_income, periode, amount, created_at, 
        				created_by, updated_at, updated_by, deleted_at, deleted_by
-				FROM m_income_type WHERE profile_id = $1 AND deleted_at IS NULL`
+				FROM m_income_type WHERE profile_id = $1 AND deleted_at IS NULL `
+	if req.ID != "" {
+		query += `AND id ` + req.Operation + ` $2 `
+	}
+	query += `ORDER BY id ` + req.Order + ` LIMIT 5`
 
 	conn, err := i.GetConn()
 	if err != nil {
@@ -237,7 +241,13 @@ func (i *IncomeTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, profil
 		}
 	}()
 
-	rows, err := stmt.QueryContext(ctx, profileID)
+	var rows *sql.Rows
+	if req.ID != "" {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID, req.ID)
+	} else {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID)
+	}
+
 	if err != nil {
 		log.Warn().Msgf(util.LogErrQueryRows, err)
 		return nil, err
