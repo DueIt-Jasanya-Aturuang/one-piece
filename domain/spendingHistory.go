@@ -11,7 +11,7 @@ type SpendingHistoryRepository interface {
 	Create(ctx context.Context, spendingHistory *SpendingHistory) error
 	Update(ctx context.Context, spendingHistory *SpendingHistory) error
 	Delete(ctx context.Context, id string, profileID string) error
-	GetAllByTimeAndProfileID(ctx context.Context, req *GetSpendingHistoryByTimeAndProfileID) (*[]SpendingHistoryJoin, error)
+	GetAllByTimeAndProfileID(ctx context.Context, req *GetFilteredDataSpendingHistory) (*[]SpendingHistoryJoin, error)
 	GetAllAmountByTimeAndProfileID(ctx context.Context, req *GetSpendingHistoryByTimeAndProfileID) (int, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingHistoryJoin, error)
 	UnitOfWorkRepository
@@ -22,7 +22,7 @@ type SpendingHistoryUsecase interface {
 	Create(ctx context.Context, req *RequestCreateSpendingHistory) (*ResponseSpendingHistory, error)
 	Update(ctx context.Context, req *RequestUpdateSpendingHistory) (*ResponseSpendingHistory, error)
 	Delete(ctx context.Context, id string, profileID string) error
-	GetAllByTimeAndProfileID(ctx context.Context, req *GetFilteredDataSpendingHistory) (*[]ResponseSpendingHistory, error)
+	GetAllByTimeAndProfileID(ctx context.Context, req *GetFilteredDataSpendingHistory) (*[]ResponseSpendingHistory, string, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseSpendingHistory, error)
 }
 
@@ -38,6 +38,7 @@ type GetFilteredDataSpendingHistory struct {
 	StartTime time.Time
 	EndTime   time.Time
 	Type      string
+	RequestGetAllPaginate
 }
 
 // SpendingHistory spending history entity

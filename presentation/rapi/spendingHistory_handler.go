@@ -143,14 +143,24 @@ func (h *SpendingHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r 
 	startTime, _ = time.Parse("2006-01-02", start)
 	endTime, _ = time.Parse("2006-01-02", end)
 
+	cursor := r.URL.Query().Get("cursor")
+	order := r.URL.Query().Get("order")
+	order, operation := helper.GetOrder(order)
+
 	req := &domain.GetFilteredDataSpendingHistory{
 		ProfileID: r.Header.Get("Profile-ID"),
 		StartTime: startTime,
 		EndTime:   endTime,
 		Type:      typeQuery,
+		RequestGetAllPaginate: domain.RequestGetAllPaginate{
+			ProfileID: r.Header.Get("Profile-ID"),
+			ID:        cursor,
+			Operation: operation,
+			Order:     order,
+		},
 	}
 
-	spendingHistories, err := h.spendingHistoryUsecase.GetAllByTimeAndProfileID(r.Context(), req)
+	spendingHistories, cursorResp, err := h.spendingHistoryUsecase.GetAllByTimeAndProfileID(r.Context(), req)
 	if err != nil {
 		if errors.Is(err, usecase.InvalidTimestamp) {
 			err = _error.HttpErrString(err.Error(), response.CM06)
@@ -159,7 +169,11 @@ func (h *SpendingHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r 
 		return
 	}
 
-	helper.SuccessResponseEncode(w, spendingHistories, "data spending history")
+	resp := map[string]any{
+		"cursor":           cursorResp,
+		"spending_history": spendingHistories,
+	}
+	helper.SuccessResponseEncode(w, resp, "data spending history")
 }
 
 func (h *SpendingHistoryHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *http.Request) {

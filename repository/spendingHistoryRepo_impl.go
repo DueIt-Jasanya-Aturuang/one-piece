@@ -150,7 +150,7 @@ func (s *SpendingHistoryRepositoryImpl) Delete(ctx context.Context, id string, p
 }
 
 func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
-	ctx context.Context, req *domain.GetSpendingHistoryByTimeAndProfileID,
+	ctx context.Context, req *domain.GetFilteredDataSpendingHistory,
 ) (*[]domain.SpendingHistoryJoin, error) {
 	query := `SELECT tsh.id, tsh.profile_id, tsh.spending_type_id, tsh.payment_method_id, tsh.payment_name, tsh.before_balance, 
        				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.time_spending_history, tsh.show_time_spending_history, 
@@ -159,7 +159,12 @@ func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
 				FROM t_spending_history tsh 
 				JOIN m_spending_type mst ON tsh.spending_type_id = mst.id
 				LEFT JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
-				WHERE tsh.profile_id = $1 AND tsh.time_spending_history BETWEEN $2 AND $3 AND tsh.deleted_at IS NULL`
+				WHERE tsh.profile_id = $1 AND tsh.time_spending_history BETWEEN $2 AND $3 AND tsh.deleted_at IS NULL `
+
+	if req.ID != "" {
+		query += `AND tsh.id ` + req.Operation + ` $4 `
+	}
+	query += `ORDER BY tsh.id ` + req.Order + ` LIMIT 5`
 
 	conn, err := s.GetConn()
 	if err != nil {
@@ -176,7 +181,13 @@ func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
 		}
 	}()
 
-	rows, err := stmt.QueryContext(ctx, req.ProfileID, req.StartTime, req.EndTime)
+	var rows *sql.Rows
+	if req.ID != "" {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID, req.StartTime, req.EndTime, req.ID)
+	} else {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID, req.StartTime, req.EndTime)
+	}
+
 	if err != nil {
 		log.Warn().Msgf(util.LogErrQueryRows, err)
 		return nil, err

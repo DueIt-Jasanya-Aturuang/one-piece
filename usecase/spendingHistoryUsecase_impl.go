@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/converter"
@@ -225,40 +224,37 @@ func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, prof
 	return nil
 }
 
-func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetFilteredDataSpendingHistory) (*[]domain.ResponseSpendingHistory, error) {
+func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetFilteredDataSpendingHistory) (*[]domain.ResponseSpendingHistory, string, error) {
 	err := s.spendingHistoryRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer s.spendingHistoryRepo.CloseConn()
 
-	var startTime, endTime time.Time
 	if req.Type != "" {
-		startTime, endTime, _ = helper.TimeDateByTypeFilter(req.Type)
+		req.StartTime, req.EndTime, _ = helper.TimeDateByTypeFilter(req.Type)
 	} else {
-		startTime, endTime, err = helper.FormatDate(req.StartTime, req.EndTime)
+		req.StartTime, req.EndTime, err = helper.FormatDate(req.StartTime, req.EndTime)
 		if err != nil {
-			return nil, InvalidTimestamp
+			return nil, "", InvalidTimestamp
 		}
 	}
 
-	spendingHistories, err := s.spendingHistoryRepo.GetAllByTimeAndProfileID(ctx, &domain.GetSpendingHistoryByTimeAndProfileID{
-		ProfileID: req.ProfileID,
-		StartTime: startTime,
-		EndTime:   endTime,
-	})
+	spendingHistories, err := s.spendingHistoryRepo.GetAllByTimeAndProfileID(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	var spendingHistoryJoinResponses []domain.ResponseSpendingHistory
-
+	var cursor string
 	for _, spendingHistory := range *spendingHistories {
 		spendingHistoryJoinResponse := converter.GetAllSpendingHistoryJoinModelToResponse(spendingHistory)
 		spendingHistoryJoinResponses = append(spendingHistoryJoinResponses, spendingHistoryJoinResponse)
+
+		cursor = spendingHistory.ID
 	}
 
-	return &spendingHistoryJoinResponses, nil
+	return &spendingHistoryJoinResponses, cursor, nil
 }
 
 func (s *SpendingHistoryUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseSpendingHistory, error) {

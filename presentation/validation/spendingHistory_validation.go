@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 )
@@ -16,7 +17,8 @@ func CreateSpendingHistory(req *domain.RequestCreateSpendingHistory) error {
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
 		return _error.HttpErrString("invalid profile id", response.CM05)
 	}
-	if _, errParse := uuid.Parse(req.SpendingTypeID); errParse != nil {
+
+	if _, errParse := ulid.Parse(req.SpendingTypeID); errParse != nil {
 		err["spending_type_id"] = append(err["spending_type_id"], "invalid spending type id")
 	}
 
@@ -76,10 +78,10 @@ func UpdateSpendingHistory(req *domain.RequestUpdateSpendingHistory) error {
 	if _, errParse := uuid.Parse(req.ProfileID); errParse != nil {
 		return _error.HttpErrString("invalid profile id", response.CM05)
 	}
-	if _, errParse := uuid.Parse(req.SpendingTypeID); errParse != nil {
+	if _, errParse := ulid.Parse(req.SpendingTypeID); errParse != nil {
 		err["spending_type_id"] = append(err["spending_type_id"], "invalid spending type id")
 	}
-	if _, errParse := uuid.Parse(req.ID); errParse != nil {
+	if _, errParse := ulid.Parse(req.ID); errParse != nil {
 		return _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 	}
 
