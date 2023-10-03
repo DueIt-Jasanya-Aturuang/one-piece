@@ -366,7 +366,7 @@ func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, req 
 	if req.ID != "" {
 		query += `AND id ` + req.Operation + ` $2 `
 	}
-	query += `ORDER BY id ` + req.Order + ` LIMIT 2`
+	query += `ORDER BY id ` + req.Order + ` LIMIT 5`
 
 	conn, err := s.GetConn()
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+	"github.com/oklog/ulid/v2"
 	"github.com/rs/zerolog/log"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
@@ -108,7 +109,7 @@ func (h *SpendingTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request)
 		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
 		return
 	}
-	_, err = uuid.Parse(id)
+	_, err = ulid.Parse(id)
 	if err != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
 		return
@@ -133,7 +134,7 @@ func (h *SpendingTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *
 		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
 		return
 	}
-	_, err = uuid.Parse(id)
+	_, err = ulid.Parse(id)
 	if err != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
 		return
