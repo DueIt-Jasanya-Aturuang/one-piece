@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -170,13 +171,34 @@ func (h *SpendingTypeHandlerImpl) GetAllByPeriodeAndProfileID(w http.ResponseWri
 		return
 	}
 
-	spendingTypes, err := h.spendingTypeUsecase.GetAllByPeriodeAndProfileID(r.Context(), profileID, periodInt)
+	cursor := r.URL.Query().Get("cursor")
+	order := r.URL.Query().Get("order")
+	order, operation := helper.GetOrder(order)
+
+	req := &domain.RequestGetAllSpendingTypeByTime{
+		ProfileID: profileID,
+		Periode:   periodInt,
+		StartTime: time.Time{},
+		EndTime:   time.Time{},
+		RequestGetAllPaginate: domain.RequestGetAllPaginate{
+			ProfileID: profileID,
+			ID:        cursor,
+			Operation: operation,
+			Order:     order,
+		},
+	}
+
+	spendingTypes, cursorResp, err := h.spendingTypeUsecase.GetAllByPeriodeAndProfileID(r.Context(), req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	helper.SuccessResponseEncode(w, spendingTypes, "data spending types")
+	resp := map[string]any{
+		"cursor":        cursorResp,
+		"spending_type": spendingTypes,
+	}
+	helper.SuccessResponseEncode(w, resp, "data spending types")
 }
 
 func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
@@ -188,11 +210,26 @@ func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *ht
 		return
 	}
 
-	spendingTypes, err := h.spendingTypeUsecase.GetAllByProfileID(r.Context(), profileID)
+	cursor := r.URL.Query().Get("cursor")
+	order := r.URL.Query().Get("order")
+	order, operation := helper.GetOrder(order)
+
+	req := &domain.RequestGetAllPaginate{
+		ProfileID: profileID,
+		ID:        cursor,
+		Operation: operation,
+		Order:     order,
+	}
+
+	spendingTypes, cursorResp, err := h.spendingTypeUsecase.GetAllByProfileID(r.Context(), req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	helper.SuccessResponseEncode(w, spendingTypes, "data spending types")
+	resp := map[string]any{
+		"cursor":        cursorResp,
+		"spending_type": spendingTypes,
+	}
+	helper.SuccessResponseEncode(w, resp, "data spending types")
 }

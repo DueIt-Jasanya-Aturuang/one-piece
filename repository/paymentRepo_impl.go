@@ -251,7 +251,7 @@ func (p *PaymentRepositoryImpl) GetByNameAndProfileID(ctx context.Context, name 
 	return &payment, nil
 }
 
-func (p *PaymentRepositoryImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaymentPaginate) (*[]domain.Payment, error) {
+func (p *PaymentRepositoryImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaginate) (*[]domain.Payment, error) {
 	query := `SELECT id, profile_id, name, description, image, created_at, created_by, 
        			updated_at, updated_by, deleted_at, deleted_by
           FROM m_payment_methods WHERE profile_id = $1 AND deleted_at IS NULL `

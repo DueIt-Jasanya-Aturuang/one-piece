@@ -14,8 +14,8 @@ type SpendingTypeRepository interface {
 	CheckByTitleAndProfileID(ctx context.Context, profileID string, title string) (bool, error)
 	GetDefault(ctx context.Context) (*[]SpendingType, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingType, error)
-	GetAllByTimeAndProfileID(ctx context.Context, req *GetAllSpendingTypeByTime) (*[]SpendingTypeJoin, error)
-	GetAllByProfileID(ctx context.Context, profileID string) (*[]SpendingType, error)
+	GetAllByTimeAndProfileID(ctx context.Context, req *RequestGetAllSpendingTypeByTime) (*[]SpendingTypeJoin, error)
+	GetAllByProfileID(ctx context.Context, req *RequestGetAllPaginate) (*[]SpendingType, error)
 	UnitOfWorkRepository
 }
 
@@ -25,14 +25,16 @@ type SpendingTypeUsecase interface {
 	Update(ctx context.Context, req *RequestUpdateSpendingType) (*ResponseSpendingType, error)
 	Delete(ctx context.Context, id string, profileID string) error
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseSpendingType, error)
-	GetAllByPeriodeAndProfileID(ctx context.Context, profileID string, periode int) (*ResponseAllSpendingType, error)
-	GetAllByProfileID(ctx context.Context, profileID string) (*[]ResponseSpendingType, error)
+	GetAllByPeriodeAndProfileID(ctx context.Context, req *RequestGetAllSpendingTypeByTime) (*ResponseAllSpendingType, string, error)
+	GetAllByProfileID(ctx context.Context, req *RequestGetAllPaginate) (*[]ResponseSpendingType, string, error)
 }
 
-type GetAllSpendingTypeByTime struct {
+type RequestGetAllSpendingTypeByTime struct {
 	ProfileID string
+	Periode   int
 	StartTime time.Time
 	EndTime   time.Time
+	RequestGetAllPaginate
 }
 
 // SpendingType spending type entity

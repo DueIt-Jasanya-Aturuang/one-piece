@@ -119,7 +119,7 @@ func (h *PaymentHandlerImpl) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	order, operation := helper.GetOrder(order)
 
-	req := &domain.RequestGetAllPaymentPaginate{
+	req := &domain.RequestGetAllPaginate{
 		ProfileID: profileID,
 		ID:        cursor,
 		Operation: operation,

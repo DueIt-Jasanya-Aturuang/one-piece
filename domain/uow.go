@@ -14,6 +14,13 @@ type AuditInfo struct {
 	DeletedBy sql.NullString
 }
 
+type RequestGetAllPaginate struct {
+	ProfileID string
+	ID        string
+	Operation string
+	Order     string
+}
+
 //counterfeiter:generate -o ./mocks . UnitOfWorkRepository
 type UnitOfWorkRepository interface {
 	OpenConn(ctx context.Context) error

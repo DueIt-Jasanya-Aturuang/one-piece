@@ -283,14 +283,19 @@ func (s *SpendingTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id
 	return &spendingType, nil
 }
 
-func (s *SpendingTypeRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetAllSpendingTypeByTime) (*[]domain.SpendingTypeJoin, error) {
+func (s *SpendingTypeRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.RequestGetAllSpendingTypeByTime) (*[]domain.SpendingTypeJoin, error) {
 	query := `SELECT mst.id, mst.profile_id, mst.title, mst.maximum_limit, mst.icon, mst.created_at, mst.created_by, 
        				mst.updated_at, mst.updated_by, mst.deleted_at, mst.deleted_by, 
        				COALESCE(SUM(CASE WHEN tsh.time_spending_history BETWEEN $2 AND $3 AND tsh.deleted_at IS NULL THEN tsh.spending_amount ELSE 0 END), 0)
 				FROM m_spending_type mst
 				LEFT JOIN t_spending_history tsh ON mst.id = tsh.spending_type_id
-				WHERE mst.profile_id = $1 AND mst.deleted_at IS NULL
-				GROUP BY mst.id`
+				WHERE mst.profile_id = $1 AND mst.deleted_at IS NULL `
+
+	if req.ID != "" {
+		query += `AND mst.id ` + req.Operation + ` $4 `
+	}
+
+	query += `GROUP BY mst.id ORDER BY mst.id ` + req.Order + ` LIMIT 5`
 
 	conn, err := s.GetConn()
 	if err != nil {
@@ -308,7 +313,14 @@ func (s *SpendingTypeRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Contex
 		}
 	}()
 
-	rows, err := stmt.QueryContext(ctx, req.ProfileID, req.StartTime, req.EndTime)
+	var rows *sql.Rows
+
+	if req.ID != "" {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID, req.StartTime, req.EndTime, req.ID)
+	} else {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID, req.StartTime, req.EndTime)
+
+	}
 	if err != nil {
 		log.Warn().Msgf(util.LogErrQueryRows, err)
 		return nil, err
@@ -346,11 +358,15 @@ func (s *SpendingTypeRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Contex
 	return &spendingTypes, nil
 }
 
-func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.SpendingType, error) {
+func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaginate) (*[]domain.SpendingType, error) {
 	query := `SELECT mst.id, mst.profile_id, mst.title, mst.maximum_limit, mst.icon, mst.created_at, mst.created_by, 
        				mst.updated_at, mst.updated_by, mst.deleted_at, mst.deleted_by
 				FROM m_spending_type mst
-				WHERE mst.profile_id = $1 AND mst.deleted_at IS NULL`
+				WHERE mst.profile_id = $1 AND mst.deleted_at IS NULL `
+	if req.ID != "" {
+		query += `AND id ` + req.Operation + ` $2 `
+	}
+	query += `ORDER BY id ` + req.Order + ` LIMIT 2`
 
 	conn, err := s.GetConn()
 	if err != nil {
@@ -368,7 +384,12 @@ func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, prof
 		}
 	}()
 
-	rows, err := stmt.QueryContext(ctx, profileID)
+	var rows *sql.Rows
+	if req.ID != "" {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID, req.ID)
+	} else {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID)
+	}
 	if err != nil {
 		log.Warn().Msgf(util.LogErrQueryRows, err)
 		return nil, err

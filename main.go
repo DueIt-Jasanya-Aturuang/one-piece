@@ -34,7 +34,7 @@ func main() {
 
 	// usecase
 	paymentUsecase := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
-	spendingTypeUsecase := usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo)
+	spendingTypeUsecase := usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo, spendingHistoryRepo)
 	spendingHistoryUsecase := usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
 	balanceUsecase := usecase.NewBalanceUsecaseImpl(balanceRepo)
 	incomeTypeUsecase := usecase.NewIncomeTypeUsecaseImpl(incomeTypeRepo)

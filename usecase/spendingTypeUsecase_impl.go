@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/converter"
@@ -13,14 +13,17 @@ import (
 )
 
 type SpendingTypeUsecaseImpl struct {
-	spendingTypeRepo domain.SpendingTypeRepository
+	spendingTypeRepo    domain.SpendingTypeRepository
+	spendingHistoryRepo domain.SpendingHistoryRepository
 }
 
 func NewSpendingTypeUsecaseImpl(
 	spendingTypeRepo domain.SpendingTypeRepository,
+	spendingHistoryRepo domain.SpendingHistoryRepository,
 ) domain.SpendingTypeUsecase {
 	return &SpendingTypeUsecaseImpl{
-		spendingTypeRepo: spendingTypeRepo,
+		spendingTypeRepo:    spendingTypeRepo,
+		spendingHistoryRepo: spendingHistoryRepo,
 	}
 }
 
@@ -146,53 +149,57 @@ func (s *SpendingTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id st
 	return spendingTypeResponse, nil
 }
 
-func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Context, profileID string, periode int) (*domain.ResponseAllSpendingType, error) {
+func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Context, req *domain.RequestGetAllSpendingTypeByTime) (*domain.ResponseAllSpendingType, string, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer s.spendingTypeRepo.CloseConn()
 
-	exist, err := s.spendingTypeRepo.CheckData(ctx, profileID)
+	exist, err := s.spendingTypeRepo.CheckData(ctx, req.ProfileID)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	if !exist {
-		err = s.createDefaultSpendingType(ctx, profileID)
+		err = s.createDefaultSpendingType(ctx, req.ProfileID)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 	}
 
-	startTime, endTime, err := helper.TimeDate(periode)
+	req.StartTime, req.EndTime, err = helper.TimeDate(req.Periode)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	req := &domain.GetAllSpendingTypeByTime{
-		ProfileID: profileID,
-		StartTime: startTime,
-		EndTime:   endTime,
+	budgetAmount, err := s.spendingHistoryRepo.GetAllAmountByTimeAndProfileID(ctx, &domain.GetSpendingHistoryByTimeAndProfileID{
+		ProfileID: req.ProfileID,
+		StartTime: req.StartTime,
+		EndTime:   req.EndTime,
+	})
+	if err != nil {
+		return nil, "", err
 	}
 
 	spendingTypes, err := s.spendingTypeRepo.GetAllByTimeAndProfileID(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	var spendingTypeJoinResponses []domain.ResponseSpendingTypeJoin
 	var spendingTypeJoinResponse domain.ResponseSpendingTypeJoin
-	var budgetAmount int
+	var cursor string
 
 	for _, spendingType := range *spendingTypes {
-		budgetAmount += spendingType.Used
 		formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
 		formatUsed := helper.FormatRupiah(spendingType.Used)
 		persentaseMaximumLimit := helper.Persentase(spendingType.Used, spendingType.MaximumLimit)
 
 		spendingTypeJoinResponse = converter.SpendingTypeModelJoinToResponse(spendingType, persentaseMaximumLimit, formatMaximumLimit, formatUsed)
 		spendingTypeJoinResponses = append(spendingTypeJoinResponses, spendingTypeJoinResponse)
+
+		cursor = spendingType.ID
 	}
 
 	respAll := &domain.ResponseAllSpendingType{
@@ -200,44 +207,46 @@ func (s *SpendingTypeUsecaseImpl) GetAllByPeriodeAndProfileID(ctx context.Contex
 		BudgetAmount:         budgetAmount,
 		FormatBudgetAmount:   helper.FormatRupiah(budgetAmount),
 	}
-	return respAll, nil
+	return respAll, cursor, nil
 }
 
-func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, profileID string) (*[]domain.ResponseSpendingType, error) {
+func (s *SpendingTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaginate) (*[]domain.ResponseSpendingType, string, error) {
 	err := s.spendingTypeRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer s.spendingTypeRepo.CloseConn()
 
-	exist, err := s.spendingTypeRepo.CheckData(ctx, profileID)
+	exist, err := s.spendingTypeRepo.CheckData(ctx, req.ProfileID)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	if !exist {
-		err = s.createDefaultSpendingType(ctx, profileID)
+		err = s.createDefaultSpendingType(ctx, req.ProfileID)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 	}
 
-	spendingTypes, err := s.spendingTypeRepo.GetAllByProfileID(ctx, profileID)
+	spendingTypes, err := s.spendingTypeRepo.GetAllByProfileID(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	var spendingTypeResponses []domain.ResponseSpendingType
 	var spendingTypeResponse domain.ResponseSpendingType
-
+	var cursor string
 	for _, spendingType := range *spendingTypes {
 		formatMaximumLimit := helper.FormatRupiah(spendingType.MaximumLimit)
 
 		spendingTypeResponse = *converter.SpendingTypeModelToResponse(&spendingType, formatMaximumLimit)
 		spendingTypeResponses = append(spendingTypeResponses, spendingTypeResponse)
+
+		cursor = spendingType.ID
 	}
 
-	return &spendingTypeResponses, nil
+	return &spendingTypeResponses, cursor, nil
 }
 
 func (s *SpendingTypeUsecaseImpl) createDefaultSpendingType(ctx context.Context, profileID string) error {
@@ -249,7 +258,7 @@ func (s *SpendingTypeUsecaseImpl) createDefaultSpendingType(ctx context.Context,
 
 		for _, spendingType := range *spendingTypes {
 			spendingType.ProfileID = profileID
-			spendingType.ID = uuid.NewV4().String()
+			spendingType.ID = ulid.Make().String()
 			err = s.spendingTypeRepo.Create(ctx, &spendingType)
 			if err != nil {
 				return err

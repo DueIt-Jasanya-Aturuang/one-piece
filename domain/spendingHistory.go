@@ -12,6 +12,7 @@ type SpendingHistoryRepository interface {
 	Update(ctx context.Context, spendingHistory *SpendingHistory) error
 	Delete(ctx context.Context, id string, profileID string) error
 	GetAllByTimeAndProfileID(ctx context.Context, req *GetSpendingHistoryByTimeAndProfileID) (*[]SpendingHistoryJoin, error)
+	GetAllAmountByTimeAndProfileID(ctx context.Context, req *GetSpendingHistoryByTimeAndProfileID) (int, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*SpendingHistoryJoin, error)
 	UnitOfWorkRepository
 }

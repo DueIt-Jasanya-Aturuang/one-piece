@@ -11,7 +11,7 @@ type PaymentRepository interface {
 	Update(ctx context.Context, payment *Payment) error
 	Delete(ctx context.Context, id string, profileID string) error
 	CheckData(ctx context.Context, profileID string) (bool, error)
-	GetAllByProfileID(ctx context.Context, req *RequestGetAllPaymentPaginate) (*[]Payment, error)
+	GetAllByProfileID(ctx context.Context, req *RequestGetAllPaginate) (*[]Payment, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*Payment, error)
 	GetByNameAndProfileID(ctx context.Context, name string, profileID string) (*Payment, error)
 	GetDefault(ctx context.Context) (*[]Payment, error)
@@ -21,15 +21,8 @@ type PaymentRepository interface {
 type PaymentUsecase interface {
 	Create(ctx context.Context, req *RequestCreatePayment) (*ResponsePayment, error)
 	Update(ctx context.Context, req *RequestUpdatePayment) (*ResponsePayment, error)
-	GetAllByProfileID(ctx context.Context, req *RequestGetAllPaymentPaginate) (*[]ResponsePayment, string, error)
+	GetAllByProfileID(ctx context.Context, req *RequestGetAllPaginate) (*[]ResponsePayment, string, error)
 	Delete(ctx context.Context, id string, profileID string) error
-}
-
-type RequestGetAllPaymentPaginate struct {
-	ProfileID string
-	ID        string
-	Operation string
-	Order     string
 }
 
 // Payment entity payment

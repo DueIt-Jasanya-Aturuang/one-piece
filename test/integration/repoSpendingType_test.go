@@ -180,7 +180,7 @@ func GetAllByProfileIDSpendingType(t *testing.T) {
 	startPeriod := time.Date(time.Now().Year(), time.Now().Month(), 14, 0, 0, 0, 0, time.UTC)
 	endPeriod := startPeriod.AddDate(0, 1, 0)
 
-	req := &domain.GetAllSpendingTypeByTime{
+	req := &domain.RequestGetAllSpendingTypeByTime{
 		ProfileID: "profileID1",
 		StartTime: startPeriod,
 		EndTime:   endPeriod,

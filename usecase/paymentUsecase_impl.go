@@ -142,7 +142,7 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 	return paymentResponse, nil
 }
 
-func (p *PaymentUsecaseImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaymentPaginate) (*[]domain.ResponsePayment, string, error) {
+func (p *PaymentUsecaseImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaginate) (*[]domain.ResponsePayment, string, error) {
 	if err := p.paymentRepo.OpenConn(ctx); err != nil {
 		return nil, "0", err
 	}

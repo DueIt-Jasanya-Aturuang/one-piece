@@ -222,6 +222,35 @@ func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
 	return &spendingHistories, nil
 }
 
+func (s *SpendingHistoryRepositoryImpl) GetAllAmountByTimeAndProfileID(ctx context.Context, req *domain.GetSpendingHistoryByTimeAndProfileID) (int, error) {
+	query := `SELECT COALESCE(SUM(CASE WHEN time_spending_history BETWEEN $2 AND $3 AND deleted_at IS NULL THEN spending_amount ELSE 0 END), 0)
+				FROM t_spending_history
+				WHERE profile_id = $1 AND time_spending_history BETWEEN $2 AND $3 AND deleted_at IS NULL`
+
+	conn, err := s.GetConn()
+	if err != nil {
+		return 0, err
+	}
+	stmt, err := conn.PrepareContext(ctx, query)
+	if err != nil {
+		log.Warn().Msgf(util.LogErrPrepareContextClose, err)
+		return 0, err
+	}
+	defer func() {
+		if errClose := stmt.Close(); errClose != nil {
+			log.Warn().Msgf(util.LogErrPrepareContextClose, err)
+		}
+	}()
+
+	var res int
+	if err = stmt.QueryRowContext(ctx, req.ProfileID, req.StartTime, req.EndTime).Scan(&res); err != nil {
+		log.Warn().Msgf(util.LogErrQueryRowContextScan, err)
+		return 0, err
+	}
+
+	return res, nil
+}
+
 func (s *SpendingHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.SpendingHistoryJoin, error) {
 	query := `SELECT tsh.id, tsh.profile_id, tsh.spending_type_id, tsh.payment_method_id, tsh.payment_name, tsh.before_balance, 
        				tsh.spending_amount, tsh.after_balance, tsh.description, tsh.time_spending_history, tsh.show_time_spending_history, 
