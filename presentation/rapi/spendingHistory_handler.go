@@ -120,7 +120,8 @@ func (h *SpendingHistoryHandlerImpl) Delete(w http.ResponseWriter, r *http.Reque
 	err := h.spendingHistoryUsecase.Delete(r.Context(), id, profileID)
 	if err != nil {
 		if errors.Is(err, usecase.SpendingHistoryNotFound) {
-			err = _error.HttpErrString(err.Error(), response.CM01)
+			helper.SuccessResponseEncode(w, nil, "delete spending history berhasil")
+			return
 		}
 		if errors.Is(err, usecase.ProfileIDNotFound) {
 			err = _error.HttpErrString(err.Error(), response.CM01)

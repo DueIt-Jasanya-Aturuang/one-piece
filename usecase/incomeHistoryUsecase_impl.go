@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/converter"
@@ -223,40 +222,38 @@ func (i *IncomeHistoryUsecaseImpl) Delete(ctx context.Context, id string, profil
 	return nil
 }
 
-func (i *IncomeHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetFilteredDataIncomeHistory) (*[]domain.ResponseIncomeHistory, error) {
+func (i *IncomeHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetFilteredDataIncomeHistory) (*[]domain.ResponseIncomeHistory, string, error) {
 	err := i.incomeHistoryRepo.OpenConn(ctx)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer i.incomeHistoryRepo.CloseConn()
 
-	var startTime, endTime time.Time
 	if req.Type != "" {
-		startTime, endTime, _ = helper.TimeDateByTypeFilter(req.Type)
+		req.StartTime, req.EndTime, _ = helper.TimeDateByTypeFilter(req.Type)
 	} else {
-		startTime, endTime, err = helper.FormatDate(req.StartTime, req.EndTime)
+		req.StartTime, req.EndTime, err = helper.FormatDate(req.StartTime, req.EndTime)
 		if err != nil {
-			return nil, InvalidTimestamp
+			return nil, "", InvalidTimestamp
 		}
 	}
 
-	incomeHistories, err := i.incomeHistoryRepo.GetAllByTimeAndProfileID(ctx, &domain.GetIncomeHistoryByTimeAndProfileID{
-		ProfileID: req.ProfileID,
-		StartTime: startTime,
-		EndTime:   endTime,
-	})
+	incomeHistories, err := i.incomeHistoryRepo.GetAllByTimeAndProfileID(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	var incomeHistoryJoinResponses []domain.ResponseIncomeHistory
+	var cursor string
 
 	for _, incomeHistory := range *incomeHistories {
 		incomeHistoryJoinResponse := converter.GetAllIncomeHistoryJoinModelToResponse(incomeHistory)
 		incomeHistoryJoinResponses = append(incomeHistoryJoinResponses, incomeHistoryJoinResponse)
+
+		cursor = incomeHistory.ID
 	}
 
-	return &incomeHistoryJoinResponses, nil
+	return &incomeHistoryJoinResponses, cursor, nil
 }
 
 func (i *IncomeHistoryUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseIncomeHistory, error) {

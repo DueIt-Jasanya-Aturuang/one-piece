@@ -6,8 +6,10 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
@@ -117,6 +119,16 @@ func (h *IncomeHistoryHandlerImpl) Delete(w http.ResponseWriter, r *http.Request
 	profileID := r.Header.Get("Profile-ID")
 	id := chi.URLParam(r, "id")
 
+	if _, errParse := ulid.Parse(id); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
+		return
+	}
+
+	if _, errParse := uuid.Parse(profileID); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+		return
+	}
+
 	err := h.incomeHistoryUsecase.Delete(r.Context(), id, profileID)
 	if err != nil {
 		if errors.Is(err, usecase.IncomeHistoryNotFound) {
@@ -143,14 +155,24 @@ func (h *IncomeHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *h
 	startTime, _ = time.Parse("2006-01-02", start)
 	endTime, _ = time.Parse("2006-01-02", end)
 
+	cursor := r.URL.Query().Get("cursor")
+	order := r.URL.Query().Get("order")
+	order, operation := helper.GetOrder(order)
+
 	req := &domain.GetFilteredDataIncomeHistory{
 		ProfileID: r.Header.Get("Profile-ID"),
 		StartTime: startTime,
 		EndTime:   endTime,
 		Type:      typeQuery,
+		RequestGetAllPaginate: domain.RequestGetAllPaginate{
+			ProfileID: r.Header.Get("Profile-ID"),
+			ID:        cursor,
+			Operation: operation,
+			Order:     order,
+		},
 	}
 
-	incomeHistories, err := h.incomeHistoryUsecase.GetAllByTimeAndProfileID(r.Context(), req)
+	incomeHistories, cursorResp, err := h.incomeHistoryUsecase.GetAllByTimeAndProfileID(r.Context(), req)
 	if err != nil {
 		if errors.Is(err, usecase.InvalidTimestamp) {
 			err = _error.HttpErrString(err.Error(), response.CM06)
@@ -159,12 +181,26 @@ func (h *IncomeHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *h
 		return
 	}
 
-	helper.SuccessResponseEncode(w, incomeHistories, "data income history")
+	resp := map[string]any{
+		"cursor":         cursorResp,
+		"income_history": incomeHistories,
+	}
+	helper.SuccessResponseEncode(w, resp, "data income history")
 }
 
 func (h *IncomeHistoryHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	profileID := r.Header.Get("Profile-ID")
+
+	if _, errParse := ulid.Parse(id); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
+		return
+	}
+
+	if _, errParse := uuid.Parse(profileID); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+		return
+	}
 
 	incomeHistory, err := h.incomeHistoryUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
 	if err != nil {

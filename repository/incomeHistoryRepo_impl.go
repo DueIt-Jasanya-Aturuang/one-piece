@@ -140,14 +140,18 @@ func (i *IncomeHistoryRepositoryImpl) Delete(ctx context.Context, id string, pro
 	return nil
 }
 
-func (i *IncomeHistoryRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetIncomeHistoryByTimeAndProfileID) (*[]domain.IncomeHistoryJoin, error) {
+func (i *IncomeHistoryRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetFilteredDataIncomeHistory) (*[]domain.IncomeHistoryJoin, error) {
 	query := `SELECT tih.id, tih.profile_id, tih.income_type_id, tih.payment_method_id, tih.payment_name, tih.income_amount, tih.description, 
        					tih.time_income_history, tih.show_time_income_history, tih.created_at, tih.created_by, tih.updated_at, tih.updated_by, 
        					tih.deleted_at, tih.deleted_by, mit.name, mpm.name
 				FROM t_income_history tih
 				JOIN m_income_type mit ON tih.income_type_id = mit.id
 				LEFT JOIN m_payment_methods mpm ON tih.payment_method_id = mpm.id
-				WHERE tih.profile_id=$1 AND tih.time_income_history BETWEEN $2 AND $3 AND tih.deleted_at IS NULL`
+				WHERE tih.profile_id=$1 AND tih.time_income_history BETWEEN $2 AND $3 AND tih.deleted_at IS NULL `
+	if req.ID != "" {
+		query += `AND tih.id ` + req.Operation + ` $4 `
+	}
+	query += `ORDER BY tih.id ` + req.Order + ` LIMIT 5`
 
 	conn, err := i.GetConn()
 	if err != nil {
@@ -165,7 +169,13 @@ func (i *IncomeHistoryRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Conte
 		}
 	}()
 
-	rows, err := stmt.QueryContext(ctx, req.ProfileID, req.StartTime, req.EndTime)
+	var rows *sql.Rows
+	if req.ID != "" {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID, req.StartTime, req.EndTime, req.ID)
+	} else {
+		rows, err = stmt.QueryContext(ctx, req.ProfileID, req.StartTime, req.EndTime)
+	}
+
 	if err != nil {
 		log.Warn().Msgf(util.LogErrQueryRows, err)
 		return nil, err

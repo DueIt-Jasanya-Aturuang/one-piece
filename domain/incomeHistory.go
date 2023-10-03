@@ -10,7 +10,7 @@ type IncomeHistoryRepository interface {
 	Create(ctx context.Context, income *IncomeHistory) error
 	Update(ctx context.Context, income *IncomeHistory) error
 	Delete(ctx context.Context, id string, profileID string) error
-	GetAllByTimeAndProfileID(ctx context.Context, req *GetIncomeHistoryByTimeAndProfileID) (*[]IncomeHistoryJoin, error)
+	GetAllByTimeAndProfileID(ctx context.Context, req *GetFilteredDataIncomeHistory) (*[]IncomeHistoryJoin, error)
 	GetTotalIncomeByPeriode(ctx context.Context, req *GetIncomeHistoryByTimeAndProfileID) (int, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*IncomeHistoryJoin, error)
 	UnitOfWorkRepository
@@ -20,7 +20,7 @@ type IncomeHistoryUsecase interface {
 	Create(ctx context.Context, req *RequestCreateIncomeHistory) (*ResponseIncomeHistory, error)
 	Update(ctx context.Context, req *RequestUpdateIncomeHistory) (*ResponseIncomeHistory, error)
 	Delete(ctx context.Context, id string, profileID string) error
-	GetAllByTimeAndProfileID(ctx context.Context, req *GetFilteredDataIncomeHistory) (*[]ResponseIncomeHistory, error)
+	GetAllByTimeAndProfileID(ctx context.Context, req *GetFilteredDataIncomeHistory) (*[]ResponseIncomeHistory, string, error)
 	GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*ResponseIncomeHistory, error)
 }
 
@@ -30,6 +30,7 @@ type GetFilteredDataIncomeHistory struct {
 	StartTime time.Time
 	EndTime   time.Time
 	Type      string
+	RequestGetAllPaginate
 }
 
 type ValidatePaymentAndIncomeTypeID struct {

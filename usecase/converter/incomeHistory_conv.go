@@ -3,21 +3,21 @@ package converter
 import (
 	"time"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	helper2 "github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/helper"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/helper"
 )
 
 func CreateIncomeHistoryToModel(req *domain.RequestCreateIncomeHistory) *domain.IncomeHistory {
-	id := uuid.NewV4().String()
+	id := ulid.Make().String()
 	timeIncomeHistory, _ := time.Parse("2006-01-02", req.TimeIncomeHistory)
 	spendingHistory := &domain.IncomeHistory{
 		ID:                    id,
 		ProfileID:             req.ProfileID,
 		IncomeTypeID:          req.IncomeTypeID,
-		PaymentMethodID:       helper2.NewNullString(req.PaymentMethodID),
-		PaymentName:           helper2.NewNullString(req.PaymentName),
+		PaymentMethodID:       helper.NewNullString(req.PaymentMethodID),
+		PaymentName:           helper.NewNullString(req.PaymentName),
 		IncomeAmount:          req.IncomeAmount,
 		Description:           req.Description,
 		TimeIncomeHistory:     timeIncomeHistory.UTC(),
@@ -37,15 +37,15 @@ func UpdateIncomeHistoryToModel(req *domain.RequestUpdateIncomeHistory) *domain.
 		ID:                    req.ID,
 		ProfileID:             req.ProfileID,
 		IncomeTypeID:          req.IncomeTypeID,
-		PaymentMethodID:       helper2.NewNullString(req.PaymentMethodID),
-		PaymentName:           helper2.NewNullString(req.PaymentName),
+		PaymentMethodID:       helper.NewNullString(req.PaymentMethodID),
+		PaymentName:           helper.NewNullString(req.PaymentName),
 		IncomeAmount:          req.IncomeAmount,
 		Description:           req.Description,
 		TimeIncomeHistory:     timeIncomeHistory.UTC(),
 		ShowTimeIncomeHistory: req.ShowTimeIncomeHistory,
 		AuditInfo: domain.AuditInfo{
 			UpdatedAt: time.Now().Unix(),
-			UpdatedBy: helper2.NewNullString(req.ProfileID),
+			UpdatedBy: helper.NewNullString(req.ProfileID),
 		},
 	}
 	return spendingHistory
@@ -57,11 +57,11 @@ func IncomeHistoryJoinModelToResponse(incomeHistory *domain.IncomeHistoryJoin) *
 		ProfileID:             incomeHistory.ProfileID,
 		IncomeTypeID:          incomeHistory.IncomeTypeID,
 		IncomeTypeTitle:       incomeHistory.IncomeTypeTitle,
-		PaymentMethodID:       helper2.GetNullString(incomeHistory.PaymentMethodID),
-		PaymentMethodName:     helper2.GetNullString(incomeHistory.PaymentMethodName),
-		PaymentName:           helper2.GetNullString(incomeHistory.PaymentName),
+		PaymentMethodID:       helper.GetNullString(incomeHistory.PaymentMethodID),
+		PaymentMethodName:     helper.GetNullString(incomeHistory.PaymentMethodName),
+		PaymentName:           helper.GetNullString(incomeHistory.PaymentName),
 		IncomeAmount:          incomeHistory.IncomeAmount,
-		FormatIncomeAmount:    helper2.FormatRupiah(incomeHistory.IncomeAmount),
+		FormatIncomeAmount:    helper.FormatRupiah(incomeHistory.IncomeAmount),
 		Description:           incomeHistory.Description,
 		TimeIncomeHistory:     incomeHistory.TimeIncomeHistory.UTC(),
 		ShowTimeIncomeHistory: incomeHistory.ShowTimeIncomeHistory,
@@ -76,11 +76,11 @@ func GetAllIncomeHistoryJoinModelToResponse(spendingHistory domain.IncomeHistory
 		ProfileID:             spendingHistory.ProfileID,
 		IncomeTypeID:          spendingHistory.IncomeTypeID,
 		IncomeTypeTitle:       spendingHistory.IncomeTypeTitle,
-		PaymentMethodID:       helper2.GetNullString(spendingHistory.PaymentMethodID),
-		PaymentMethodName:     helper2.GetNullString(spendingHistory.PaymentMethodName),
-		PaymentName:           helper2.GetNullString(spendingHistory.PaymentName),
+		PaymentMethodID:       helper.GetNullString(spendingHistory.PaymentMethodID),
+		PaymentMethodName:     helper.GetNullString(spendingHistory.PaymentMethodName),
+		PaymentName:           helper.GetNullString(spendingHistory.PaymentName),
 		IncomeAmount:          spendingHistory.IncomeAmount,
-		FormatIncomeAmount:    helper2.FormatRupiah(spendingHistory.IncomeAmount),
+		FormatIncomeAmount:    helper.FormatRupiah(spendingHistory.IncomeAmount),
 		Description:           spendingHistory.Description,
 		TimeIncomeHistory:     spendingHistory.TimeIncomeHistory.UTC(),
 		ShowTimeIncomeHistory: spendingHistory.ShowTimeIncomeHistory,

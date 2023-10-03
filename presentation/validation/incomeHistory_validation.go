@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 )
@@ -16,7 +17,8 @@ func CreateIncomeHistory(req *domain.RequestCreateIncomeHistory) error {
 	if _, err := uuid.Parse(req.ProfileID); err != nil {
 		return _error.HttpErrString("invalid profile id", response.CM05)
 	}
-	if _, errParse := uuid.Parse(req.IncomeTypeID); errParse != nil {
+
+	if _, errParse := ulid.Parse(req.IncomeTypeID); errParse != nil {
 		err["income_type_id"] = append(err["income_type_id"], "invalid income type id")
 	}
 
@@ -31,7 +33,7 @@ func CreateIncomeHistory(req *domain.RequestCreateIncomeHistory) error {
 	}
 
 	if req.PaymentMethodID != "" {
-		if _, errParse := uuid.Parse(req.PaymentMethodID); errParse != nil {
+		if _, errParse := ulid.Parse(req.PaymentMethodID); errParse != nil {
 			err["payment_method_id"] = append(err["payment_method_id"], "invalid payment method id")
 		}
 	}
@@ -76,10 +78,12 @@ func UpdateIncomeHistory(req *domain.RequestUpdateIncomeHistory) error {
 	if _, errParse := uuid.Parse(req.ProfileID); errParse != nil {
 		return _error.HttpErrString("invalid profile id", response.CM05)
 	}
-	if _, errParse := uuid.Parse(req.IncomeTypeID); errParse != nil {
+
+	if _, errParse := ulid.Parse(req.IncomeTypeID); errParse != nil {
 		err["income_type_id"] = append(err["income_type_id"], "invalid income type id")
 	}
-	if _, errParse := uuid.Parse(req.ID); errParse != nil {
+
+	if _, errParse := ulid.Parse(req.ID); errParse != nil {
 		return _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 	}
 
@@ -94,7 +98,7 @@ func UpdateIncomeHistory(req *domain.RequestUpdateIncomeHistory) error {
 	}
 
 	if req.PaymentMethodID != "" {
-		if _, errParse := uuid.Parse(req.PaymentMethodID); errParse != nil {
+		if _, errParse := ulid.Parse(req.PaymentMethodID); errParse != nil {
 			err["payment_method_id"] = append(err["payment_method_id"], "invalid payment method id")
 		}
 	}
