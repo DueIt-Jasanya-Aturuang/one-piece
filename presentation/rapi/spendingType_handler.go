@@ -196,8 +196,10 @@ func (h *SpendingTypeHandlerImpl) GetAllByPeriodeAndProfileID(w http.ResponseWri
 	}
 
 	resp := map[string]any{
-		"cursor":        cursorResp,
-		"spending_type": spendingTypes,
+		"cursor":               cursorResp,
+		"spending_type":        spendingTypes.ResponseSpendingType,
+		"budget_amount":        spendingTypes.BudgetAmount,
+		"format_budget_amount": spendingTypes.FormatBudgetAmount,
 	}
 	helper.SuccessResponseEncode(w, resp, "data spending types")
 }
