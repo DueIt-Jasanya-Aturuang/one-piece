@@ -33,11 +33,6 @@ func NewPaymentUsecaseImpl(
 }
 
 func (p *PaymentUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreatePayment) (*domain.ResponsePayment, error) {
-	if err := p.paymentRepo.OpenConn(ctx); err != nil {
-		return nil, err
-	}
-	defer p.paymentRepo.CloseConn()
-
 	paymentCheck, err := p.paymentRepo.GetByNameAndProfileID(ctx, req.Name, req.ProfileID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
@@ -75,11 +70,6 @@ func (p *PaymentUsecaseImpl) Create(ctx context.Context, req *domain.RequestCrea
 }
 
 func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpdatePayment) (*domain.ResponsePayment, error) {
-	if err := p.paymentRepo.OpenConn(ctx); err != nil {
-		return nil, err
-	}
-	defer p.paymentRepo.CloseConn()
-
 	payment, err := p.paymentRepo.GetByIDAndProfileID(ctx, req.ID, req.ProfileID)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
@@ -143,11 +133,6 @@ func (p *PaymentUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpda
 }
 
 func (p *PaymentUsecaseImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaginate) (*[]domain.ResponsePayment, string, error) {
-	if err := p.paymentRepo.OpenConn(ctx); err != nil {
-		return nil, "0", err
-	}
-	defer p.paymentRepo.CloseConn()
-
 	exist, err := p.paymentRepo.CheckData(ctx, req.ProfileID)
 	if err != nil {
 		return nil, "0", err
@@ -178,11 +163,6 @@ func (p *PaymentUsecaseImpl) GetAllByProfileID(ctx context.Context, req *domain.
 }
 
 func (p *PaymentUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
-	if err := p.paymentRepo.OpenConn(ctx); err != nil {
-		return err
-	}
-	defer p.paymentRepo.CloseConn()
-
 	payment, err := p.paymentRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

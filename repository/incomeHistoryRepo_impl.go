@@ -153,12 +153,12 @@ func (i *IncomeHistoryRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Conte
 	}
 	query += `ORDER BY tih.id ` + req.Order + ` LIMIT 5`
 
-	conn, err := i.GetConn()
+	db, err := i.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -228,12 +228,12 @@ func (i *IncomeHistoryRepositoryImpl) GetTotalIncomeByPeriode(ctx context.Contex
 				FROM t_income_history tih
 				WHERE profile_id=$3 AND deleted_at IS NULL`
 
-	conn, err := i.GetConn()
+	db, err := i.GetDB()
 	if err != nil {
 		return 0, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return 0, err
@@ -262,12 +262,12 @@ func (i *IncomeHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context, i
 				LEFT JOIN m_payment_methods mpm ON tih.payment_method_id = mpm.id
 				WHERE tih.id=$1 AND tih.profile_id=$2 AND tih.deleted_at IS NULL`
 
-	conn, err := i.GetConn()
+	db, err := i.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err

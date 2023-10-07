@@ -32,13 +32,7 @@ func NewIncomeHistoryUsecaseImpl(
 }
 
 func (i *IncomeHistoryUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreateIncomeHistory) (*domain.ResponseIncomeHistory, error) {
-	err := i.incomeHistoryRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer i.incomeHistoryRepo.CloseConn()
-
-	err = i.validateIncomeTypeAndPaymend(ctx, &domain.ValidatePaymentAndIncomeTypeID{
+	err := i.validateIncomeTypeAndPaymend(ctx, &domain.ValidatePaymentAndIncomeTypeID{
 		ProfileID:       req.ProfileID,
 		IncomeTypeID:    req.IncomeTypeID,
 		PaymentMethodID: req.PaymentMethodID,
@@ -101,13 +95,7 @@ func (i *IncomeHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Reque
 }
 
 func (i *IncomeHistoryUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpdateIncomeHistory) (*domain.ResponseIncomeHistory, error) {
-	err := i.incomeHistoryRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer i.incomeHistoryRepo.CloseConn()
-
-	err = i.validateIncomeTypeAndPaymend(ctx, &domain.ValidatePaymentAndIncomeTypeID{
+	err := i.validateIncomeTypeAndPaymend(ctx, &domain.ValidatePaymentAndIncomeTypeID{
 		ProfileID:       req.ProfileID,
 		IncomeTypeID:    req.IncomeTypeID,
 		PaymentMethodID: req.PaymentMethodID,
@@ -175,12 +163,6 @@ func (i *IncomeHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Reque
 }
 
 func (i *IncomeHistoryUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
-	err := i.incomeHistoryRepo.OpenConn(ctx)
-	if err != nil {
-		return err
-	}
-	defer i.incomeHistoryRepo.CloseConn()
-
 	incomeHistoryJoin, err := i.incomeHistoryRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -223,12 +205,7 @@ func (i *IncomeHistoryUsecaseImpl) Delete(ctx context.Context, id string, profil
 }
 
 func (i *IncomeHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetFilteredDataIncomeHistory) (*[]domain.ResponseIncomeHistory, string, error) {
-	err := i.incomeHistoryRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, "", err
-	}
-	defer i.incomeHistoryRepo.CloseConn()
-
+	var err error
 	if req.Type != "" {
 		req.StartTime, req.EndTime, _ = helper.TimeDateByTypeFilter(req.Type)
 	} else {
@@ -257,12 +234,6 @@ func (i *IncomeHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context,
 }
 
 func (i *IncomeHistoryUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseIncomeHistory, error) {
-	err := i.incomeHistoryRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer i.incomeHistoryRepo.CloseConn()
-
 	incomeHistory, err := i.incomeHistoryRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

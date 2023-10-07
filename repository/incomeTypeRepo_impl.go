@@ -143,12 +143,12 @@ func (i *IncomeTypeRepositoryImpl) Delete(ctx context.Context, id string, profil
 func (i *IncomeTypeRepositoryImpl) CheckByNameAndProfileID(ctx context.Context, profileID string, name string) (bool, error) {
 	query := `SELECT EXISTS(SELECT id FROM m_income_type WHERE profile_id = $1 AND name = $2 AND deleted_at IS NULL);`
 
-	conn, err := i.GetConn()
+	db, err := i.GetDB()
 	if err != nil {
 		return false, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return false, err
@@ -173,12 +173,12 @@ func (i *IncomeTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id s
        				created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_income_type WHERE id = $1 AND profile_id = $2 AND deleted_at IS NULL`
 
-	conn, err := i.GetConn()
+	db, err := i.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -225,12 +225,12 @@ func (i *IncomeTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, req *d
 	}
 	query += `ORDER BY id ` + req.Order + ` LIMIT 5`
 
-	conn, err := i.GetConn()
+	db, err := i.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err

@@ -136,12 +136,12 @@ func (p *PaymentRepositoryImpl) Delete(ctx context.Context, id string, profileID
 func (p *PaymentRepositoryImpl) CheckData(ctx context.Context, profileID string) (bool, error) {
 	query := `SELECT EXISTS(SELECT id FROM m_payment_methods WHERE profile_id = $1);`
 
-	conn, err := p.GetConn()
+	db, err := p.GetDB()
 	if err != nil {
 		return false, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return false, err
@@ -166,12 +166,12 @@ func (p *PaymentRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id stri
        				updated_at, updated_by, deleted_at, deleted_by 
 			 FROM m_payment_methods WHERE id = $1 AND profile_id = $2 AND deleted_at IS NULL`
 
-	conn, err := p.GetConn()
+	db, err := p.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -211,12 +211,12 @@ func (p *PaymentRepositoryImpl) GetByNameAndProfileID(ctx context.Context, name 
        				updated_at, updated_by, deleted_at, deleted_by 
 			 FROM m_payment_methods WHERE name = $1 AND profile_id = $2 AND deleted_at IS NULL`
 
-	conn, err := p.GetConn()
+	db, err := p.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -260,12 +260,12 @@ func (p *PaymentRepositoryImpl) GetAllByProfileID(ctx context.Context, req *doma
 	}
 	query += `ORDER BY id ` + req.Order + ` LIMIT 5`
 
-	conn, err := p.GetConn()
+	db, err := p.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -320,12 +320,12 @@ func (p *PaymentRepositoryImpl) GetDefault(ctx context.Context) (*[]domain.Payme
        				updated_at, updated_by, deleted_at, deleted_by 
 			 FROM m_default_payment_method WHERE deleted_at IS NULL`
 
-	conn, err := p.GetConn()
+	db, err := p.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err

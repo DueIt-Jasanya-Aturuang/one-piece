@@ -32,13 +32,7 @@ func NewSpendingHistoryUsecaseImpl(
 }
 
 func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreateSpendingHistory) (*domain.ResponseSpendingHistory, error) {
-	err := s.spendingHistoryRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer s.spendingHistoryRepo.CloseConn()
-
-	err = s.validatePaymentAndSpendingTypeID(ctx, &domain.RequestValidatePaymentAndSpendingTypeID{
+	err := s.validatePaymentAndSpendingTypeID(ctx, &domain.RequestValidatePaymentAndSpendingTypeID{
 		ProfileID:       req.ProfileID,
 		SpendingTypeID:  req.SpendingTypeID,
 		PaymentMethodID: req.PaymentMethodID,
@@ -101,13 +95,7 @@ func (s *SpendingHistoryUsecaseImpl) Create(ctx context.Context, req *domain.Req
 }
 
 func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpdateSpendingHistory) (*domain.ResponseSpendingHistory, error) {
-	err := s.spendingHistoryRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer s.spendingHistoryRepo.CloseConn()
-
-	err = s.validatePaymentAndSpendingTypeID(ctx, &domain.RequestValidatePaymentAndSpendingTypeID{
+	err := s.validatePaymentAndSpendingTypeID(ctx, &domain.RequestValidatePaymentAndSpendingTypeID{
 		ProfileID:       req.ProfileID,
 		SpendingTypeID:  req.SpendingTypeID,
 		PaymentMethodID: req.PaymentMethodID,
@@ -177,12 +165,6 @@ func (s *SpendingHistoryUsecaseImpl) Update(ctx context.Context, req *domain.Req
 }
 
 func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
-	err := s.spendingHistoryRepo.OpenConn(ctx)
-	if err != nil {
-		return err
-	}
-	defer s.spendingHistoryRepo.CloseConn()
-
 	spendingHistoryJoin, err := s.spendingHistoryRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -225,12 +207,7 @@ func (s *SpendingHistoryUsecaseImpl) Delete(ctx context.Context, id string, prof
 }
 
 func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Context, req *domain.GetFilteredDataSpendingHistory) (*[]domain.ResponseSpendingHistory, string, error) {
-	err := s.spendingHistoryRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, "", err
-	}
-	defer s.spendingHistoryRepo.CloseConn()
-
+	var err error
 	if req.Type != "" {
 		req.StartTime, req.EndTime, _ = helper.TimeDateByTypeFilter(req.Type)
 	} else {
@@ -258,12 +235,6 @@ func (s *SpendingHistoryUsecaseImpl) GetAllByTimeAndProfileID(ctx context.Contex
 }
 
 func (s *SpendingHistoryUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseSpendingHistory, error) {
-	err := s.spendingHistoryRepo.OpenConn(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer s.spendingHistoryRepo.CloseConn()
-
 	spendingHistory, err := s.spendingHistoryRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

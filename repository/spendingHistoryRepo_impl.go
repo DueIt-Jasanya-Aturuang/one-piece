@@ -166,11 +166,11 @@ func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
 	}
 	query += `ORDER BY tsh.id ` + req.Order + ` LIMIT 5`
 
-	conn, err := s.GetConn()
+	db, err := s.GetDB()
 	if err != nil {
 		return nil, err
 	}
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContextClose, err)
 		return nil, err
@@ -238,11 +238,11 @@ func (s *SpendingHistoryRepositoryImpl) GetAllAmountByTimeAndProfileID(ctx conte
 				FROM t_spending_history
 				WHERE profile_id = $1 AND time_spending_history BETWEEN $2 AND $3 AND deleted_at IS NULL`
 
-	conn, err := s.GetConn()
+	db, err := s.GetDB()
 	if err != nil {
 		return 0, err
 	}
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContextClose, err)
 		return 0, err
@@ -272,12 +272,12 @@ func (s *SpendingHistoryRepositoryImpl) GetByIDAndProfileID(ctx context.Context,
 				LEFT JOIN m_payment_methods mpm ON tsh.payment_method_id = mpm.id
 				WHERE tsh.profile_id = $1 AND tsh.id = $2 AND tsh.deleted_at IS NULL`
 
-	conn, err := s.GetConn()
+	db, err := s.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContextClose, err)
 		return nil, err

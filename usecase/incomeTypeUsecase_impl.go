@@ -23,11 +23,6 @@ func NewIncomeTypeUsecaseImpl(
 }
 
 func (i *IncomeTypeUsecaseImpl) Create(ctx context.Context, req *domain.RequestCreateIncomeType) (*domain.ResponseIncomeType, error) {
-	if err := i.incomeTypeRepo.OpenConn(ctx); err != nil {
-		return nil, err
-	}
-	defer i.incomeTypeRepo.CloseConn()
-
 	exist, err := i.incomeTypeRepo.CheckByNameAndProfileID(ctx, req.ProfileID, req.Name)
 	if err != nil {
 		return nil, err
@@ -54,11 +49,6 @@ func (i *IncomeTypeUsecaseImpl) Create(ctx context.Context, req *domain.RequestC
 }
 
 func (i *IncomeTypeUsecaseImpl) Update(ctx context.Context, req *domain.RequestUpdateIncomeType) (*domain.ResponseIncomeType, error) {
-	if err := i.incomeTypeRepo.OpenConn(ctx); err != nil {
-		return nil, err
-	}
-	defer i.incomeTypeRepo.CloseConn()
-
 	incomeType, err := i.incomeTypeRepo.GetByIDAndProfileID(ctx, req.ID, req.ProfileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -97,11 +87,6 @@ func (i *IncomeTypeUsecaseImpl) Update(ctx context.Context, req *domain.RequestU
 }
 
 func (i *IncomeTypeUsecaseImpl) Delete(ctx context.Context, id string, profileID string) error {
-	if err := i.incomeTypeRepo.OpenConn(ctx); err != nil {
-		return err
-	}
-	defer i.incomeTypeRepo.CloseConn()
-
 	err := i.incomeTypeRepo.StartTx(ctx, helper.LevelReadCommitted(), func() error {
 		err := i.incomeTypeRepo.Delete(ctx, id, profileID)
 		if err != nil {
@@ -115,11 +100,6 @@ func (i *IncomeTypeUsecaseImpl) Delete(ctx context.Context, id string, profileID
 }
 
 func (i *IncomeTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id string, profileID string) (*domain.ResponseIncomeType, error) {
-	if err := i.incomeTypeRepo.OpenConn(ctx); err != nil {
-		return nil, err
-	}
-	defer i.incomeTypeRepo.CloseConn()
-
 	incomeType, err := i.incomeTypeRepo.GetByIDAndProfileID(ctx, id, profileID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -134,11 +114,6 @@ func (i *IncomeTypeUsecaseImpl) GetByIDAndProfileID(ctx context.Context, id stri
 }
 
 func (i *IncomeTypeUsecaseImpl) GetAllByProfileID(ctx context.Context, req *domain.RequestGetAllPaginate) (*[]domain.ResponseIncomeType, string, error) {
-	if err := i.incomeTypeRepo.OpenConn(ctx); err != nil {
-		return nil, "", err
-	}
-	defer i.incomeTypeRepo.CloseConn()
-
 	incomeTypes, err := i.incomeTypeRepo.GetAllByProfileID(ctx, req)
 	if err != nil {
 		return nil, "", err

@@ -135,12 +135,12 @@ func (s *SpendingTypeRepositoryImpl) Delete(ctx context.Context, id string, prof
 func (s *SpendingTypeRepositoryImpl) CheckData(ctx context.Context, profileID string) (bool, error) {
 	query := `SELECT EXISTS(SELECT id FROM m_spending_type WHERE profile_id = $1);`
 
-	conn, err := s.GetConn()
+	db, err := s.GetDB()
 	if err != nil {
 		return false, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return false, err
@@ -163,12 +163,12 @@ func (s *SpendingTypeRepositoryImpl) CheckData(ctx context.Context, profileID st
 func (s *SpendingTypeRepositoryImpl) CheckByTitleAndProfileID(ctx context.Context, profileID string, title string) (bool, error) {
 	query := `SELECT EXISTS(SELECT id FROM m_spending_type WHERE profile_id = $1 AND title = $2 AND deleted_at IS NULL);`
 
-	conn, err := s.GetConn()
+	db, err := s.GetDB()
 	if err != nil {
 		return false, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return false, err
@@ -192,12 +192,12 @@ func (s *SpendingTypeRepositoryImpl) GetDefault(ctx context.Context) (*[]domain.
 	query := `SELECT id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_default_spending_type WHERE active = true AND deleted_at IS NULL`
 
-	conn, err := s.GetConn()
+	db, err := s.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -244,12 +244,12 @@ func (s *SpendingTypeRepositoryImpl) GetByIDAndProfileID(ctx context.Context, id
 	query := `SELECT id, profile_id, title, maximum_limit, icon, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
 				FROM m_spending_type WHERE id = $1 AND profile_id = $2 AND deleted_at IS NULL`
 
-	conn, err := s.GetConn()
+	db, err := s.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -297,12 +297,12 @@ func (s *SpendingTypeRepositoryImpl) GetAllByTimeAndProfileID(ctx context.Contex
 
 	query += `GROUP BY mst.id ORDER BY mst.id ` + req.Order + ` LIMIT 5`
 
-	conn, err := s.GetConn()
+	db, err := s.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
@@ -368,12 +368,12 @@ func (s *SpendingTypeRepositoryImpl) GetAllByProfileID(ctx context.Context, req 
 	}
 	query += `ORDER BY id ` + req.Order + ` LIMIT 5`
 
-	conn, err := s.GetConn()
+	db, err := s.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err

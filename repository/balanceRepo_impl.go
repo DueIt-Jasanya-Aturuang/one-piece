@@ -103,12 +103,12 @@ func (b *BalanceRepositoryImpl) GetByProfileID(ctx context.Context, profileID st
 					created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
        FROM m_balance WHERE profile_id = $1`
 
-	conn, err := b.GetConn()
+	db, err := b.GetDB()
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := conn.PrepareContext(ctx, query)
+	stmt, err := db.PrepareContext(ctx, query)
 	if err != nil {
 		log.Warn().Msgf(util.LogErrPrepareContext, err)
 		return nil, err
