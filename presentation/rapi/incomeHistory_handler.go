@@ -14,7 +14,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/validation"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
 )
 
 type IncomeHistoryHandlerImpl struct {
@@ -47,17 +47,17 @@ func (h *IncomeHistoryHandlerImpl) Create(w http.ResponseWriter, r *http.Request
 
 	incomeHistory, err := h.incomeHistoryUsecase.Create(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, usecase.IncomeHistoryNotFound) {
+		if errors.Is(err, usecase_old.IncomeHistoryNotFound) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
-		if errors.Is(err, usecase.InvalidIncomeTypeID) {
+		if errors.Is(err, usecase_old.InvalidIncomeTypeID) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"income_type_id": {
 					err.Error(),
 				},
 			}, response.CM06)
 		}
-		if errors.Is(err, usecase.InvalidPaymentMethodID) {
+		if errors.Is(err, usecase_old.InvalidPaymentMethodID) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"payment_method_id": {
 					err.Error(),
@@ -91,17 +91,17 @@ func (h *IncomeHistoryHandlerImpl) Update(w http.ResponseWriter, r *http.Request
 
 	incomeHistory, err := h.incomeHistoryUsecase.Update(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, usecase.IncomeHistoryNotFound) {
+		if errors.Is(err, usecase_old.IncomeHistoryNotFound) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
-		if errors.Is(err, usecase.InvalidIncomeTypeID) {
+		if errors.Is(err, usecase_old.InvalidIncomeTypeID) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"income_type_id": {
 					err.Error(),
 				},
 			}, response.CM06)
 		}
-		if errors.Is(err, usecase.InvalidPaymentMethodID) {
+		if errors.Is(err, usecase_old.InvalidPaymentMethodID) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"payment_method_id": {
 					err.Error(),
@@ -131,10 +131,10 @@ func (h *IncomeHistoryHandlerImpl) Delete(w http.ResponseWriter, r *http.Request
 
 	err := h.incomeHistoryUsecase.Delete(r.Context(), id, profileID)
 	if err != nil {
-		if errors.Is(err, usecase.IncomeHistoryNotFound) {
+		if errors.Is(err, usecase_old.IncomeHistoryNotFound) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
-		if errors.Is(err, usecase.ProfileIDNotFound) {
+		if errors.Is(err, usecase_old.ProfileIDNotFound) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)
@@ -174,7 +174,7 @@ func (h *IncomeHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *h
 
 	incomeHistories, cursorResp, err := h.incomeHistoryUsecase.GetAllByTimeAndProfileID(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, usecase.InvalidTimestamp) {
+		if errors.Is(err, usecase_old.InvalidTimestamp) {
 			err = _error.HttpErrString(err.Error(), response.CM06)
 		}
 		helper.ErrorResponseEncode(w, err)
@@ -182,8 +182,8 @@ func (h *IncomeHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *h
 	}
 
 	resp := map[string]any{
-		"cursor":         cursorResp,
-		"income_history": incomeHistories,
+		"cursor":                   cursorResp,
+		"incomeHistory_repository": incomeHistories,
 	}
 	helper.SuccessResponseEncode(w, resp, "data income history")
 }
@@ -204,7 +204,7 @@ func (h *IncomeHistoryHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r 
 
 	incomeHistory, err := h.incomeHistoryUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
 	if err != nil {
-		if errors.Is(err, usecase.IncomeHistoryNotFound) {
+		if errors.Is(err, usecase_old.IncomeHistoryNotFound) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)

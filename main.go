@@ -7,12 +7,13 @@ import (
 	middlewareChi "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog/log"
 
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository_old"
+
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/middleware"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
 )
 
 func main() {
@@ -22,23 +23,23 @@ func main() {
 	pgConn := infra.NewPostgresConn()
 	minioConn := infra.NewMinioConn()
 
-	// repository
-	uow := repository.NewUnitOfWorkRepositoryImpl(pgConn)
-	paymentRepo := repository.NewPaymentRepositoryImpl(uow)
-	minioRepo := repository.NewMinioImpl(minioConn)
-	spendingTypeRepo := repository.NewSpendingTypeRepositoryImpl(uow)
-	spendingHistoryRepo := repository.NewSpendingHistoryRepositoryImpl(uow)
-	balanceRepo := repository.NewBalanceRepositoryImpl(uow)
-	incomeTypeRepo := repository.NewIncomeTypeRepositoryImpl(uow)
-	incomeHistoryRepo := repository.NewIncomeHistoryRepositoryImpl(uow)
+	// repository_old
+	uow := repository_old.NewUnitOfWorkRepositoryImpl(pgConn)
+	paymentRepo := repository_old.NewPaymentRepositoryImpl(uow)
+	minioRepo := repository_old.NewMinioImpl(minioConn)
+	spendingTypeRepo := repository_old.NewSpendingTypeRepositoryImpl(uow)
+	spendingHistoryRepo := repository_old.NewSpendingHistoryRepositoryImpl(uow)
+	balanceRepo := repository_old.NewBalanceRepositoryImpl(uow)
+	incomeTypeRepo := repository_old.NewIncomeTypeRepositoryImpl(uow)
+	incomeHistoryRepo := repository_old.NewIncomeHistoryRepositoryImpl(uow)
 
-	// usecase
-	paymentUsecase := usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
-	spendingTypeUsecase := usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo, spendingHistoryRepo)
-	spendingHistoryUsecase := usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
-	balanceUsecase := usecase.NewBalanceUsecaseImpl(balanceRepo)
-	incomeTypeUsecase := usecase.NewIncomeTypeUsecaseImpl(incomeTypeRepo)
-	incomeHistoryUsecase := usecase.NewIncomeHistoryUsecaseImpl(incomeTypeRepo, incomeHistoryRepo, paymentRepo, balanceRepo)
+	// usecase_old
+	paymentUsecase := usecase_old.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	spendingTypeUsecase := usecase_old.NewSpendingTypeUsecaseImpl(spendingTypeRepo, spendingHistoryRepo)
+	spendingHistoryUsecase := usecase_old.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
+	balanceUsecase := usecase_old.NewBalanceUsecaseImpl(balanceRepo)
+	incomeTypeUsecase := usecase_old.NewIncomeTypeUsecaseImpl(incomeTypeRepo)
+	incomeHistoryUsecase := usecase_old.NewIncomeHistoryUsecaseImpl(incomeTypeRepo, incomeHistoryRepo, paymentRepo, balanceRepo)
 
 	// handler
 	paymentHandler := rapi.NewPaymentHandlerImpl(paymentUsecase)

@@ -13,7 +13,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/validation"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
 )
 
 type PaymentHandlerImpl struct {
@@ -51,7 +51,7 @@ func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 
 	payment, err := h.paymentUsecase.Create(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, usecase.NamePaymentExist) {
+		if errors.Is(err, usecase_old.NamePaymentExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"name": {
 					err.Error(),
@@ -91,13 +91,13 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 
 	payment, err := h.paymentUsecase.Update(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, usecase.NamePaymentExist) {
+		if errors.Is(err, usecase_old.NamePaymentExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"name": {
 					err.Error(),
 				},
 			}, response.CM06)
-		} else if errors.Is(err, usecase.PaymentNotExist) {
+		} else if errors.Is(err, usecase_old.PaymentNotExist) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
 
@@ -154,7 +154,7 @@ func (h *PaymentHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
 
 	err := h.paymentUsecase.Delete(r.Context(), id, profileID)
 	if err != nil {
-		if errors.Is(err, usecase.PaymentNotExist) {
+		if errors.Is(err, usecase_old.PaymentNotExist) {
 			helper.SuccessResponseEncode(w, nil, "deleted payment successfully")
 			return
 		}

@@ -13,7 +13,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/validation"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
 )
 
 type IncomeTypeHandlerImpl struct {
@@ -44,7 +44,7 @@ func (i *IncomeTypeHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 
 	incomeType, err := i.incomeTypeUsecase.Create(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, usecase.NameIncomeTypeIsExist) {
+		if errors.Is(err, usecase_old.NameIncomeTypeIsExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"name": {
 					"name pemasukan kategori sudah tersedia",
@@ -77,14 +77,14 @@ func (i *IncomeTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 
 	incomeType, err := i.incomeTypeUsecase.Update(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, usecase.NameIncomeTypeIsExist) {
+		if errors.Is(err, usecase_old.NameIncomeTypeIsExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"name": {
 					"name pemasukan kategori sudah tersedia",
 				},
 			}, response.CM06)
 		}
-		if errors.Is(err, usecase.IncomeTypeIsNotExist) {
+		if errors.Is(err, usecase_old.IncomeTypeIsNotExist) {
 			err = _error.HttpErrString("pemasukan kategori tidak ditemukan", response.CM01)
 		}
 
@@ -132,7 +132,7 @@ func (i *IncomeTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *ht
 
 	resp, err := i.incomeTypeUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
 	if err != nil {
-		if errors.Is(err, usecase.IncomeTypeIsNotExist) {
+		if errors.Is(err, usecase_old.IncomeTypeIsNotExist) {
 			err = _error.HttpErrString("data pemasukan kategori tidak ditemukan", response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)

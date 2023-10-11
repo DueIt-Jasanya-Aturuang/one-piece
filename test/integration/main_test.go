@@ -12,19 +12,20 @@ import (
 	"github.com/ory/dockertest/v3"
 	"github.com/rs/zerolog/log"
 
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository_old"
+
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/test/integration/setup"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
 )
 
 var DB *sql.DB
 var minioClient *minio.Client
-var Uow = repository.NewUnitOfWorkRepositoryImpl(DB)
-var PaymentRepo = repository.NewPaymentRepositoryImpl(Uow)
-var SpendingTypeRepo = repository.NewSpendingTypeRepositoryImpl(Uow)
-var SpendingHistoryRepo = repository.NewSpendingHistoryRepositoryImpl(Uow)
-var SpendingTypeUsecase = usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
+var Uow = repository_old.NewUnitOfWorkRepositoryImpl(DB)
+var PaymentRepo = repository_old.NewPaymentRepositoryImpl(Uow)
+var SpendingTypeRepo = repository_old.NewSpendingTypeRepositoryImpl(Uow)
+var SpendingHistoryRepo = repository_old.NewSpendingHistoryRepositoryImpl(Uow)
+var SpendingTypeUsecase = usecase_old.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
 
 func TestMain(m *testing.M) {
 	infra.LogInit()
@@ -34,11 +35,11 @@ func TestMain(m *testing.M) {
 	pgResource, dbPg, _ := setup.Postgres(dockerpool)
 	resources = append(resources, pgResource)
 	DB = dbPg
-	Uow = repository.NewUnitOfWorkRepositoryImpl(DB)
-	PaymentRepo = repository.NewPaymentRepositoryImpl(Uow)
-	SpendingTypeRepo = repository.NewSpendingTypeRepositoryImpl(Uow)
-	SpendingHistoryRepo = repository.NewSpendingHistoryRepositoryImpl(Uow)
-	SpendingTypeUsecase = usecase.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
+	Uow = repository_old.NewUnitOfWorkRepositoryImpl(DB)
+	PaymentRepo = repository_old.NewPaymentRepositoryImpl(Uow)
+	SpendingTypeRepo = repository_old.NewSpendingTypeRepositoryImpl(Uow)
+	SpendingHistoryRepo = repository_old.NewSpendingHistoryRepositoryImpl(Uow)
+	SpendingTypeUsecase = usecase_old.NewSpendingTypeUsecaseImpl(SpendingTypeRepo)
 
 	if DB == nil {
 		panic("db nil")

@@ -10,7 +10,7 @@ import (
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
 )
 
 type BalanceHandlerImpl struct {
@@ -34,7 +34,7 @@ func (b BalanceHandlerImpl) GetByProfileID(w http.ResponseWriter, r *http.Reques
 
 	resp, err := b.balanceUsecase.GetByProfileID(r.Context(), profileID)
 	if err != nil {
-		if errors.Is(err, usecase.BalanceNotExist) {
+		if errors.Is(err, usecase_old.BalanceNotExist) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 		}
 

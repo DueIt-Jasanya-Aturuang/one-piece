@@ -16,7 +16,7 @@ import (
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/validation"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
 )
 
 type SpendingTypeHandlerImpl struct {
@@ -49,7 +49,7 @@ func (h *SpendingTypeHandlerImpl) Create(w http.ResponseWriter, r *http.Request)
 
 	spendingType, err := h.spendingTypeUsecase.Create(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, usecase.TitleSpendingTypeExist) {
+		if errors.Is(err, usecase_old.TitleSpendingTypeExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"title": {
 					err.Error(),
@@ -83,14 +83,14 @@ func (h *SpendingTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request)
 
 	spendingType, err := h.spendingTypeUsecase.Update(r.Context(), req)
 	if err != nil {
-		if errors.Is(err, usecase.TitleSpendingTypeExist) {
+		if errors.Is(err, usecase_old.TitleSpendingTypeExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"title": {
 					err.Error(),
 				},
 			}, response.CM06)
 		}
-		if errors.Is(err, usecase.SpendingTypeNotFound) {
+		if errors.Is(err, usecase_old.SpendingTypeNotFound) {
 			err = _error.HttpErrString("not found", response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)
@@ -142,7 +142,7 @@ func (h *SpendingTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *
 
 	spendingType, err := h.spendingTypeUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
 	if err != nil {
-		if errors.Is(err, usecase.SpendingTypeNotFound) {
+		if errors.Is(err, usecase_old.SpendingTypeNotFound) {
 			err = _error.HttpErrString("not found", response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)

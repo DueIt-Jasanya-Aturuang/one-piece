@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
+	_repository2 "github.com/DueIt-Jasanya-Aturuang/one-piece/repository_old"
 )
 
 func TestSpendingHistoryCreate(t *testing.T) {

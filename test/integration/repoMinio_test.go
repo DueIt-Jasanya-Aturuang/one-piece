@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository_old"
 )
 
 func createBucket(t *testing.T) {
@@ -22,7 +22,7 @@ func minioRepo(t *testing.T) {
 	fileHeader := newFileHeader()
 	fileExt := filepath.Ext(fileHeader.Filename)
 	ctx := context.TODO()
-	minioRepo := repository.NewMinioImpl(minioClient)
+	minioRepo := repository_old.NewMinioImpl(minioClient)
 
 	fileName := minioRepo.GenerateFileName(fileExt, "payment-images/public/")
 

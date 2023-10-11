@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository_old"
 )
 
 func TestRepoCreatePayment(t *testing.T) {
@@ -19,8 +19,8 @@ func TestRepoCreatePayment(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := repository.NewUnitOfWorkRepositoryImpl(db)
-	paymentRepo := repository.NewPaymentRepositoryImpl(uow)
+	uow := repository_old.NewUnitOfWorkRepositoryImpl(db)
+	paymentRepo := repository_old.NewPaymentRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`INSERT INTO m_payment_methods (id, name, description, image, created_at, created_by, updated_at) 
 				VALUES ($1, $2, $3, $4, $5, $6, $7)`)
@@ -104,8 +104,8 @@ func TestRepoUpdatePayment(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := repository.NewUnitOfWorkRepositoryImpl(db)
-	paymentRepo := repository.NewPaymentRepositoryImpl(uow)
+	uow := repository_old.NewUnitOfWorkRepositoryImpl(db)
+	paymentRepo := repository_old.NewPaymentRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`UPDATE m_payment_methods SET name = $1, description = $2, image = $3, updated_at = $4, updated_by = $5 
             	WHERE id = $6 AND deleted_at IS NULL`)
@@ -187,8 +187,8 @@ func TestRepoGetPaymentById(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := repository.NewUnitOfWorkRepositoryImpl(db)
-	paymentRepo := repository.NewPaymentRepositoryImpl(uow)
+	uow := repository_old.NewUnitOfWorkRepositoryImpl(db)
+	paymentRepo := repository_old.NewPaymentRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
@@ -255,8 +255,8 @@ func TestRepoGetPaymentByName(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := repository.NewUnitOfWorkRepositoryImpl(db)
-	paymentRepo := repository.NewPaymentRepositoryImpl(uow)
+	uow := repository_old.NewUnitOfWorkRepositoryImpl(db)
+	paymentRepo := repository_old.NewPaymentRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
@@ -323,8 +323,8 @@ func TestRepoGetAllPayment(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	uow := repository.NewUnitOfWorkRepositoryImpl(db)
-	paymentRepo := repository.NewPaymentRepositoryImpl(uow)
+	uow := repository_old.NewUnitOfWorkRepositoryImpl(db)
+	paymentRepo := repository_old.NewPaymentRepositoryImpl(uow)
 
 	query := regexp.QuoteMeta(`SELECT id, name, description, image, created_at, created_by, 
        				updated_at, updated_by, deleted_at, deleted_by 
