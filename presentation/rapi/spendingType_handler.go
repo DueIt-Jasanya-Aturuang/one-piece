@@ -221,6 +221,16 @@ func (p *Presenter) GetAllSpendingTypeByPeriodeAndProfileID(w http.ResponseWrite
 		return
 	}
 
+	if spendingTypes == nil {
+		helper.SuccessResponseEncode(w, map[string]any{
+			"cursor":               "",
+			"spending_type":        nil,
+			"budget_amount":        0,
+			"format_budget_amount": "0",
+		}, "data spending type")
+		return
+	}
+
 	var responseSpendingTypes []schema.ResponseSpendingTypeJoinTable
 	var responseSpendingType *schema.ResponseSpendingTypeJoinTable
 
@@ -268,6 +278,14 @@ func (p *Presenter) GetAllSpendingTypeByProfileID(w http.ResponseWriter, r *http
 	})
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
+		return
+	}
+
+	if spendingTypes == nil {
+		helper.SuccessResponseEncode(w, map[string]any{
+			"cursor":        "",
+			"spending_type": nil,
+		}, "data spending type")
 		return
 	}
 

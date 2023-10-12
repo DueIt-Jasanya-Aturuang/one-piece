@@ -232,6 +232,14 @@ func (p *Presenter) GetAllIncomeHistoryByProfileID(w http.ResponseWriter, r *htt
 		return
 	}
 
+	if incomeHistories == nil {
+		helper.SuccessResponseEncode(w, map[string]any{
+			"cursor":         "",
+			"income_history": nil,
+		}, "data income history")
+		return
+	}
+
 	var respIncomeHistories []schema.ResponseIncomeHistory
 	var respIncomeHistory *schema.ResponseIncomeHistory
 

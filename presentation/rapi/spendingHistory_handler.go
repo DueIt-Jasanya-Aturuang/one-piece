@@ -229,6 +229,14 @@ func (p *Presenter) GetAllSpendingHistoryByProfileID(w http.ResponseWriter, r *h
 		return
 	}
 
+	if spendingHistories == nil {
+		helper.SuccessResponseEncode(w, map[string]any{
+			"cursor":           "",
+			"spending_history": nil,
+		}, "data spending history")
+		return
+	}
+
 	var responses []schema.ResponseSpendingHistory
 	var responseSpendingHistory *schema.ResponseSpendingHistory
 

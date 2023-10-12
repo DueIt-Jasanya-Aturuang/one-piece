@@ -202,6 +202,14 @@ func (p *Presenter) GetAllIncomeTypeByProfileID(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	if incomeTypes == nil {
+		helper.SuccessResponseEncode(w, map[string]any{
+			"cursor":      "",
+			"income_type": nil,
+		}, "data income type")
+		return
+	}
+
 	var responses []schema.ResponseIncomeType
 	var responseIncomeType *schema.ResponseIncomeType
 

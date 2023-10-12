@@ -152,6 +152,14 @@ func (p *Presenter) GetAllPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if payments == nil {
+		helper.SuccessResponseEncode(w, map[string]any{
+			"cursor":   "",
+			"payments": nil,
+		}, "data payment")
+		return
+	}
+
 	var responses []schema.ResponsePayment
 	var responsePayment *schema.ResponsePayment
 
