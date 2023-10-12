@@ -1,22 +1,22 @@
-package validation
+package util
 
 import (
 	"fmt"
 )
 
-var required = "field ini tidak boleh dikosongkan"
+var Required = "field ini tidak boleh dikosongkan"
 var minString = "field ini tidak boleh kurang dari %d"
 var maxString = "field ini tidak boleh lebih dari %d"
 var minNumeric = "field ini tidak boleh kurang dari %d"
 var maxNumeric = "field ini tidak boleh lebih dari %d"
-var fileSize = "maximal size harus %d kb atau %d mb"
-var fileContent = "file content harus %s"
+var FileSize = "maximal size harus %d kb atau %d mb"
+var FileContent = "file content harus %s"
 
-const image = "image"
+const Image = "image"
 
-func contentType(typeContent string) []string {
+func ContentType(typeContent string) []string {
 	switch typeContent {
-	case image:
+	case Image:
 		return []string{
 			"image/png", "image/jpeg", "image/jpg",
 		}
@@ -26,13 +26,13 @@ func contentType(typeContent string) []string {
 		"image/png", "image/jpeg", "image/jpg",
 	}
 }
-func checkContentType(headerContentType string, typeContent string) bool {
+func CheckContentType(headerContentType string, typeContent string) bool {
 	if headerContentType == "" {
 		return false
 	}
 
 	var status bool
-	for _, v := range contentType(typeContent) {
+	for _, v := range ContentType(typeContent) {
 		if headerContentType == v {
 			return true
 		}
@@ -41,7 +41,7 @@ func checkContentType(headerContentType string, typeContent string) bool {
 	return status
 }
 
-func maxMinString(s string, min, max int) string {
+func MaxMinString(s string, min, max int) string {
 	switch {
 	case len(s) < min:
 		return fmt.Sprintf(minString, min)
@@ -52,7 +52,7 @@ func maxMinString(s string, min, max int) string {
 	return ""
 }
 
-func maxMinNumeric(i int, min, max int) string {
+func MaxMinNumeric(i int, min, max int) string {
 	switch {
 	case i < min:
 		return fmt.Sprintf(minNumeric, min)

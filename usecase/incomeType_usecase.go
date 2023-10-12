@@ -18,25 +18,25 @@ type IncomeTypeUsecase interface {
 
 type RequestCreateIncomeType struct {
 	ProfileID   string
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Icon        string `json:"icon"`
+	Name        string
+	Description string
+	Icon        string
 }
 
 type RequestUpdateIncomeType struct {
 	ID          string
 	ProfileID   string
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Icon        string `json:"icon"`
+	Name        string
+	Description string
+	Icon        string
 }
 
 type ResponseIncomeType struct {
-	ID          string  `json:"id"`
-	ProfileID   string  `json:"profile_id"`
-	Name        string  `json:"name"`
-	Description *string `json:"description"`
-	Icon        string  `json:"icon"`
+	ID          string
+	ProfileID   string
+	Name        string
+	Description *string
+	Icon        string
 }
 
 func (req *RequestCreateIncomeType) ToModel() *repository.IncomeType {

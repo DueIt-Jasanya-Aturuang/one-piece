@@ -5,46 +5,45 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
-	"github.com/oklog/ulid/v2"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/validation"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/schema"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
-type IncomeTypeHandlerImpl struct {
-	incomeTypeUsecase domain.IncomeTypeUsecase
-}
+func (p *Presenter) CreateIncomeType(w http.ResponseWriter, r *http.Request) {
+	profileID := r.Header.Get("Profile-ID")
 
-func NewIncomeTypeHandlerImpl(incomeTypeUsecase domain.IncomeTypeUsecase) *IncomeTypeHandlerImpl {
-	return &IncomeTypeHandlerImpl{
-		incomeTypeUsecase: incomeTypeUsecase,
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
 	}
-}
 
-func (i *IncomeTypeHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
-	req := new(domain.RequestCreateIncomeType)
+	req := new(schema.RequestCreateOrUpdateIncomeType)
 
 	err := helper.DecodeJson(r, req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
-	req.ProfileID = r.Header.Get("Profile-ID")
 
-	err = validation.CreateIncomeType(req)
+	err = req.Validate()
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	incomeType, err := i.incomeTypeUsecase.Create(r.Context(), req)
+	incomeType, err := p.incomeTypeUsecase.Create(r.Context(), &usecase.RequestCreateIncomeType{
+		ProfileID:   profileID,
+		Name:        req.Name,
+		Description: req.Description,
+		Icon:        req.Icon,
+	})
 	if err != nil {
-		if errors.Is(err, usecase_old.NameIncomeTypeIsExist) {
+		if errors.Is(err, usecase.NameIncomeTypeIsExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"name": {
 					"name pemasukan kategori sudah tersedia",
@@ -55,36 +54,60 @@ func (i *IncomeTypeHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helper.SuccessResponseEncode(w, incomeType, "created pemasukan kategori sukses")
+	resp := &schema.ResponseIncomeType{
+		ID:          incomeType.ID,
+		ProfileID:   incomeType.ProfileID,
+		Name:        incomeType.Name,
+		Description: incomeType.Description,
+		Icon:        incomeType.Icon,
+	}
+	helper.SuccessResponseEncode(w, resp, "created pemasukan kategori sukses")
 }
 
-func (i *IncomeTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
-	req := new(domain.RequestUpdateIncomeType)
+func (p *Presenter) UpdateIncomeType(w http.ResponseWriter, r *http.Request) {
+	profileID := r.Header.Get("Profile-ID")
+	id := chi.URLParam(r, "id")
+
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
+	}
+
+	if errParse := util.ParseUlid(id); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
+		return
+	}
+
+	req := new(schema.RequestCreateOrUpdateIncomeType)
 
 	err := helper.DecodeJson(r, req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
-	req.ID = chi.URLParam(r, "id")
-	req.ProfileID = r.Header.Get("Profile-ID")
 
-	err = validation.UpdateIncomeType(req)
+	err = req.Validate()
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	incomeType, err := i.incomeTypeUsecase.Update(r.Context(), req)
+	incomeType, err := p.incomeTypeUsecase.Update(r.Context(), &usecase.RequestUpdateIncomeType{
+		ID:          id,
+		ProfileID:   profileID,
+		Name:        req.Name,
+		Description: req.Description,
+		Icon:        req.Icon,
+	})
 	if err != nil {
-		if errors.Is(err, usecase_old.NameIncomeTypeIsExist) {
+		if errors.Is(err, usecase.NameIncomeTypeIsExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"name": {
 					"name pemasukan kategori sudah tersedia",
 				},
 			}, response.CM06)
 		}
-		if errors.Is(err, usecase_old.IncomeTypeIsNotExist) {
+		if errors.Is(err, usecase.IncomeTypeIsNotExist) {
 			err = _error.HttpErrString("pemasukan kategori tidak ditemukan", response.CM01)
 		}
 
@@ -92,23 +115,31 @@ func (i *IncomeTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helper.SuccessResponseEncode(w, incomeType, "update pemasukan kategori sukses")
+	resp := &schema.ResponseIncomeType{
+		ID:          incomeType.ID,
+		ProfileID:   incomeType.ProfileID,
+		Name:        incomeType.Name,
+		Description: incomeType.Description,
+		Icon:        incomeType.Icon,
+	}
+	helper.SuccessResponseEncode(w, resp, "update pemasukan kategori sukses")
 }
 
-func (i *IncomeTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+func (p *Presenter) DeleteIncomeType(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
+	id := chi.URLParam(r, "id")
 
-	if _, err := ulid.Parse(id); err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
-		return
-	}
-	if _, err := uuid.Parse(profileID); err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
 		return
 	}
 
-	err := i.incomeTypeUsecase.Delete(r.Context(), id, profileID)
+	if errParse := util.ParseUlid(id); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
+		return
+	}
+
+	err := p.incomeTypeUsecase.Delete(r.Context(), id, profileID)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
@@ -117,59 +148,77 @@ func (i *IncomeTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
 	helper.SuccessResponseEncode(w, nil, "deleted pemasukan kategori sukses")
 }
 
-func (i *IncomeTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+func (p *Presenter) GetIncomeTypeByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
+	id := chi.URLParam(r, "id")
 
-	if _, err := ulid.Parse(id); err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
-		return
-	}
-	if _, err := uuid.Parse(profileID); err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
 		return
 	}
 
-	resp, err := i.incomeTypeUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
+	if errParse := util.ParseUlid(id); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
+		return
+	}
+
+	incomeType, err := p.incomeTypeUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
 	if err != nil {
-		if errors.Is(err, usecase_old.IncomeTypeIsNotExist) {
+		if errors.Is(err, usecase.IncomeTypeIsNotExist) {
 			err = _error.HttpErrString("data pemasukan kategori tidak ditemukan", response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
+	resp := &schema.ResponseIncomeType{
+		ID:          incomeType.ID,
+		ProfileID:   incomeType.ProfileID,
+		Name:        incomeType.Name,
+		Description: incomeType.Description,
+		Icon:        incomeType.Icon,
+	}
 	helper.SuccessResponseEncode(w, resp, "data pemasukan kategori")
 }
 
-func (i *IncomeTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
+func (p *Presenter) GetAllIncomeTypeByProfileID(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
 
-	if _, err := uuid.Parse(profileID); err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
 		return
 	}
 
 	cursor := r.URL.Query().Get("cursor")
 	order := r.URL.Query().Get("order")
-	order, operation := helper.GetOrder(order)
 
-	req := &domain.RequestGetAllPaginate{
-		ProfileID: profileID,
+	incomeTypes, cursorResp, err := p.incomeTypeUsecase.GetAllByProfileID(r.Context(), &usecase.RequestGetAllByProfileIDWithISD{
 		ID:        cursor,
-		Operation: operation,
+		ProfileID: profileID,
 		Order:     order,
-	}
-
-	incomeTypes, cursorResp, err := i.incomeTypeUsecase.GetAllByProfileID(r.Context(), req)
+	})
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
+	var responses []schema.ResponseIncomeType
+	var responseIncomeType *schema.ResponseIncomeType
+
+	for _, incomeType := range *incomeTypes {
+		responseIncomeType = &schema.ResponseIncomeType{
+			ID:          incomeType.ID,
+			ProfileID:   incomeType.ProfileID,
+			Name:        incomeType.Name,
+			Description: incomeType.Description,
+			Icon:        incomeType.Icon,
+		}
+
+		responses = append(responses, *responseIncomeType)
+	}
 	resp := map[string]any{
 		"cursor":      cursorResp,
-		"income_type": incomeTypes,
+		"income_type": &responses,
 	}
 
 	helper.SuccessResponseEncode(w, resp, "data pemasukan kategori")

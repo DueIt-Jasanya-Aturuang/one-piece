@@ -95,7 +95,7 @@ func (s *SpendingHistoryRepositoryImpl) GetAllByTimeAndProfileID(
 	return &spendingHistories, nil
 }
 
-func (s *SpendingHistoryRepositoryImpl) GetAllAmountByTimeAndProfileID(ctx context.Context, req *repository.GetTotalSpendingHistoryByPeriode) (int, error) {
+func (s *SpendingHistoryRepositoryImpl) GetTotalAmountByPeriode(ctx context.Context, req *repository.GetTotalSpendingHistoryByPeriode) (int, error) {
 	query := `SELECT COALESCE(SUM(CASE WHEN time_spending_history BETWEEN $2 AND $3 AND deleted_at IS NULL THEN spending_amount ELSE 0 END), 0)
 				FROM t_spending_history
 				WHERE profile_id = $1 AND time_spending_history BETWEEN $2 AND $3 AND deleted_at IS NULL`

@@ -31,42 +31,42 @@ type RequestGetAllSpendingHistoryWithISD struct {
 
 type RequestCreateSpendingHistory struct {
 	ProfileID               string
-	SpendingTypeID          string `json:"spending_type_id"`
-	PaymentMethodID         string `json:"payment_method_id"`
-	PaymentName             string `json:"payment_name"`
-	SpendingAmount          int    `json:"spending_amount"`
-	Description             string `json:"description"`
-	TimeSpendingHistory     string `json:"time_spending_history"`
-	ShowTimeSpendingHistory string `json:"show_time_spending_history"`
+	SpendingTypeID          string
+	PaymentMethodID         string
+	PaymentName             string
+	SpendingAmount          int
+	Description             string
+	TimeSpendingHistory     string
+	ShowTimeSpendingHistory string
 }
 
 type RequestUpdateSpendingHistory struct {
 	ID                      string
 	ProfileID               string
-	SpendingTypeID          string `json:"spending_type_id"`
-	PaymentMethodID         string `json:"payment_method_id"`
-	PaymentName             string `json:"payment_name"`
-	SpendingAmount          int    `json:"spending_amount"`
-	Description             string `json:"description"`
-	TimeSpendingHistory     string `json:"time_spending_history"`
-	ShowTimeSpendingHistory string `json:"show_time_spending_history"`
+	SpendingTypeID          string
+	PaymentMethodID         string
+	PaymentName             string
+	SpendingAmount          int
+	Description             string
+	TimeSpendingHistory     string
+	ShowTimeSpendingHistory string
 }
 
 type ResponseSpendingHistory struct {
-	ID                      string    `json:"id"`
-	ProfileID               string    `json:"profile_id"`
-	SpendingTypeID          string    `json:"spending_type_id"`
-	SpendingTypeTitle       string    `json:"spending_type_title"`
-	PaymentMethodID         *string   `json:"payment_method_id"`
-	PaymentMethodName       *string   `json:"payment_method_name"`
-	PaymentName             *string   `json:"payment_name"`
-	BeforeBalance           int       `json:"before_balance"`
-	SpendingAmount          int       `json:"spending_amount"`
-	FormatSpendingAmount    string    `json:"format_spending_amount"`
-	AfterBalance            int       `json:"after_balance"`
-	Description             string    `json:"description"`
-	TimeSpendingHistory     time.Time `json:"time_spending_history"`
-	ShowTimeSpendingHistory string    `json:"show_time_spending_history"`
+	ID                      string
+	ProfileID               string
+	SpendingTypeID          string
+	SpendingTypeTitle       string
+	PaymentMethodID         *string
+	PaymentMethodName       *string
+	PaymentName             *string
+	BeforeBalance           int
+	SpendingAmount          int
+	FormatSpendingAmount    string
+	AfterBalance            int
+	Description             string
+	TimeSpendingHistory     time.Time
+	ShowTimeSpendingHistory string
 }
 
 func (req *RequestCreateSpendingHistory) ToModel(balance int) *repository.SpendingHistory {

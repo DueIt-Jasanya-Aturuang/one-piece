@@ -5,31 +5,24 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
-	"github.com/oklog/ulid/v2"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/validation"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/schema"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
-type PaymentHandlerImpl struct {
-	paymentUsecase domain.PaymentUsecase
-}
+func (p *Presenter) CreatePayment(w http.ResponseWriter, r *http.Request) {
+	profileID := r.Header.Get("Profile-ID")
 
-func NewPaymentHandlerImpl(
-	paymentUsecase domain.PaymentUsecase,
-) *PaymentHandlerImpl {
-	return &PaymentHandlerImpl{
-		paymentUsecase: paymentUsecase,
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
 	}
-}
 
-func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
-	req := new(domain.RequestCreatePayment)
+	req := new(schema.RequestCreateOrUpdatePayment)
 
 	err := helper.ParseForm(r, req)
 	if err != nil {
@@ -38,20 +31,22 @@ func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, fileHeader, _ := r.FormFile("image")
-	profileID := r.Header.Get("Profile-ID")
-
-	req.ProfileID = profileID
 	req.Image = fileHeader
 
-	err = validation.CreatePayment(req)
+	err = req.ValidateCreate()
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	payment, err := h.paymentUsecase.Create(r.Context(), req)
+	payment, err := p.paymentUsecase.Create(r.Context(), &usecase.RequestCreatePayment{
+		ProfileID:   profileID,
+		Name:        req.Name,
+		Description: req.Description,
+		Image:       req.Image,
+	})
 	if err != nil {
-		if errors.Is(err, usecase_old.NamePaymentExist) {
+		if errors.Is(err, usecase.NamePaymentExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"name": {
 					err.Error(),
@@ -63,11 +58,31 @@ func (h *PaymentHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helper.SuccessResponseEncode(w, payment, "created payment berhasil")
+	resp := &schema.ResponsePayment{
+		ID:          payment.ID,
+		ProfileID:   payment.ProfileID,
+		Name:        payment.Name,
+		Description: payment.Description,
+		Image:       payment.Image,
+	}
+	helper.SuccessResponseEncode(w, resp, "created payment berhasil")
 }
 
-func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
-	req := new(domain.RequestUpdatePayment)
+func (p *Presenter) UpdatePayment(w http.ResponseWriter, r *http.Request) {
+	profileID := r.Header.Get("Profile-ID")
+	id := chi.URLParam(r, "id")
+
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
+	}
+
+	if errParse := util.ParseUlid(id); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
+		return
+	}
+
+	req := new(schema.RequestCreateOrUpdatePayment)
 
 	err := helper.ParseForm(r, req)
 	if err != nil {
@@ -75,29 +90,30 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := chi.URLParam(r, "id")
-	profileID := r.Header.Get("Profile-ID")
-	req.ProfileID = profileID
-	req.ID = id
-
 	_, fileHeader, _ := r.FormFile("image")
 	req.Image = fileHeader
 
-	err = validation.UpdatePayment(req)
+	err = req.ValidateUpdate()
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	payment, err := h.paymentUsecase.Update(r.Context(), req)
+	payment, err := p.paymentUsecase.Update(r.Context(), &usecase.RequestUpdatePayment{
+		ProfileID:   profileID,
+		ID:          id,
+		Name:        req.Name,
+		Description: req.Description,
+		Image:       req.Image,
+	})
 	if err != nil {
-		if errors.Is(err, usecase_old.NamePaymentExist) {
+		if errors.Is(err, usecase.NamePaymentExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"name": {
 					err.Error(),
 				},
 			}, response.CM06)
-		} else if errors.Is(err, usecase_old.PaymentNotExist) {
+		} else if errors.Is(err, usecase.PaymentNotExist) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
 
@@ -105,56 +121,76 @@ func (h *PaymentHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helper.SuccessResponseEncode(w, payment, "update payment berhasil")
+	resp := &schema.ResponsePayment{
+		ID:          payment.ID,
+		ProfileID:   payment.ProfileID,
+		Name:        payment.Name,
+		Description: payment.Description,
+		Image:       payment.Image,
+	}
+	helper.SuccessResponseEncode(w, resp, "update payment berhasil")
 }
 
-func (h *PaymentHandlerImpl) GetAll(w http.ResponseWriter, r *http.Request) {
+func (p *Presenter) GetAllPayment(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
-	cursor := r.URL.Query().Get("cursor")
-	order := r.URL.Query().Get("order")
-	if _, err := uuid.Parse(profileID); err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
 		return
 	}
 
-	order, operation := helper.GetOrder(order)
+	cursor := r.URL.Query().Get("cursor")
+	order := r.URL.Query().Get("order")
 
-	req := &domain.RequestGetAllPaginate{
-		ProfileID: profileID,
+	payments, cursorResp, err := p.paymentUsecase.GetAllByProfileID(r.Context(), &usecase.RequestGetAllByProfileIDWithISD{
 		ID:        cursor,
-		Operation: operation,
+		ProfileID: profileID,
 		Order:     order,
-	}
-	payments, cursorResp, err := h.paymentUsecase.GetAllByProfileID(r.Context(), req)
+	})
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
+	var responses []schema.ResponsePayment
+	var responsePayment *schema.ResponsePayment
+
+	for _, payment := range *payments {
+		responsePayment = &schema.ResponsePayment{
+			ID:          payment.ID,
+			ProfileID:   payment.ProfileID,
+			Name:        payment.Name,
+			Description: payment.Description,
+			Image:       payment.Image,
+		}
+
+		responses = append(responses, *responsePayment)
+	}
+
 	resp := map[string]any{
-		"payments": payments,
+		"payments": &responses,
 		"cursor":   cursorResp,
 	}
 	helper.SuccessResponseEncode(w, resp, "data payment")
 }
 
-func (h *PaymentHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+func (p *Presenter) DeletePayment(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
+	id := chi.URLParam(r, "id")
 
-	if _, err := uuid.Parse(profileID); err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
 		return
 	}
 
-	if _, err := ulid.Parse(id); err != nil {
+	if errParse := util.ParseUlid(id); errParse != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
 		return
 	}
 
-	err := h.paymentUsecase.Delete(r.Context(), id, profileID)
+	err := p.paymentUsecase.Delete(r.Context(), id, profileID)
 	if err != nil {
-		if errors.Is(err, usecase_old.PaymentNotExist) {
+		if errors.Is(err, usecase.PaymentNotExist) {
 			helper.SuccessResponseEncode(w, nil, "deleted payment successfully")
 			return
 		}

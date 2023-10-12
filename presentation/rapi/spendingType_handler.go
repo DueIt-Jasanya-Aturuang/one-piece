@@ -4,35 +4,27 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
-	"github.com/oklog/ulid/v2"
-	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/validation"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/schema"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
-type SpendingTypeHandlerImpl struct {
-	spendingTypeUsecase domain.SpendingTypeUsecase
-}
+func (p *Presenter) CreateSpendingType(w http.ResponseWriter, r *http.Request) {
+	profileID := r.Header.Get("Profile-ID")
 
-func NewSpendingTypeHandlerImpl(
-	spendingTypeUsecase domain.SpendingTypeUsecase,
-) *SpendingTypeHandlerImpl {
-	return &SpendingTypeHandlerImpl{
-		spendingTypeUsecase: spendingTypeUsecase,
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
 	}
-}
 
-func (h *SpendingTypeHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
-	req := new(domain.RequestCreateSpendingType)
+	req := new(schema.RequestCreateOrUpdateSpendingType)
 
 	err := helper.DecodeJson(r, req)
 	if err != nil {
@@ -40,16 +32,20 @@ func (h *SpendingTypeHandlerImpl) Create(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	req.ProfileID = r.Header.Get("Profile-ID")
-	err = validation.CreateSpendingType(req)
+	err = req.Validate()
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	spendingType, err := h.spendingTypeUsecase.Create(r.Context(), req)
+	spendingType, err := p.spendingTypeUsecase.Create(r.Context(), &usecase.RequestCreateSpendingType{
+		ProfileID:    profileID,
+		Title:        req.Title,
+		MaximumLimit: req.MaximumLimit,
+		Icon:         req.Icon,
+	})
 	if err != nil {
-		if errors.Is(err, usecase_old.TitleSpendingTypeExist) {
+		if errors.Is(err, usecase.TitleSpendingTypeExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"title": {
 					err.Error(),
@@ -60,11 +56,32 @@ func (h *SpendingTypeHandlerImpl) Create(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	helper.SuccessResponseEncode(w, spendingType, "crete spending type berhasil")
+	resp := &schema.ResponseSpendingType{
+		ID:                 spendingType.ID,
+		ProfileID:          spendingType.ProfileID,
+		Title:              spendingType.Title,
+		MaximumLimit:       spendingType.MaximumLimit,
+		FormatMaximumLimit: spendingType.FormatMaximumLimit,
+		Icon:               spendingType.Icon,
+	}
+	helper.SuccessResponseEncode(w, resp, "crete spending type berhasil")
 }
 
-func (h *SpendingTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
-	req := new(domain.RequestUpdateSpendingType)
+func (p *Presenter) UpdateSpendingType(w http.ResponseWriter, r *http.Request) {
+	profileID := r.Header.Get("Profile-ID")
+	id := chi.URLParam(r, "id")
+
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
+	}
+
+	if errParse := util.ParseUlid(id); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
+		return
+	}
+
+	req := new(schema.RequestCreateOrUpdateSpendingType)
 
 	err := helper.DecodeJson(r, req)
 	if err != nil {
@@ -72,50 +89,60 @@ func (h *SpendingTypeHandlerImpl) Update(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	req.ProfileID = r.Header.Get("Profile-ID")
-	req.ID = chi.URLParam(r, "id")
-
-	err = validation.UpdateSpendingType(req)
+	err = req.Validate()
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	spendingType, err := h.spendingTypeUsecase.Update(r.Context(), req)
+	spendingType, err := p.spendingTypeUsecase.Update(r.Context(), &usecase.RequestUpdateSpendingType{
+		ID:           id,
+		ProfileID:    profileID,
+		Title:        req.Title,
+		MaximumLimit: req.MaximumLimit,
+		Icon:         req.Icon,
+	})
 	if err != nil {
-		if errors.Is(err, usecase_old.TitleSpendingTypeExist) {
+		if errors.Is(err, usecase.TitleSpendingTypeExist) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"title": {
 					err.Error(),
 				},
 			}, response.CM06)
 		}
-		if errors.Is(err, usecase_old.SpendingTypeNotFound) {
+		if errors.Is(err, usecase.SpendingTypeNotFound) {
 			err = _error.HttpErrString("not found", response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	helper.SuccessResponseEncode(w, spendingType, "update spending type berhasil")
+	resp := &schema.ResponseSpendingType{
+		ID:                 spendingType.ID,
+		ProfileID:          spendingType.ProfileID,
+		Title:              spendingType.Title,
+		MaximumLimit:       spendingType.MaximumLimit,
+		FormatMaximumLimit: spendingType.FormatMaximumLimit,
+		Icon:               spendingType.Icon,
+	}
+	helper.SuccessResponseEncode(w, resp, "update spending type berhasil")
 }
 
-func (h *SpendingTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
+func (p *Presenter) DeleteSpendingType(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
 	id := chi.URLParam(r, "id")
 
-	_, err := uuid.Parse(profileID)
-	if err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
 		return
 	}
-	_, err = ulid.Parse(id)
-	if err != nil {
+
+	if errParse := util.ParseUlid(id); errParse != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
 		return
 	}
 
-	err = h.spendingTypeUsecase.Delete(r.Context(), id, profileID)
+	err := p.spendingTypeUsecase.Delete(r.Context(), id, profileID)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
@@ -124,42 +151,48 @@ func (h *SpendingTypeHandlerImpl) Delete(w http.ResponseWriter, r *http.Request)
 	helper.SuccessResponseEncode(w, nil, "deleted spending type berhasil")
 }
 
-func (h *SpendingTypeHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
+func (p *Presenter) GetSpendingTypeByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
 	id := chi.URLParam(r, "id")
 
-	log.Info().Msgf("%s | %s", profileID, id)
-	_, err := uuid.Parse(profileID)
-	if err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
-		return
-	}
-	_, err = ulid.Parse(id)
-	if err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
 		return
 	}
 
-	spendingType, err := h.spendingTypeUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
+	if errParse := util.ParseUlid(id); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
+		return
+	}
+
+	spendingType, err := p.spendingTypeUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
 	if err != nil {
-		if errors.Is(err, usecase_old.SpendingTypeNotFound) {
+		if errors.Is(err, usecase.SpendingTypeNotFound) {
 			err = _error.HttpErrString("not found", response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	helper.SuccessResponseEncode(w, spendingType, "data spending type")
+	resp := &schema.ResponseSpendingType{
+		ID:                 spendingType.ID,
+		ProfileID:          spendingType.ProfileID,
+		Title:              spendingType.Title,
+		MaximumLimit:       spendingType.MaximumLimit,
+		FormatMaximumLimit: spendingType.FormatMaximumLimit,
+		Icon:               spendingType.Icon,
+	}
+	helper.SuccessResponseEncode(w, resp, "data spending type")
 }
 
-func (h *SpendingTypeHandlerImpl) GetAllByPeriodeAndProfileID(w http.ResponseWriter, r *http.Request) {
+func (p *Presenter) GetAllSpendingTypeByPeriodeAndProfileID(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
 
-	_, err := uuid.Parse(profileID)
-	if err != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("not found", response.CM01))
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
 		return
 	}
+
 	periode := chi.URLParam(r, "periode")
 	periodInt, err := strconv.Atoi(periode)
 	if err != nil {
@@ -174,37 +207,49 @@ func (h *SpendingTypeHandlerImpl) GetAllByPeriodeAndProfileID(w http.ResponseWri
 
 	cursor := r.URL.Query().Get("cursor")
 	order := r.URL.Query().Get("order")
-	order, operation := helper.GetOrder(order)
 
-	req := &domain.RequestGetAllSpendingTypeByTime{
-		ProfileID: profileID,
-		Periode:   periodInt,
-		StartTime: time.Time{},
-		EndTime:   time.Time{},
-		RequestGetAllPaginate: domain.RequestGetAllPaginate{
-			ProfileID: profileID,
+	spendingTypes, cursorResp, err := p.spendingTypeUsecase.GetAllByPeriodeAndProfileID(r.Context(), &usecase.RequestGetAllSpendingTypeByPeriodeWithISD{
+		Periode: periodInt,
+		RequestGetAllByProfileIDWithISD: usecase.RequestGetAllByProfileIDWithISD{
 			ID:        cursor,
-			Operation: operation,
+			ProfileID: profileID,
 			Order:     order,
 		},
-	}
-
-	spendingTypes, cursorResp, err := h.spendingTypeUsecase.GetAllByPeriodeAndProfileID(r.Context(), req)
+	})
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
+	var responseSpendingTypes []schema.ResponseSpendingTypeJoinTable
+	var responseSpendingType *schema.ResponseSpendingTypeJoinTable
+
+	for _, spendingType := range *spendingTypes.ResponseSpendingType {
+		responseSpendingType = &schema.ResponseSpendingTypeJoinTable{
+			ID:                 spendingType.ID,
+			ProfileID:          spendingType.ProfileID,
+			Title:              spendingType.Title,
+			MaximumLimit:       spendingType.MaximumLimit,
+			FormatMaximumLimit: spendingType.FormatMaximumLimit,
+			Icon:               spendingType.Icon,
+			Used:               spendingType.Used,
+			FormatUsed:         spendingType.FormatUsed,
+			PersentaseUsed:     spendingType.PersentaseUsed,
+		}
+
+		responseSpendingTypes = append(responseSpendingTypes, *responseSpendingType)
+	}
+
 	resp := map[string]any{
 		"cursor":               cursorResp,
-		"spending_type":        spendingTypes.ResponseSpendingType,
+		"spending_type":        &responseSpendingTypes,
 		"budget_amount":        spendingTypes.BudgetAmount,
 		"format_budget_amount": spendingTypes.FormatBudgetAmount,
 	}
 	helper.SuccessResponseEncode(w, resp, "data spending types")
 }
 
-func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
+func (p *Presenter) GetAllSpendingTypeByProfileID(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
 
 	_, err := uuid.Parse(profileID)
@@ -215,24 +260,37 @@ func (h *SpendingTypeHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *ht
 
 	cursor := r.URL.Query().Get("cursor")
 	order := r.URL.Query().Get("order")
-	order, operation := helper.GetOrder(order)
 
-	req := &domain.RequestGetAllPaginate{
-		ProfileID: profileID,
+	spendingTypes, cursorResp, err := p.spendingTypeUsecase.GetAllByProfileID(r.Context(), &usecase.RequestGetAllByProfileIDWithISD{
 		ID:        cursor,
-		Operation: operation,
+		ProfileID: profileID,
 		Order:     order,
-	}
-
-	spendingTypes, cursorResp, err := h.spendingTypeUsecase.GetAllByProfileID(r.Context(), req)
+	})
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
+	var responseSpendingTypes []schema.ResponseSpendingType
+	var responseSpendingType *schema.ResponseSpendingType
+
+	for _, spendingType := range *spendingTypes {
+		responseSpendingType = &schema.ResponseSpendingType{
+			ID:                 spendingType.ID,
+			ProfileID:          spendingType.ProfileID,
+			Title:              spendingType.Title,
+			MaximumLimit:       spendingType.MaximumLimit,
+			FormatMaximumLimit: spendingType.FormatMaximumLimit,
+			Icon:               spendingType.Icon,
+		}
+
+		responseSpendingTypes = append(responseSpendingTypes, *responseSpendingType)
+	}
+
 	resp := map[string]any{
 		"cursor":        cursorResp,
-		"spending_type": spendingTypes,
+		"spending_type": &responseSpendingTypes,
 	}
+
 	helper.SuccessResponseEncode(w, resp, "data spending types")
 }

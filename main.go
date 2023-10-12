@@ -1,19 +1,31 @@
 package main
 
 import (
-	"net/http"
+	"context"
+	"database/sql"
+	"os"
+	"os/signal"
+	"time"
 
-	"github.com/go-chi/chi/v5"
-	middlewareChi "github.com/go-chi/chi/v5/middleware"
+	"github.com/minio/minio-go/v7"
 	"github.com/rs/zerolog/log"
-
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository_old"
 
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/infra"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/middleware"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository/balance_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository/incomeHistory_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository/incomeType_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository/minio_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository/payment_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository/spendingHistory_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository/spendingType_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/repository/uow_repository"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/balance_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/incomeHistory_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/incomeType_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/payment_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/spendingHistory_usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase/spendingType_usecase"
 )
 
 func main() {
@@ -23,79 +35,60 @@ func main() {
 	pgConn := infra.NewPostgresConn()
 	minioConn := infra.NewMinioConn()
 
-	// repository_old
-	uow := repository_old.NewUnitOfWorkRepositoryImpl(pgConn)
-	paymentRepo := repository_old.NewPaymentRepositoryImpl(uow)
-	minioRepo := repository_old.NewMinioImpl(minioConn)
-	spendingTypeRepo := repository_old.NewSpendingTypeRepositoryImpl(uow)
-	spendingHistoryRepo := repository_old.NewSpendingHistoryRepositoryImpl(uow)
-	balanceRepo := repository_old.NewBalanceRepositoryImpl(uow)
-	incomeTypeRepo := repository_old.NewIncomeTypeRepositoryImpl(uow)
-	incomeHistoryRepo := repository_old.NewIncomeHistoryRepositoryImpl(uow)
+	depen := dependency(pgConn, minioConn)
 
-	// usecase_old
-	paymentUsecase := usecase_old.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
-	spendingTypeUsecase := usecase_old.NewSpendingTypeUsecaseImpl(spendingTypeRepo, spendingHistoryRepo)
-	spendingHistoryUsecase := usecase_old.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceRepo, paymentRepo)
-	balanceUsecase := usecase_old.NewBalanceUsecaseImpl(balanceRepo)
-	incomeTypeUsecase := usecase_old.NewIncomeTypeUsecaseImpl(incomeTypeRepo)
-	incomeHistoryUsecase := usecase_old.NewIncomeHistoryUsecaseImpl(incomeTypeRepo, incomeHistoryRepo, paymentRepo, balanceRepo)
-
-	// handler
-	paymentHandler := rapi.NewPaymentHandlerImpl(paymentUsecase)
-	spendingTypeHandler := rapi.NewSpendingTypeHandlerImpl(spendingTypeUsecase)
-	spendingHistoryHandler := rapi.NewSpendingHistoryHandlerImpl(spendingHistoryUsecase)
-	balanceHandler := rapi.NewBalanceHandlerImpl(balanceUsecase)
-	incomeTypeHandler := rapi.NewIncomeTypeHandlerImpl(incomeTypeUsecase)
-	incomeHistoryHandler := rapi.NewIncomeHistoryHandlerImpl(incomeHistoryUsecase)
-
-	// route
-	r := chi.NewRouter()
-	r.Use(middlewareChi.Logger)
-	r.Use(middlewareChi.Recoverer)
-	r.Use(middleware.CheckApiKey)
-	r.MethodNotAllowed(helper.MethodNotAllowed)
-
-	r.Route("/finance", func(r chi.Router) {
-		r.Use(middleware.SetAuthorization)
-
-		r.Get("/payment", paymentHandler.GetAll)
-		r.Post("/payment", paymentHandler.Create)
-		r.Put("/payment/{id}", paymentHandler.Update)
-		r.Delete("/payment/{id}", paymentHandler.Delete)
-
-		r.Get("/spending-type", spendingTypeHandler.GetAllByProfileID)
-		r.Get("/spending-type/{periode}", spendingTypeHandler.GetAllByPeriodeAndProfileID)
-		r.Get("/spending-type/detail/{id}", spendingTypeHandler.GetByIDAndProfileID)
-		r.Post("/spending-type", spendingTypeHandler.Create)
-		r.Put("/spending-type/{id}", spendingTypeHandler.Update)
-		r.Delete("/spending-type/{id}", spendingTypeHandler.Delete)
-
-		r.Get("/spending-history", spendingHistoryHandler.GetAllByProfileID)
-		r.Get("/spending-history/{id}", spendingHistoryHandler.GetByIDAndProfileID)
-		r.Post("/spending-history", spendingHistoryHandler.Create)
-		r.Put("/spending-history/{id}", spendingHistoryHandler.Update)
-		r.Delete("/spending-history/{id}", spendingHistoryHandler.Delete)
-
-		r.Get("/income-type", incomeTypeHandler.GetAllByProfileID)
-		r.Get("/income-type/detail/{id}", incomeTypeHandler.GetByIDAndProfileID)
-		r.Post("/income-type", incomeTypeHandler.Create)
-		r.Put("/income-type/{id}", incomeTypeHandler.Update)
-		r.Delete("/income-type/{id}", incomeTypeHandler.Delete)
-
-		r.Get("/income-history", incomeHistoryHandler.GetAllByProfileID)
-		r.Get("/income-history/{id}", incomeHistoryHandler.GetByIDAndProfileID)
-		r.Post("/income-history", incomeHistoryHandler.Create)
-		r.Put("/income-history/{id}", incomeHistoryHandler.Update)
-		r.Delete("/income-history/{id}", incomeHistoryHandler.Delete)
-
-		r.Get("/balance", balanceHandler.GetByProfileID)
+	httpServer, err := rapi.NewPresenter(rapi.PresenterConfig{
+		Dependency: depen,
 	})
+	if err != nil {
+		log.Fatal().Msgf("creating new presenter: %s", err.Error())
+	}
 
+	exitSignal := make(chan os.Signal, 1)
+	signal.Notify(exitSignal, os.Interrupt)
+	go func() {
+		<-exitSignal
+		log.Info().Msgf("Interrupt signal recivied, existing...")
+
+		shudownCtx, shutdownCancel := context.WithTimeout(context.Background(), time.Minute)
+		defer shutdownCancel()
+
+		err = httpServer.Shutdown(shudownCtx)
+		if err != nil {
+			log.Err(err).Msg("shutting down HTTP server")
+		}
+	}()
 	log.Info().Msgf("Server is running on port %s", infra.AppAddr)
-	err := http.ListenAndServe(infra.AppAddr, r)
+	err = httpServer.ListenAndServe()
 	if err != nil {
 		log.Fatal().Err(err).Msgf("failed listen server on %s", infra.AppAddr)
 	}
+}
 
+func dependency(db *sql.DB, minioClient *minio.Client) *rapi.Dependency {
+	uow := uow_repository.NewUnitOfWorkRepositoryImpl(db)
+	paymentRepo := payment_repository.NewPaymentRepositoryImpl(uow)
+	minioRepo := minio_repository.NewMinioImpl(minioClient)
+	spendingTypeRepo := spendingType_repository.NewSpendingTypeRepositoryImpl(uow)
+	spendingHistoryRepo := spendingHistory_repository.NewSpendingHistoryRepositoryImpl(uow)
+	balanceRepo := balance_repository.NewBalanceRepositoryImpl(uow)
+	incomeTypeRepo := incomeType_repository.NewIncomeTypeRepositoryImpl(uow)
+	incomeHistoryRepo := incomeHistory_repository.NewIncomeHistoryRepositoryImpl(uow)
+
+	// usecase_old
+	balanceUsecase := balance_usecase.NewBalanceUsecaseImpl(balanceRepo)
+	paymentUsecase := payment_usecase.NewPaymentUsecaseImpl(paymentRepo, minioRepo)
+	spendingTypeUsecase := spendingType_usecase.NewSpendingTypeUsecaseImpl(spendingTypeRepo, spendingHistoryRepo)
+	spendingHistoryUsecase := spendingHistory_usecase.NewSpendingHistoryUsecaseImpl(spendingHistoryRepo, spendingTypeRepo, balanceUsecase, paymentRepo)
+	incomeTypeUsecase := incomeType_usecase.NewIncomeTypeUsecaseImpl(incomeTypeRepo)
+	incomeHistoryUsecase := incomeHistory_usecase.NewIncomeHistoryUsecaseImpl(incomeTypeRepo, incomeHistoryRepo, paymentRepo, balanceUsecase)
+
+	return &rapi.Dependency{
+		BalanceUsecase:         balanceUsecase,
+		IncomeHistoryUsecase:   incomeHistoryUsecase,
+		IncomeTypeUsecase:      incomeTypeUsecase,
+		PaymentUsecase:         paymentUsecase,
+		SpendingHistoryUsecase: spendingHistoryUsecase,
+		SpendingTypeUsecase:    spendingTypeUsecase,
+	}
 }

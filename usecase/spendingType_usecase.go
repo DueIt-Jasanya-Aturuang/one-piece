@@ -25,44 +25,44 @@ type RequestGetAllSpendingTypeByPeriodeWithISD struct {
 
 type RequestCreateSpendingType struct {
 	ProfileID    string
-	Title        string `json:"title"`
-	MaximumLimit int    `json:"maximum_limit"`
-	Icon         string `json:"icon"`
+	Title        string
+	MaximumLimit int
+	Icon         string
 }
 
 type RequestUpdateSpendingType struct {
-	ID           string // ID get in url parameter
+	ID           string
 	ProfileID    string
-	Title        string `json:"title"`
-	MaximumLimit int    `json:"maximum_limit"`
-	Icon         string `json:"icon"`
+	Title        string
+	MaximumLimit int
+	Icon         string
 }
 
 type ResponseSpendingType struct {
-	ID                 string `json:"id"`
-	ProfileID          string `json:"profile_id"`
-	Title              string `json:"title"`
-	MaximumLimit       int    `json:"maximum_limit"`
-	FormatMaximumLimit string `json:"format_maximum_limit"`
-	Icon               string `json:"icon"`
+	ID                 string
+	ProfileID          string
+	Title              string
+	MaximumLimit       int
+	FormatMaximumLimit string
+	Icon               string
 }
 
 type ResponseAllSpendingType struct {
-	ResponseSpendingType *[]ResponseSpendingTypeJoinTable `json:"spending_type"`
-	BudgetAmount         int                              `json:"budget_amount"`
-	FormatBudgetAmount   string                           `json:"format_budget_amount"`
+	ResponseSpendingType *[]ResponseSpendingTypeJoinTable
+	BudgetAmount         int
+	FormatBudgetAmount   string
 }
 
 type ResponseSpendingTypeJoinTable struct {
-	ID                 string `json:"id"`
-	ProfileID          string `json:"profile_id"`
-	Title              string `json:"title"`
-	MaximumLimit       int    `json:"maximum_limit"`
-	FormatMaximumLimit string `json:"format_maximum_limit"`
-	Icon               string `json:"icon"`
-	Used               int    `json:"used"`
-	FormatUsed         string `json:"format_used"`
-	PersentaseUsed     string `json:"persentase_used"`
+	ID                 string
+	ProfileID          string
+	Title              string
+	MaximumLimit       int
+	FormatMaximumLimit string
+	Icon               string
+	Used               int
+	FormatUsed         string
+	PersentaseUsed     string
 }
 
 func (req *RequestCreateSpendingType) ToModel() *repository.SpendingType {

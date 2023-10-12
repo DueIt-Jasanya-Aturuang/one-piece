@@ -15,14 +15,14 @@ type BalanceUsecase interface {
 }
 
 type ResponseBalance struct {
-	ID                        string `json:"id"`
-	ProfileID                 string `json:"profile_id"`
-	TotalIncomeAmount         int    `json:"total_income_amount"`
-	TotalIncomeAmountFormat   string `json:"total_income_amount_format"`
-	TotalSpendingAmount       int    `json:"total_spending_amount"`
-	TotalSpendingAmountFormat string `json:"total_spending_amount_format"`
-	Balance                   int    `json:"balance"`
-	BalanceFormat             string `json:"balance_format"`
+	ID                        string
+	ProfileID                 string
+	TotalIncomeAmount         int
+	TotalIncomeAmountFormat   string
+	TotalSpendingAmount       int
+	TotalSpendingAmountFormat string
+	Balance                   int
+	BalanceFormat             string
 }
 
 type RequestUpdateBalance struct {

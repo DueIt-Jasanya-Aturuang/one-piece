@@ -6,58 +6,61 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
-	"github.com/oklog/ulid/v2"
+	"github.com/rs/zerolog/log"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/validation"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/schema"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
-type IncomeHistoryHandlerImpl struct {
-	incomeHistoryUsecase domain.IncomeHistoryUsecase
-}
-
-func NewIncomeHistoryHandlerImpl(
-	incomeHistoryUsecase domain.IncomeHistoryUsecase,
-) *IncomeHistoryHandlerImpl {
-	return &IncomeHistoryHandlerImpl{
-		incomeHistoryUsecase: incomeHistoryUsecase,
+func (p *Presenter) CreateIncomeHistory(w http.ResponseWriter, r *http.Request) {
+	profileID := r.Header.Get("Profile-ID")
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
 	}
-}
 
-func (h *IncomeHistoryHandlerImpl) Create(w http.ResponseWriter, r *http.Request) {
-	req := new(domain.RequestCreateIncomeHistory)
+	req := new(schema.RequestCreateOrUpdateIncomeHistory)
 
 	err := helper.DecodeJson(r, req)
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
-	req.ProfileID = r.Header.Get("Profile-ID")
 
-	err = validation.CreateIncomeHistory(req)
+	err = req.Validate()
 	if err != nil {
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	incomeHistory, err := h.incomeHistoryUsecase.Create(r.Context(), req)
+	incomeHistory, err := p.incomeHistoryUsecase.Create(r.Context(), &usecase.RequestCreateIncomeHistory{
+		ProfileID:             profileID,
+		IncomeTypeID:          req.IncomeTypeID,
+		PaymentMethodID:       req.PaymentMethodID,
+		PaymentName:           req.PaymentName,
+		IncomeAmount:          req.IncomeAmount,
+		Description:           req.Description,
+		TimeIncomeHistory:     req.TimeIncomeHistory,
+		ShowTimeIncomeHistory: req.ShowTimeIncomeHistory,
+	})
+
 	if err != nil {
-		if errors.Is(err, usecase_old.IncomeHistoryNotFound) {
+		if errors.Is(err, usecase.IncomeHistoryNotFound) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
+			log.Warn().Msgf("anomali create income history | data : %v | err : %v", req, err)
 		}
-		if errors.Is(err, usecase_old.InvalidIncomeTypeID) {
+		if errors.Is(err, usecase.InvalidIncomeTypeID) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"income_type_id": {
 					err.Error(),
 				},
 			}, response.CM06)
 		}
-		if errors.Is(err, usecase_old.InvalidPaymentMethodID) {
+		if errors.Is(err, usecase.InvalidPaymentMethodID) {
 			err = _error.HttpErrMapOfSlices(map[string][]string{
 				"payment_method_id": {
 					err.Error(),
@@ -68,74 +71,124 @@ func (h *IncomeHistoryHandlerImpl) Create(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	helper.SuccessResponseEncode(w, incomeHistory, "create income history berhasil")
+	resp := &schema.ResponseIncomeHistory{
+		ID:                    incomeHistory.ID,
+		ProfileID:             incomeHistory.ProfileID,
+		IncomeTypeID:          incomeHistory.IncomeTypeID,
+		IncomeTypeTitle:       incomeHistory.IncomeTypeTitle,
+		PaymentMethodID:       incomeHistory.PaymentMethodID,
+		PaymentMethodName:     incomeHistory.PaymentMethodName,
+		PaymentName:           incomeHistory.PaymentName,
+		IncomeAmount:          incomeHistory.IncomeAmount,
+		FormatIncomeAmount:    incomeHistory.FormatIncomeAmount,
+		Description:           incomeHistory.Description,
+		TimeIncomeHistory:     incomeHistory.TimeIncomeHistory,
+		ShowTimeIncomeHistory: incomeHistory.ShowTimeIncomeHistory,
+	}
+	helper.SuccessResponseEncode(w, resp, "create income history berhasil")
 }
 
-func (h *IncomeHistoryHandlerImpl) Update(w http.ResponseWriter, r *http.Request) {
-	req := new(domain.RequestUpdateIncomeHistory)
-
-	err := helper.DecodeJson(r, req)
-	if err != nil {
-		helper.ErrorResponseEncode(w, err)
-		return
-	}
-
-	req.ProfileID = r.Header.Get("Profile-ID")
-	req.ID = chi.URLParam(r, "id")
-
-	err = validation.UpdateIncomeHistory(req)
-	if err != nil {
-		helper.ErrorResponseEncode(w, err)
-		return
-	}
-
-	incomeHistory, err := h.incomeHistoryUsecase.Update(r.Context(), req)
-	if err != nil {
-		if errors.Is(err, usecase_old.IncomeHistoryNotFound) {
-			err = _error.HttpErrString(err.Error(), response.CM01)
-		}
-		if errors.Is(err, usecase_old.InvalidIncomeTypeID) {
-			err = _error.HttpErrMapOfSlices(map[string][]string{
-				"income_type_id": {
-					err.Error(),
-				},
-			}, response.CM06)
-		}
-		if errors.Is(err, usecase_old.InvalidPaymentMethodID) {
-			err = _error.HttpErrMapOfSlices(map[string][]string{
-				"payment_method_id": {
-					err.Error(),
-				},
-			}, response.CM06)
-		}
-		helper.ErrorResponseEncode(w, err)
-		return
-	}
-
-	helper.SuccessResponseEncode(w, incomeHistory, "update income history berhasil")
-}
-
-func (h *IncomeHistoryHandlerImpl) Delete(w http.ResponseWriter, r *http.Request) {
+func (p *Presenter) UpdateIncomeHistory(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
 	id := chi.URLParam(r, "id")
 
-	if _, errParse := ulid.Parse(id); errParse != nil {
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
+	}
+
+	if errParse := util.ParseUlid(id); errParse != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
 		return
 	}
 
-	if _, errParse := uuid.Parse(profileID); errParse != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
+	req := new(schema.RequestCreateOrUpdateIncomeHistory)
+
+	err := helper.DecodeJson(r, req)
+	if err != nil {
+		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	err := h.incomeHistoryUsecase.Delete(r.Context(), id, profileID)
+	err = req.Validate()
 	if err != nil {
-		if errors.Is(err, usecase_old.IncomeHistoryNotFound) {
+		helper.ErrorResponseEncode(w, err)
+		return
+	}
+
+	incomeHistory, err := p.incomeHistoryUsecase.Update(r.Context(), &usecase.RequestUpdateIncomeHistory{
+		ID:                    id,
+		ProfileID:             profileID,
+		IncomeTypeID:          req.IncomeTypeID,
+		PaymentMethodID:       req.PaymentMethodID,
+		PaymentName:           req.PaymentName,
+		IncomeAmount:          req.IncomeAmount,
+		Description:           req.Description,
+		TimeIncomeHistory:     req.TimeIncomeHistory,
+		ShowTimeIncomeHistory: req.ShowTimeIncomeHistory,
+	})
+
+	if err != nil {
+		if errors.Is(err, usecase.IncomeHistoryNotFound) {
+			err = _error.HttpErrString(err.Error(), response.CM01)
+			log.Warn().Msgf("anomali update income history | data : %v | err : %v", req, err)
+		}
+		if errors.Is(err, usecase.InvalidIncomeTypeID) {
+			err = _error.HttpErrMapOfSlices(map[string][]string{
+				"income_type_id": {
+					err.Error(),
+				},
+			}, response.CM06)
+		}
+		if errors.Is(err, usecase.InvalidPaymentMethodID) {
+			err = _error.HttpErrMapOfSlices(map[string][]string{
+				"payment_method_id": {
+					err.Error(),
+				},
+			}, response.CM06)
+		}
+		helper.ErrorResponseEncode(w, err)
+		return
+	}
+
+	resp := &schema.ResponseIncomeHistory{
+		ID:                    incomeHistory.ID,
+		ProfileID:             incomeHistory.ProfileID,
+		IncomeTypeID:          incomeHistory.IncomeTypeID,
+		IncomeTypeTitle:       incomeHistory.IncomeTypeTitle,
+		PaymentMethodID:       incomeHistory.PaymentMethodID,
+		PaymentMethodName:     incomeHistory.PaymentMethodName,
+		PaymentName:           incomeHistory.PaymentName,
+		IncomeAmount:          incomeHistory.IncomeAmount,
+		FormatIncomeAmount:    incomeHistory.FormatIncomeAmount,
+		Description:           incomeHistory.Description,
+		TimeIncomeHistory:     incomeHistory.TimeIncomeHistory,
+		ShowTimeIncomeHistory: incomeHistory.ShowTimeIncomeHistory,
+	}
+	helper.SuccessResponseEncode(w, resp, "update income history berhasil")
+}
+
+func (p *Presenter) DeleteIncomeHistory(w http.ResponseWriter, r *http.Request) {
+	profileID := r.Header.Get("Profile-ID")
+	id := chi.URLParam(r, "id")
+
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
+	}
+
+	if errParse := util.ParseUlid(id); errParse != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
+		return
+	}
+
+	err := p.incomeHistoryUsecase.Delete(r.Context(), id, profileID)
+	if err != nil {
+		if errors.Is(err, usecase.IncomeHistoryNotFound) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
-		if errors.Is(err, usecase_old.ProfileIDNotFound) {
-			err = _error.HttpErrString(err.Error(), response.CM01)
+		if errors.Is(err, usecase.ProfileIDNotFound) {
+			err = _error.HttpErrString("invalid profile id", response.CM04)
 		}
 		helper.ErrorResponseEncode(w, err)
 		return
@@ -144,72 +197,105 @@ func (h *IncomeHistoryHandlerImpl) Delete(w http.ResponseWriter, r *http.Request
 	helper.SuccessResponseEncode(w, nil, "delete spending history berhasil")
 }
 
-func (h *IncomeHistoryHandlerImpl) GetAllByProfileID(w http.ResponseWriter, r *http.Request) {
+func (p *Presenter) GetAllIncomeHistoryByProfileID(w http.ResponseWriter, r *http.Request) {
+	profileID := r.Header.Get("Profile-ID")
+
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
+	}
+
 	typeQuery := r.URL.Query().Get("type")
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")
-
-	var startTime time.Time
-	var endTime time.Time
-
-	startTime, _ = time.Parse("2006-01-02", start)
-	endTime, _ = time.Parse("2006-01-02", end)
-
 	cursor := r.URL.Query().Get("cursor")
 	order := r.URL.Query().Get("order")
-	order, operation := helper.GetOrder(order)
 
-	req := &domain.GetFilteredDataIncomeHistory{
-		ProfileID: r.Header.Get("Profile-ID"),
+	startTime, _ := time.Parse("2006-01-02", start)
+	endTime, _ := time.Parse("2006-01-02", end)
+
+	incomeHistories, cursorResp, err := p.incomeHistoryUsecase.GetAllByTimeAndProfileID(r.Context(), &usecase.RequestGetAllIncomeHistoryWithISD{
+		Type:      typeQuery,
 		StartTime: startTime,
 		EndTime:   endTime,
-		Type:      typeQuery,
-		RequestGetAllPaginate: domain.RequestGetAllPaginate{
-			ProfileID: r.Header.Get("Profile-ID"),
+		RequestGetAllByProfileIDWithISD: usecase.RequestGetAllByProfileIDWithISD{
 			ID:        cursor,
-			Operation: operation,
+			ProfileID: profileID,
 			Order:     order,
 		},
-	}
-
-	incomeHistories, cursorResp, err := h.incomeHistoryUsecase.GetAllByTimeAndProfileID(r.Context(), req)
+	})
 	if err != nil {
-		if errors.Is(err, usecase_old.InvalidTimestamp) {
+		if errors.Is(err, usecase.InvalidTimestamp) {
 			err = _error.HttpErrString(err.Error(), response.CM06)
 		}
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
+	var respIncomeHistories []schema.ResponseIncomeHistory
+	var respIncomeHistory *schema.ResponseIncomeHistory
+
+	for _, incomeHistory := range *incomeHistories {
+		respIncomeHistory = &schema.ResponseIncomeHistory{
+			ID:                    incomeHistory.ID,
+			ProfileID:             incomeHistory.ProfileID,
+			IncomeTypeID:          incomeHistory.IncomeTypeID,
+			IncomeTypeTitle:       incomeHistory.IncomeTypeTitle,
+			PaymentMethodID:       incomeHistory.PaymentMethodID,
+			PaymentMethodName:     incomeHistory.PaymentMethodName,
+			PaymentName:           incomeHistory.PaymentName,
+			IncomeAmount:          incomeHistory.IncomeAmount,
+			FormatIncomeAmount:    incomeHistory.FormatIncomeAmount,
+			Description:           incomeHistory.Description,
+			TimeIncomeHistory:     incomeHistory.TimeIncomeHistory,
+			ShowTimeIncomeHistory: incomeHistory.ShowTimeIncomeHistory,
+		}
+		respIncomeHistories = append(respIncomeHistories, *respIncomeHistory)
+	}
+
 	resp := map[string]any{
-		"cursor":                   cursorResp,
-		"incomeHistory_repository": incomeHistories,
+		"cursor":         cursorResp,
+		"income_history": &respIncomeHistories,
 	}
 	helper.SuccessResponseEncode(w, resp, "data income history")
 }
 
-func (h *IncomeHistoryHandlerImpl) GetByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
+func (p *Presenter) GetIncomeHistoryByIDAndProfileID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	profileID := r.Header.Get("Profile-ID")
 
-	if _, errParse := ulid.Parse(id); errParse != nil {
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM04))
+		return
+	}
+
+	if errParse := util.ParseUlid(id); errParse != nil {
 		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01))
 		return
 	}
 
-	if _, errParse := uuid.Parse(profileID); errParse != nil {
-		helper.ErrorResponseEncode(w, _error.HttpErrString("invalid profile id", response.CM05))
-		return
-	}
-
-	incomeHistory, err := h.incomeHistoryUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
+	incomeHistory, err := p.incomeHistoryUsecase.GetByIDAndProfileID(r.Context(), id, profileID)
 	if err != nil {
-		if errors.Is(err, usecase_old.IncomeHistoryNotFound) {
+		if errors.Is(err, usecase.IncomeHistoryNotFound) {
 			err = _error.HttpErrString(err.Error(), response.CM01)
 		}
 		helper.ErrorResponseEncode(w, err)
 		return
 	}
 
-	helper.SuccessResponseEncode(w, incomeHistory, "data income history")
+	resp := &schema.ResponseIncomeHistory{
+		ID:                    incomeHistory.ID,
+		ProfileID:             incomeHistory.ProfileID,
+		IncomeTypeID:          incomeHistory.IncomeTypeID,
+		IncomeTypeTitle:       incomeHistory.IncomeTypeTitle,
+		PaymentMethodID:       incomeHistory.PaymentMethodID,
+		PaymentMethodName:     incomeHistory.PaymentMethodName,
+		PaymentName:           incomeHistory.PaymentName,
+		IncomeAmount:          incomeHistory.IncomeAmount,
+		FormatIncomeAmount:    incomeHistory.FormatIncomeAmount,
+		Description:           incomeHistory.Description,
+		TimeIncomeHistory:     incomeHistory.TimeIncomeHistory,
+		ShowTimeIncomeHistory: incomeHistory.ShowTimeIncomeHistory,
+	}
+	helper.SuccessResponseEncode(w, resp, "data income history")
 }

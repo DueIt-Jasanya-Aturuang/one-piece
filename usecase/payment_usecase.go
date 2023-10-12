@@ -18,26 +18,26 @@ type PaymentUsecase interface {
 }
 
 type RequestCreatePayment struct {
-	Name        string                `form:"name"`
-	Description string                `form:"description"`
-	Image       *multipart.FileHeader `form:"image"`
 	ProfileID   string
+	Name        string
+	Description string
+	Image       *multipart.FileHeader
 }
 
 type RequestUpdatePayment struct {
-	Name        string                `form:"name"`
-	Description string                `form:"description"`
-	Image       *multipart.FileHeader `form:"image"`
 	ProfileID   string
 	ID          string
+	Name        string
+	Description string
+	Image       *multipart.FileHeader
 }
 
 type ResponsePayment struct {
-	ID          string  `json:"id"`
-	ProfileID   string  `json:"profile_id"`
-	Name        string  `json:"name"`
-	Description *string `json:"description"`
-	Image       string  `json:"image"`
+	ID          string
+	ProfileID   string
+	Name        string
+	Description *string
+	Image       string
 }
 
 func (req *RequestCreatePayment) ToModel(fileName string) *repository.Payment {

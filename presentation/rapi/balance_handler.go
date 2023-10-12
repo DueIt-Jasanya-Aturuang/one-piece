@@ -4,37 +4,26 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/_error"
 	"github.com/jasanya-tech/jasanya-response-backend-golang/response"
 
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/domain"
 	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/helper"
-	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase_old"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/presentation/rapi/schema"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/usecase"
+	"github.com/DueIt-Jasanya-Aturuang/one-piece/util"
 )
 
-type BalanceHandlerImpl struct {
-	balanceUsecase domain.BalanceUsecase
-}
-
-func NewBalanceHandlerImpl(balanceUsecase domain.BalanceUsecase) *BalanceHandlerImpl {
-	return &BalanceHandlerImpl{
-		balanceUsecase: balanceUsecase,
-	}
-}
-
-func (b BalanceHandlerImpl) GetByProfileID(w http.ResponseWriter, r *http.Request) {
+func (p *Presenter) GetBalanceByProfileID(w http.ResponseWriter, r *http.Request) {
 	profileID := r.Header.Get("Profile-ID")
 
-	if _, err := uuid.Parse(profileID); err != nil {
-		err := _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
-		helper.ErrorResponseEncode(w, err)
+	if err := util.ParseUUID(profileID); err != nil {
+		helper.ErrorResponseEncode(w, _error.HttpErrString(response.CodeCompanyName[response.CM04], response.CM04))
 		return
 	}
 
-	resp, err := b.balanceUsecase.GetByProfileID(r.Context(), profileID)
+	balance, err := p.balanceUsecase.GetOrCreateByProfileID(r.Context(), profileID)
 	if err != nil {
-		if errors.Is(err, usecase_old.BalanceNotExist) {
+		if errors.Is(err, usecase.BalanceNotExist) {
 			err = _error.HttpErrString(response.CodeCompanyName[response.CM01], response.CM01)
 		}
 
@@ -42,5 +31,15 @@ func (b BalanceHandlerImpl) GetByProfileID(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	resp := &schema.ResponseBalance{
+		ID:                        balance.ID,
+		ProfileID:                 balance.ProfileID,
+		TotalIncomeAmount:         balance.TotalIncomeAmount,
+		TotalIncomeAmountFormat:   balance.TotalIncomeAmountFormat,
+		TotalSpendingAmount:       balance.TotalSpendingAmount,
+		TotalSpendingAmountFormat: balance.TotalSpendingAmountFormat,
+		Balance:                   balance.Balance,
+		BalanceFormat:             balance.BalanceFormat,
+	}
 	helper.SuccessResponseEncode(w, resp, "data balance profil")
 }

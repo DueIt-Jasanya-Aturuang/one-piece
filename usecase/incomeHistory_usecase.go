@@ -31,40 +31,40 @@ type RequestGetAllIncomeHistoryWithISD struct {
 
 type RequestCreateIncomeHistory struct {
 	ProfileID             string
-	IncomeTypeID          string `json:"income_type_id"`
-	PaymentMethodID       string `json:"payment_method_id"`
-	PaymentName           string `json:"payment_name"`
-	IncomeAmount          int    `json:"income_amount"`
-	Description           string `json:"description"`
-	TimeIncomeHistory     string `json:"time_income_history"`
-	ShowTimeIncomeHistory string `json:"show_time_income_history"`
+	IncomeTypeID          string
+	PaymentMethodID       string
+	PaymentName           string
+	IncomeAmount          int
+	Description           string
+	TimeIncomeHistory     string
+	ShowTimeIncomeHistory string
 }
 
 type RequestUpdateIncomeHistory struct {
 	ID                    string
 	ProfileID             string
-	IncomeTypeID          string `json:"income_type_id"`
-	PaymentMethodID       string `json:"payment_method_id"`
-	PaymentName           string `json:"payment_name"`
-	IncomeAmount          int    `json:"income_amount"`
-	Description           string `json:"description"`
-	TimeIncomeHistory     string `json:"time_income_history"`
-	ShowTimeIncomeHistory string `json:"show_time_income_history"`
+	IncomeTypeID          string
+	PaymentMethodID       string
+	PaymentName           string
+	IncomeAmount          int
+	Description           string
+	TimeIncomeHistory     string
+	ShowTimeIncomeHistory string
 }
 
 type ResponseIncomeHistory struct {
-	ID                    string    `json:"id"`
-	ProfileID             string    `json:"profile_id"`
-	IncomeTypeID          string    `json:"income_type_id"`
-	IncomeTypeTitle       string    `json:"income_type_title"`
-	PaymentMethodID       *string   `json:"payment_method_id"`
-	PaymentMethodName     *string   `json:"payment_method_name"`
-	PaymentName           *string   `json:"payment_name"`
-	IncomeAmount          int       `json:"income_amount"`
-	FormatIncomeAmount    string    `json:"format_income_amount"`
-	Description           string    `json:"description"`
-	TimeIncomeHistory     time.Time `json:"time_income_history"`
-	ShowTimeIncomeHistory string    `json:"show_time_income_history"`
+	ID                    string
+	ProfileID             string
+	IncomeTypeID          string
+	IncomeTypeTitle       string
+	PaymentMethodID       *string
+	PaymentMethodName     *string
+	PaymentName           *string
+	IncomeAmount          int
+	FormatIncomeAmount    string
+	Description           string
+	TimeIncomeHistory     time.Time
+	ShowTimeIncomeHistory string
 }
 
 func (req *RequestCreateIncomeHistory) ToModel() *repository.IncomeHistory {
